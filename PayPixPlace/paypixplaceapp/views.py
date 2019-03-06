@@ -1,8 +1,25 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+
+posts = [
+    {
+        'user': 'SpicyPaper',
+        'pix_number': '3500'
+    },
+    {
+        'user': 'Kurokabe',
+        'pix_number': '200'
+    },
+    {
+        'user': 'Lorkii',
+        'pix_number': '1080'
+    }
+]
 
 def home(request):
-    return HttpResponse('<h1>PayPixPlay Home</h1>')
+    context = {
+        'posts': posts
+    }
+    return render(request, 'paypixplaceapp/home.html', context)
 
 def createCanvas(request):
-    return HttpResponse('<h1>PayPixPlay Create Canvas</h1>')
+    return render(request, 'paypixplaceapp/create_canvas.html')
