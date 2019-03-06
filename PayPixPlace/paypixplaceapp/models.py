@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 class Role(models.Model):
     name = models.CharField(max_length=30)
@@ -6,16 +7,16 @@ class Role(models.Model):
 class Color(models.Model):
     hex = models.CharField(max_length=9)
 
-class User(models.Model):
+class User(AbstractUser):
     email = models.CharField(max_length=255)
     pseudo = models.CharField(max_length=30)
     password = models.CharField(max_length=255)
-    pix = models.IntegerField()
-    max_ammo = models.IntegerField()
-    ammo = models.IntegerField()
-    last_ammo_usage = models.IntegerField()
-    ammo_reloading_seconds = models.IntegerField()   
-    role_id = models.ForeignKey(Role, on_delete=models.CASCADE) 
+    pix = models.IntegerField(default=200)
+    max_ammo = models.IntegerField(default=3)
+    ammo = models.IntegerField(default=3)
+    last_ammo_usage = models.IntegerField(null=True)
+    ammo_reloading_seconds = models.IntegerField(default=60)   
+    role_id = models.ForeignKey(Role, on_delete=models.CASCADE, null=True) 
     owns = models.ManyToManyField(Color)
 
 class Pixie(models.Model):
