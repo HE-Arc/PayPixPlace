@@ -23,3 +23,5 @@ def home(request):
 
 def createCanvas(request):
     return render(request, 'paypixplaceapp/create_canvas.html')
+
+
