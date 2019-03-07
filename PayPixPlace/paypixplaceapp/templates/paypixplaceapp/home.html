@@ -1,14 +1,10 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>PayPixPlace - Home</title>
-</head>
-<body>
+{% extends "paypixplaceapp/base.html" %}
+{% block content %}
+    
     <h1>PayPixPlace - Home</h1>
     {% for post in posts %}
         <h2>{{ post.user }}</h2>
-        <p></p>
+        <p>PIX number : {{ post.pix_number }}</p>
     {% endfor %}
-</body>
-</html>
+    
+{% endblock content %}
