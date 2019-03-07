@@ -2,9 +2,11 @@
 {% block content %}
     
     <h1>PayPixPlace - Home</h1>
-    {% for post in posts %}
-        <h2>{{ post.user }}</h2>
-        <p>PIX number : {{ post.pix_number }}</p>
+    {% for user in users %}
+        <h2>Username : {{ user.username }}</h2>
+        <p>Email : {{ user.email }}</p>
+        <p>PIX number : {{ user.pix }}</p>
+        <p>Ammo number : {{ user.ammo }}</p>
     {% endfor %}
     
 {% endblock content %}

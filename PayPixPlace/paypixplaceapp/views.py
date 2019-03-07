@@ -1,23 +1,10 @@
 from django.shortcuts import render
 
-posts = [
-    {
-        'user': 'SpicyPaper',
-        'pix_number': '3500'
-    },
-    {
-        'user': 'Kurokabe',
-        'pix_number': '200'
-    },
-    {
-        'user': 'Lorkii',
-        'pix_number': '1080'
-    }
-]
+from .models import User
 
 def home(request):
     context = {
-        'posts': posts
+        'users': User.objects.all()
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
