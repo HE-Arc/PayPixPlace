@@ -25,7 +25,9 @@ SECRET_KEY = 'ajkmec-f5=8^7zhj9m$9x++w3uz!@-d(%mf*=o14qg7foxpjo4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'paypixplace.srvz-webapp.he-arc.ch'
+]
 
 
 # Application definition
