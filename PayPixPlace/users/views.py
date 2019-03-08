@@ -1,14 +1,15 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
+from .forms import SignUpForm
 from django.contrib import messages
 
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+def signup(request):
+    if request.method == "POST":
+        form = SignUpForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}!')
+            user = form.save()
+            messages.success(request, f'Account created for {user.username}!')
             return redirect('paypixplace-home')
     else:
-        form = UserCreationForm()
-    return render(request, 'users/register.html', {'form': form})
+        form = SignUpForm()
+
+    return render(request, 'users/signup.html', {'form': form})

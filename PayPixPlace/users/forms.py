@@ -1,9 +1,17 @@
 from django import forms
-
+from django.contrib.auth.forms import UserCreationForm
 from paypixplaceapp.models import User
 
-class UserForm(forms.ModelForm):
+class SignUpForm(UserCreationForm):
+    email = forms.EmailField()
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password')
+        fields = (
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'password1',
+            'password2'
+        )
