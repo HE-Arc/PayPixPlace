@@ -26,7 +26,8 @@ SECRET_KEY = 'ajkmec-f5=8^7zhj9m$9x++w3uz!@-d(%mf*=o14qg7foxpjo4'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'paypixplace.srvz-webapp.he-arc.ch'
+    'paypixplace.srvz-webapp.he-arc.ch',
+    'localhost',
 ]
 
 
