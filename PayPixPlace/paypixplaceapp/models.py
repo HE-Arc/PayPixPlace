@@ -9,7 +9,6 @@ class Color(models.Model):
 
 class User(AbstractUser):
     email = models.CharField(max_length=255)
-    pseudo = models.CharField(max_length=30)
     password = models.CharField(max_length=255)
     pix = models.IntegerField(default=200)
     max_ammo = models.IntegerField(default=3)
