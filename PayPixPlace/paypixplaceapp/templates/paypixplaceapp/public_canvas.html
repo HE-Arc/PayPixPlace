@@ -2,23 +2,5 @@
 {% block content %}
     
     <h1>Public Canvas</h1>
-
-    {% for c in canvas %}
-        <h2>{{ c.name }}</h2>
-        <canvas id="{{c.name}}" width="{% widthratio c.width 1 10 %}" height="{% widthratio c.height 1 10 %}" style="border:1px solid #000000;">
-            Canvas are not supported
-        </canvas>
-        <script>
-            var canva = document.getElementById("{{c.name}}");
-            var ctx = canva.getContext("2d");
-            
-            {% for p in c.pixels %}
-                x = {% widthratio p.x 1 10 %};
-                y = {% widthratio p.y 1 10 %};
-                ctx.fillStyle = "{{p.hex}}";
-                ctx.fillRect(x, y, 10, 10);
-            {% endfor %}
-        </script>
-    {% endfor %}
     
 {% endblock content %}

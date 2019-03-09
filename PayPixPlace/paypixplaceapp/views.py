@@ -29,7 +29,7 @@ def createCanvas(request):
             # ...
             # redirect to a new URL:
             create_canvas_in_db(request)
-            return redirect('paypixplace-publiccanvas')
+            return redirect('paypixplace-communitycanvas')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -45,14 +45,13 @@ def createCanvas(request):
 def publicCanvas(request):
     context = {
         'title': 'Public Canvas',
-        'users': User.objects.all(),
-        'canvas' : getCanvas(),
     }
     return render(request, 'paypixplaceapp/public_canvas.html', context)
 
 def communityCanvas(request):
     context = {
-        'title': 'Community Canvas'
+        'title': 'Community Canvas',
+        'canvas' : getCanvas(),
     }
     return render(request, 'paypixplaceapp/community_canvas.html', context)
 
