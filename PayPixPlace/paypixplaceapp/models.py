@@ -15,7 +15,7 @@ class User(AbstractUser):
     ammo = models.IntegerField(default=3)
     last_ammo_usage = models.IntegerField(null=True)
     ammo_reloading_seconds = models.IntegerField(default=60)   
-    role_id = models.ForeignKey(Role, on_delete=models.CASCADE, null=True) 
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True) 
     owns = models.ManyToManyField(Color)
 
 class Pixie(models.Model):
@@ -25,8 +25,8 @@ class Pixie(models.Model):
     bonus = models.IntegerField()
 
 class Purchase(models.Model):
-    pixie_id = models.ForeignKey(Pixie, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    pixie = models.ForeignKey(Pixie, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     purchase_date = models.DateField()
 
 class Canvas(models.Model):
@@ -36,15 +36,15 @@ class Canvas(models.Model):
     width = models.IntegerField()
     height = models.IntegerField()
     is_profit_on = models.BooleanField()
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
 class Pixel(models.Model):
     x = models.IntegerField()
     y = models.IntegerField()
     hex = models.CharField(max_length=9)
-    end_protection_date = models.DateField()
-    canvas_id = models.ForeignKey(Canvas, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    end_protection_date = models.DateField(null=True)
+    canvas = models.ForeignKey(Canvas, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True) 
 
 class Colors_pack(models.Model):
     name = models.CharField(max_length=50)
@@ -53,6 +53,6 @@ class Colors_pack(models.Model):
 
 class Slot(models.Model):
     place_num = models.IntegerField()
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    color_id = models.ForeignKey(Color, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE)
 

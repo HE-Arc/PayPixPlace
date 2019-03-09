@@ -1,4 +1,10 @@
 {% extends "paypixplaceapp/base.html" %}
 {% block content %}
 	<h1>PayPixPlace - Create Canvas</h1>
+
+	<form action="./" method="post">
+		{% csrf_token %}
+		{{ form.as_p }}
+		<input type="submit" value="Submit">
+	</form>
 {% endblock content %}
