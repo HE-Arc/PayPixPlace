@@ -31,3 +31,9 @@ def privateCanvas(request):
         'title': 'Private Canvas'
     }
     return render(request, 'paypixplaceapp/private_canvas.html', context)
+
+def purchasePix(request):
+    context = {
+        'title': 'Purchase PIX'
+    }
+    return render(request, 'paypixplaceapp/purchase_pix.html', context)

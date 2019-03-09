@@ -7,4 +7,5 @@ urlpatterns = [
     path('canvas/public/', views.publicCanvas, name='paypixplace-publiccanvas'),
     path('canvas/community/', views.communityCanvas, name='paypixplace-communitycanvas'),
     path('canvas/private/', views.privateCanvas, name='paypixplace-privatecanvas'),
+    path('purchase_pix/', views.purchasePix, name='paypixplace-purchasepix'),
 ]
