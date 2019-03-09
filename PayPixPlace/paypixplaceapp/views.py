@@ -2,15 +2,21 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 
-from .models import User
-
-from .models import Canvas, Pixel
+from .models import User, Canvas, Pixel
 
 from .forms import CreateCanvas
 
+def getCanvas():
+    canvas = Canvas.objects.all()
+    for c in canvas:
+        c.pixels = Pixel.objects.filter(canvas=c.id)
+    return canvas
+
+
 def home(request):
     context = {
-        'users': User.objects.all()
+        'users': User.objects.all(),
+        'canvas' : getCanvas(),
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
