@@ -1,10 +1,11 @@
 {% extends "paypixplaceapp/base.html" %}
+{% load crispy_forms_tags %}
 {% block content %}
 	<h1>PayPixPlace - Create Canvas</h1>
 
 	<form action="./" method="post">
 		{% csrf_token %}
-		{{ form.as_p }}
+		{{ form|crispy }}
 		<input type="submit" value="Submit">
 	</form>
 {% endblock content %}

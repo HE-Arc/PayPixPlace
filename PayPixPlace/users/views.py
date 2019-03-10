@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import RegisterForm
+from .forms import RegisterForm, UpdateForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
@@ -17,7 +17,17 @@ def register(request):
 
 @login_required
 def profile(request):
+    if request.method == 'POST':
+        u_form = UpdateForm(request.POST, instance=request.user)
+        if u_form.is_valid():
+            u_form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('profile')
+    else:
+        u_form = UpdateForm(instance=request.user)
+
     context = {
-        'title': 'Profile'
+        'title': 'Profile',
+        'u_form': u_form
     }
     return render(request, 'users/profile.html', context)

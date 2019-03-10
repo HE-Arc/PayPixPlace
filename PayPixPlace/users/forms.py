@@ -15,3 +15,15 @@ class RegisterForm(UserCreationForm):
             'password1',
             'password2'
         )
+
+class UpdateForm(forms.ModelForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'first_name',
+            'last_name',
+            'email'
+        )
