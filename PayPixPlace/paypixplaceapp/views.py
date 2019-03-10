@@ -1,9 +1,6 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-
+from django.views.generic import ListView, DetailView
 from .models import User, Canvas, Pixel
-
 from .forms import CreateCanvas
 
 def home(request):
@@ -11,6 +8,22 @@ def home(request):
         'title': 'Home',
     }
     return render(request, 'paypixplaceapp/home.html', context)
+
+class CanvasView(ListView):
+    model = Canvas
+    template_name = 'paypixplaceapp/canvas/community_canvas.html'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['title'] = 'Community Canvas'
+        context['canvas'] = getCanvas()
+        return context
+
+class CanvasDetailsView(DetailView):
+    model = Canvas
+    template_name = 'paypixplaceapp/canvas/canvas_detail.html'
 
 def getCanvas():
     canvas = Canvas.objects.all()
@@ -40,20 +53,25 @@ def createCanvas(request):
         'form': form
     }
 
-    return render(request, 'paypixplaceapp/create_canvas.html', context)
+    return render(request, 'paypixplaceapp/canvas/create_canvas.html', context)
 
 def publicCanvas(request):
     context = {
         'title': 'Public Canvas',
     }
-    return render(request, 'paypixplaceapp/public_canvas.html', context)
+    return render(request, 'paypixplaceapp/canvas/public_canvas.html', context)
 
-def communityCanvas(request):
+def privateCanvas(request):
     context = {
-        'title': 'Community Canvas',
-        'canvas' : getCanvas(),
+        'title': 'Private Canvas'
     }
-    return render(request, 'paypixplaceapp/community_canvas.html', context)
+    return render(request, 'paypixplaceapp/canvas/private_canvas.html', context)
+
+def purchasePix(request):
+    context = {
+        'title': 'Purchase PIX'
+    }
+    return render(request, 'paypixplaceapp/purchase_pix.html', context)
 
 def create_canvas_in_db(request):
 
@@ -74,8 +92,7 @@ def create_canvas_in_db(request):
 
     instances = [create_pixel(x, y, "#FFFFFF", canvas_id) for x in range(width) for y in range(height)]
     Pixel.objects.bulk_create(instances)            
-            
-
+      
 def create_pixel(x, y, hex, canvas_id):
     p = Pixel()
     p.x = x
@@ -83,14 +100,3 @@ def create_pixel(x, y, hex, canvas_id):
     p.hex = hex
     p.canvas_id = canvas_id
     return p
-def privateCanvas(request):
-    context = {
-        'title': 'Private Canvas'
-    }
-    return render(request, 'paypixplaceapp/private_canvas.html', context)
-
-def purchasePix(request):
-    context = {
-        'title': 'Purchase PIX'
-    }
-    return render(request, 'paypixplaceapp/purchase_pix.html', context)
