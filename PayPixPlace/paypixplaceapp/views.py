@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from .models import User, Canvas, Pixel
 from .forms import CreateCanvas
+from datetime import datetime
+from django.http import JsonResponse
 
 def home(request):
     context = {
@@ -100,3 +102,24 @@ def create_pixel(x, y, hex, canvas_id):
     p.hex = hex
     p.canvas_id = canvas_id
     return p
+
+def change_pixel_color(request):
+    canvas_id = request.GET.get('canvas_id')
+    x = request.GET.get('x')
+    y = request.GET.get('y')
+    hex = request.GET.get('hex')
+    user = request.user
+
+    current_date = datetime.now()
+
+    pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
+    if pixel.end_protection_date is None or current_date > pixel.end_protection_date:
+        pixel.hex = hex
+        pixel.user = user
+        pixel.save()
+
+    # TODO send user confirmation
+    data = {
+        'is_taken': "Element modified"
+    }
+    return JsonResponse(data)

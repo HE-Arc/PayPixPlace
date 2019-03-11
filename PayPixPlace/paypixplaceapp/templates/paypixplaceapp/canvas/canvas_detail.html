@@ -17,6 +17,30 @@
             ctx.fillStyle = "{{p.hex}}";
             ctx.fillRect(x, y, 10, 10);
         {% endfor %}
+
+        canva.addEventListener('click', function(event) { 
+            var rect = canva.getBoundingClientRect();
+            var x = parseInt((event.clientX - rect.left) / 10);
+            var y = parseInt((event.clientY - rect.top) / 10);
+
+            $.ajax({
+                type: 'GET',
+                url: '/change_pixel_color/',
+                data: {
+                'canvas_id': {{ object.id }},
+                'x': x,
+                'y': y,
+                'hex': '#00FF00',
+                },
+                dataType: 'json',
+                success: function (data) {
+                if (data.is_taken) {
+                    alert("ELEMENT MODIFIED");
+                }
+                }
+            });
+
+        }, false);
     </script>
     
 {% endblock content %}
