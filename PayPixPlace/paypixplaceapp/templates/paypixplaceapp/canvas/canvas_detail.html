@@ -11,7 +11,7 @@
         var canva = document.getElementById("{{ object.name }}");
         var ctx = canva.getContext("2d");
         
-        {% for p in object.pixels %}
+        {% for p in object.pixel_set.all %}
             x = {% widthratio p.x 1 10 %};
             y = {% widthratio p.y 1 10 %};
             ctx.fillStyle = "{{p.hex}}";

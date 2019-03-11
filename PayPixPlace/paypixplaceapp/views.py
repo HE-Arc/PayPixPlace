@@ -42,7 +42,7 @@ def createCanvas(request):
             # ...
             # redirect to a new URL:
             create_canvas_in_db(request)
-            return redirect('paypixplace-communitycanvas')
+            return redirect('canvas-community')
 
     # if a GET (or any other method) we'll create a blank form
     else:
