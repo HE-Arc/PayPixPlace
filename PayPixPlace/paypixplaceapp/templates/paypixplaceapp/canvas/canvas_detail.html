@@ -4,6 +4,20 @@
     <h1>Community Canvas</h1>
     
     <h2>{{ object.name }}</h2>
+    <p>Canvas Theme : {{ object.theme }}</p>
+    <p>Canvas Place : 
+        {% if object.place == 0 %}
+            Public
+        {% elif object.place == 1 %}
+            Community
+        {% elif object.place == 2 %}
+            Private
+        {% else %}
+            Invalid
+        {% endif %}
+    </p>
+    <p>Is Profit On : {{ object.is_profit_on }}</p>
+
     <canvas id="{{ object.name }}" width="{% widthratio object.width 1 10 %}" height="{% widthratio object.height 1 10 %}" style="border:1px solid #000000;">
         Canvas are not supported
     </canvas>

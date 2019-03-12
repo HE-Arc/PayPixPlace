@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
+from django.contrib import messages
 from .models import User, Canvas, Pixel
 from .forms import CreateCanvas
 
@@ -38,11 +39,17 @@ def createCanvas(request):
         form = CreateCanvas(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            create_canvas_in_db(request)
-            return redirect('paypixplace-communitycanvas')
+            # create_canvas_in_db(request)
+
+            canvas = form.save(commit=False)
+            canvas.user = request.user
+            canvas.save()
+
+            instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.height)]
+            Pixel.objects.bulk_create(instances)  
+
+            messages.success(request, f'You create a new canvas successfully!')
+            return redirect('canvas-community')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -71,27 +78,7 @@ def purchasePix(request):
     context = {
         'title': 'Purchase PIX'
     }
-    return render(request, 'paypixplaceapp/purchase_pix.html', context)
-
-def create_canvas_in_db(request):
-
-    width = 10
-    height = 10
-
-    newCanvas = Canvas()
-    newCanvas.name = request.POST['canvas_name']
-    # TODO change the default parameters when the form will be completed
-    newCanvas.theme = ""
-    newCanvas.place = 0
-    newCanvas.width = width
-    newCanvas.height = height
-    newCanvas.is_profit_on = False
-    newCanvas.save()
-
-    canvas_id = Canvas.objects.latest('id').id
-
-    instances = [create_pixel(x, y, "#FFFFFF", canvas_id) for x in range(width) for y in range(height)]
-    Pixel.objects.bulk_create(instances)            
+    return render(request, 'paypixplaceapp/purchase_pix.html', context)        
       
 def create_pixel(x, y, hex, canvas_id):
     p = Pixel()
