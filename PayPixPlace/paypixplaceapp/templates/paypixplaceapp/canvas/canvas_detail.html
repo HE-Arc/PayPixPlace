@@ -4,14 +4,38 @@
     <h1>Community Canvas</h1>
     
     <h2>{{ object.name }}</h2>
-    <canvas id="canvas" width="5000" height="5000">
-        Canvas are not supported
-    </canvas>
+    <div class="colorSelector">
+        <div id="picker1">
+
+        </div>
+        <div id="picker2">
+
+        </div>
+        <div id="picker3">
+
+        </div>
+    </div>
+    <div style="overflow : hidden;">
+        <canvas id="canvas" width="5000" height="5000">
+                Canvas are not supported
+        </canvas>
+    </div>
     <style>
         #canvas {
             border:1px solid #000000;
             transform-origin: 0 0;
             cursor: pointer;
+        }
+        .colorSelector > div {
+            width: 50px;
+            height: 50px;
+            background-color: blueviolet;
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .colorSelector > div:hover {
+            border: solid 2px black;
         }
     </style>
     <script>
@@ -21,6 +45,27 @@
         let pixelWidth = 5000 / {{ object.width }};
 
         let scale = 0.1;
+
+        let drawingColor = "#FF0000";
+
+        let pickers = [
+            document.getElementById("picker1"),
+            document.getElementById("picker2"),
+            document.getElementById("picker3")
+        ];
+
+        let colors = [
+            "#FF0000",
+            "#00FF00",
+            "#0000FF"
+        ];
+
+        for (let i = 0 ; i < pickers.length ; i++) {
+            pickers[i].style.backgroundColor = colors[i];
+            pickers[i].addEventListener('click', function() {
+                setDrawingColor(i);
+            }, false);
+        }
 
         function drawPixels() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -39,6 +84,18 @@
             canvas.style.transform = "scale(" + scale + ")";
         }
 
+        function setDrawingColor(id) {
+            drawingColor = colors[id];
+        }
+
+        function hexToRgb(hex) {
+            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
         canvas.addEventListener('click', function(event) {
             let x = parseInt((event.offsetX) / pixelWidth);
             let y = parseInt((event.offsetY) / pixelWidth);
@@ -50,12 +107,12 @@
                     'canvas_id': {{ object.id }},
                     'x': x,
                     'y': y,
-                    'hex': '#00FF00',
+                    'hex': drawingColor,
                 },
                 dataType: 'json',
                 success: function (data) {
                     if (data.is_taken) {
-                        location.reload();
+                        location.reload(); // will change later
                     }
                 }
             });
@@ -66,10 +123,18 @@
             let x = parseInt((event.offsetX) / pixelWidth);
             let y = parseInt((event.offsetY) / pixelWidth);
             drawPixels();
-            ctx.lineWidth = 1/scale;
+            ctx.lineWidth = 1 / scale;
+            let c = hexToRgb(drawingColor);
+            ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
+            ctx.fillRect(
+                x * pixelWidth, 
+                y * pixelWidth, 
+                pixelWidth,
+                pixelWidth
+            );
             ctx.strokeRect(
-                x*pixelWidth, 
-                y*pixelWidth, 
+                x * pixelWidth, 
+                y * pixelWidth, 
                 pixelWidth, 
                 pixelWidth
             );
