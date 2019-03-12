@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Role(models.Model):
     name = models.CharField(max_length=30)
@@ -33,8 +34,8 @@ class Canvas(models.Model):
     name = models.CharField(max_length=50)
     theme = models.CharField(max_length=50)
     place = models.SmallIntegerField()
-    width = models.IntegerField()
-    height = models.IntegerField()
+    width = models.IntegerField(default=20, validators=[ MaxValueValidator(300), MinValueValidator(10) ])
+    height = models.IntegerField(default=20, validators=[ MaxValueValidator(300), MinValueValidator(10) ])
     is_profit_on = models.BooleanField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 

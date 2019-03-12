@@ -1,11 +1,11 @@
 {% extends "paypixplaceapp/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-	<h1>PayPixPlace - Create Canvas</h1>
 
-	<form action="./" method="post">
-		{% csrf_token %}
-		{{ form|crispy }}
-		<input type="submit" value="Submit">
-	</form>
+<div class="offset-md-2 col-md-8">
+	<fieldset class="form-group">
+		<legend class="border-bottom mb-4"><h2>Create A New Canvas</h2></legend>
+		{% crispy form %}
+	</fieldset>
+</div>
 {% endblock content %}
