@@ -53,6 +53,21 @@
         }
     </style>
     <script>
+        let pixels;
+        $(document).ready(function(){
+            $.ajax({
+                type: 'GET',
+                url: '/canvas/json',
+                data: {
+                    'id': {{ object.id }},
+                },
+                dataType: 'json',
+                success: function (data) {
+                    pixels = JSON.parse(data);
+                }
+            });
+        });
+
         let canvas = document.getElementById("canvas");
         let ctx = canvas.getContext("2d");
         
@@ -125,8 +140,8 @@
                 },
                 dataType: 'json',
                 success: function (data) {
-                    if (data.is_taken) {
-                        location.reload(); // will change later
+                    if (data.is_valid) {
+                        
                     }
                 }
             });

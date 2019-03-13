@@ -5,6 +5,7 @@ from .models import User, Canvas, Pixel
 from .forms import CreateCanvas
 from datetime import datetime
 from django.http import JsonResponse
+from django.core import serializers
 
 def home(request):
     context = {
@@ -97,14 +98,32 @@ def change_pixel_color(request):
 
     current_date = datetime.now()
 
+    modification_valid = False
+
     pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
-    if pixel.end_protection_date is None or current_date > pixel.end_protection_date:
+    if can_modify_pixel(pixel, user):
         pixel.hex = hex
         pixel.user = user
         pixel.save()
+        # user.ammo -= 1 TODO remove after enabling ammo recuperation
+        # user.save()
+        modification_valid = True
 
     # TODO send user confirmation
     data = {
-        'is_taken': "Element modified"
+        'is_valid': modification_valid,
     }
     return JsonResponse(data)
+
+def can_modify_pixel(pixel, user):
+    return (pixel.end_protection_date is None or current_date > pixel.end_protection_date) and (user.ammo > 0)
+
+def get_json(request):
+    id = request.GET.get('id')
+    if not id:
+        raise Http404
+
+    canvas = Canvas.objects.get(id=id)
+    pixels = canvas.pixel_set.all()
+    pixels_obj = serializers.serialize('json', list(pixels), fields=('x','y', 'hex', 'user'))
+    return JsonResponse(pixels_obj, safe=False)
