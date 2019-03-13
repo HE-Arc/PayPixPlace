@@ -1,7 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Div
-from crispy_forms.bootstrap import InlineRadios, PrependedText, StrictButton, InlineField
+from crispy_forms.layout import Layout
+from crispy_forms.bootstrap import InlineRadios, PrependedText, StrictButton
 from .models import Canvas
 
 class CreateCanvas(forms.ModelForm):
