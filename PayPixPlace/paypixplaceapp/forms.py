@@ -13,7 +13,7 @@ class CreateCanvas(forms.ModelForm):
 
     class Meta:
         model = Canvas
-        fields = ( 'name', 'theme', 'width', 'height', 'place', 'is_profit_on' )
+        fields = ( 'name', 'theme', 'width', 'place', 'is_profit_on' )
         labels = {
             'is_profit_on': 'Enable profit for 250 PIX! - You will get 10% of the PIX that users spent on this canvas, if this is enabled!',
         }
@@ -26,17 +26,7 @@ class CreateCanvas(forms.ModelForm):
         self.helper.layout = Layout(
             PrependedText('name', '<i class="fas fa-user"></i>'),
             PrependedText('theme', '<i class="fas fa-book"></i>'),
-            Row(
-                Column(
-                    PrependedText('width', '<i class="fas fa-arrows-alt-h"></i>'),
-                    css_class='form-group col-md-6 mb-0'
-                ),
-                Column(
-                    PrependedText('height', '<i class="fas fa-arrows-alt-v"></i>'),
-                    css_class='form-group col-md-6 mb-0'
-                ),
-                css_class='form-row'
-            ),
+            PrependedText('width', '<i class="fas fa-arrows-alt-h"></i>'),
             'is_profit_on',
             InlineRadios('place', css_class='p-0'),
             StrictButton('Create Canvas', type='submit', css_class='btn-outline-info'),

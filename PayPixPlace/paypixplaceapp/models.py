@@ -35,7 +35,6 @@ class Canvas(models.Model):
     theme = models.CharField(max_length=50)
     place = models.SmallIntegerField()
     width = models.IntegerField(default=20, validators=[ MaxValueValidator(300), MinValueValidator(10) ])
-    height = models.IntegerField(default=20, validators=[ MaxValueValidator(300), MinValueValidator(10) ])
     is_profit_on = models.BooleanField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 

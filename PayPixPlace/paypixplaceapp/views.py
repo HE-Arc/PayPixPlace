@@ -44,13 +44,18 @@ def createCanvas(request):
         if form.is_valid():
             canvas = form.save(commit=False)
             canvas.user = request.user
-            canvas.save()
 
-            instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.height)]
-            Pixel.objects.bulk_create(instances)  
+            # Check if the given place is a valid one
+            if canvas.place >= 0 and canvas.place <= 2:
+                canvas.save()
 
-            messages.success(request, f'You create a new canvas successfully!')
-            return redirect('canvas-community')
+                instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
+                Pixel.objects.bulk_create(instances)  
+
+                messages.success(request, f'You create a new canvas successfully!')
+                return redirect('canvas-community')
+            else:
+                messages.error(request, f'The place is invalid!')
 
     # if a GET (or any other method) we'll create a blank form
     else:
