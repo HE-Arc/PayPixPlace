@@ -48,6 +48,8 @@
 
         let drawingColor = "#FF0000";
 
+        let displayGrid = false;
+
         let pickers = [
             document.getElementById("picker1"),
             document.getElementById("picker2"),
@@ -70,13 +72,23 @@
         function drawPixels() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             {% for p in object.pixel_set.all %}
-            ctx.fillStyle = "{{p.hex}}";
-            ctx.fillRect(
-                {{ p.x }} * pixelWidth, 
-                {{ p.y }} * pixelWidth, 
-                pixelWidth,
-                pixelWidth
-            );
+                ctx.fillStyle = "{{p.hex}}";
+                ctx.fillRect(
+                    {{ p.x }} * pixelWidth, 
+                    {{ p.y }} * pixelWidth, 
+                    pixelWidth,
+                    pixelWidth
+                );
+                if (displayGrid) {
+                    ctx.lineWidth = 1 / scale;
+                    ctx.strokeStyle = "rgba( 128, 128, 128, 0.1)";
+                    ctx.strokeRect(
+                        {{ p.x }} * pixelWidth, 
+                        {{ p.y }} * pixelWidth, 
+                        pixelWidth, 
+                        pixelWidth
+                    );
+                }
             {% endfor %}
         }
         
