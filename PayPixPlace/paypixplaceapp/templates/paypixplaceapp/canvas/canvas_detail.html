@@ -53,13 +53,16 @@
         }
     </style>
     <script>
+        const canvasId = {{ object.id }};
+    </script>
+    <script>
         let pixels;
         $(document).ready(function(){
             $.ajax({
                 type: 'GET',
                 url: '/canvas/json',
                 data: {
-                    'id': {{ object.id }},
+                    'id': canvasId,
                 },
                 dataType: 'json',
                 success: function (data) {
