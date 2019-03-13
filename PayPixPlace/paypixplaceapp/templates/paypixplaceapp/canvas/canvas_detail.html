@@ -1,4 +1,5 @@
 {% extends "paypixplaceapp/base.html" %}
+{% load staticfiles %}
 {% block content %}
     
     <h1>Community Canvas</h1>
@@ -30,13 +31,13 @@
         </div>
     </div>
     <div style="overflow : hidden;">
-        <canvas id="canvas" width="5000" height="5000">
+        <canvas id="canvas" width="4000" height="4000">
                 Canvas are not supported
         </canvas>
     </div>
     <style>
         #canvas {
-            border:1px solid #000000;
+            border:50px solid #000000;
             transform-origin: 0 0;
             cursor: pointer;
         }
@@ -54,148 +55,8 @@
     </style>
     <script>
         const canvasId = {{ object.id }};
+        const pixelWidth = 4000 / {{ object.width }};
     </script>
-    <script>
-        let pixels;
-        $(document).ready(function(){
-            $.ajax({
-                type: 'GET',
-                url: '/canvas/json',
-                data: {
-                    'id': canvasId,
-                },
-                dataType: 'json',
-                success: function (data) {
-                    pixels = JSON.parse(data);
-                }
-            });
-        });
-
-        let canvas = document.getElementById("canvas");
-        let ctx = canvas.getContext("2d");
-        
-        let pixelWidth = 5000 / {{ object.width }};
-
-        let scale = 0.1;
-
-        let drawingColor = "#FF0000";
-
-        let displayGrid = false;
-
-        let pickers = [
-            document.getElementById("picker1"),
-            document.getElementById("picker2"),
-            document.getElementById("picker3")
-        ];
-
-        let colors = [
-            "#FF0000",
-            "#00FF00",
-            "#0000FF"
-        ];
-
-        for (let i = 0 ; i < pickers.length ; i++) {
-            pickers[i].style.backgroundColor = colors[i];
-            pickers[i].addEventListener('click', function() {
-                setDrawingColor(i);
-            }, false);
-        }
-
-        function drawPixels() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            {% for p in object.pixel_set.all %}
-                ctx.fillStyle = "{{p.hex}}";
-                ctx.fillRect(
-                    {{ p.x }} * pixelWidth, 
-                    {{ p.y }} * pixelWidth, 
-                    pixelWidth,
-                    pixelWidth
-                );
-                if (displayGrid) {
-                    ctx.lineWidth = 1 / scale;
-                    ctx.strokeStyle = "rgba( 128, 128, 128, 0.1)";
-                    ctx.strokeRect(
-                        {{ p.x }} * pixelWidth, 
-                        {{ p.y }} * pixelWidth, 
-                        pixelWidth, 
-                        pixelWidth
-                    );
-                }
-            {% endfor %}
-        }
-        
-        function setCanvasScale() {
-            canvas.style.transform = "scale(" + scale + ")";
-        }
-
-        function setDrawingColor(id) {
-            drawingColor = colors[id];
-        }
-
-        function hexToRgb(hex) {
-            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16)
-            } : null;
-        }
-        canvas.addEventListener('click', function(event) {
-            let x = parseInt((event.offsetX) / pixelWidth);
-            let y = parseInt((event.offsetY) / pixelWidth);
-
-            $.ajax({
-                type: 'GET',
-                url: '/change_pixel_color/',
-                data: {
-                    'canvas_id': {{ object.id }},
-                    'x': x,
-                    'y': y,
-                    'hex': drawingColor,
-                },
-                dataType: 'json',
-                success: function (data) {
-                    if (data.is_valid) {
-                        
-                    }
-                }
-            });
-
-        }, false);
-
-        canvas.addEventListener("mousemove", function() {
-            let x = parseInt((event.offsetX) / pixelWidth);
-            let y = parseInt((event.offsetY) / pixelWidth);
-            drawPixels();
-            ctx.lineWidth = 1 / scale;
-            let c = hexToRgb(drawingColor);
-            ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
-            ctx.fillRect(
-                x * pixelWidth, 
-                y * pixelWidth, 
-                pixelWidth,
-                pixelWidth
-            );
-            ctx.strokeRect(
-                x * pixelWidth, 
-                y * pixelWidth, 
-                pixelWidth, 
-                pixelWidth
-            );
-        }, false);
-
-        canvas.addEventListener("mouseleave", function() {
-            drawPixels();
-        }, false);
-
-        canvas.addEventListener("wheel", function(e) {
-            e.deltaY < 0 ? scale *= 1.2 : scale /= 1.2;
-            setCanvasScale();
-            e.preventDefault();
-        }, false);
-
-        drawPixels();
-        setCanvasScale();
-    </script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>
     
 {% endblock content %}
