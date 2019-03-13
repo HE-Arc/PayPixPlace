@@ -2,15 +2,17 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" class="offset-md-2 col-md-8">
         {% csrf_token %}
+
         <fieldset class="form-group">
-            <legend class="border-bottom mb-4">{{ user.username }} Profile Info</legend>
+            <legend class="border-bottom mb-4"><h2>{{ user.username }} Profile Info</h2></legend>
             {{ u_form|crispy }}
+        
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Update</button>
+            </div>
         </fieldset>
-        <div class="form-group">
-            <button class="btn btn-outline-info" type="submit">Update</button>
-        </div>
     </form>
     
 {% endblock content %}
