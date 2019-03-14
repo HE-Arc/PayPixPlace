@@ -40,9 +40,9 @@ namespace :python do
   end
 end
 
-after 'deploy:published', 'django:setProd'
-after 'deploy:published', 'django:migrate'
-after 'deploy:published', 'django:collect_static'
+after 'deploy:updated', 'django:setProd'
+after 'deploy:updated', 'django:migrate'
+after 'deploy:updated', 'django:collect_static'
 
 namespace :django do
   
