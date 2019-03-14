@@ -51,14 +51,14 @@ namespace :django do
   desc 'Migrate database'
   task :migrate do
     on roles([:app, :web]) do |h|
-      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py migrate --noinput --ignore-ghost-migrations"
+      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py migrate"
     end
   end
 
   desc 'Collect static files'
   task :migrate do
     on roles([:app, :web]) do |h|
-      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py collectstatic"
+      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py collectstatic --noinput"
     end
   end
 
