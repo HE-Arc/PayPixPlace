@@ -9,7 +9,7 @@ class Color(models.Model):
     hex = models.CharField(max_length=9)
 
 class User(AbstractUser):
-    email = models.CharField(max_length=255)
+    email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     pix = models.IntegerField(default=200)
     max_ammo = models.IntegerField(default=3)
