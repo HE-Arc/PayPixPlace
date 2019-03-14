@@ -40,7 +40,9 @@ namespace :python do
   end
 end
 
-after 'deploy:published', 'django:migrate'
+after 'deploy:updated', 'django:setProd'
+after 'deploy:updated', 'django:migrate'
+after 'deploy:updated', 'django:collect_static'
 
 namespace :django do
   
@@ -51,18 +53,23 @@ namespace :django do
   desc 'Migrate database'
   task :migrate do
     on roles([:app, :web]) do |h|
-      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py migrate --noinput --ignore-ghost-migrations"
+      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py migrate"
     end
   end
 
   desc 'Collect static files'
-  task :migrate do
+  task :collect_static do
     on roles([:app, :web]) do |h|
-      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py collectstatic"
+      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py collectstatic --noinput"
     end
   end
 
-
+  desc 'set debug to False'
+  task :setProd do
+    on roles([:app, :web]) do |h|
+      execute "sed -i 's/DEBUG = True/DEBUG = False/g' #{release_path}/PayPixPlace/PayPixPlace/settings.py"
+    end
+  end
 end
 
 # Default branch is :master
