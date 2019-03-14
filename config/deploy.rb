@@ -40,13 +40,14 @@ namespace :python do
   end
 end
 
-#after 'python:create_venv', 'django:migrate'
+after 'deploy:published', 'django:migrate'
 
 namespace :django do
 
   desc 'Migrate database'
   task :migrate do
     on roles([:app, :web]) do |h|
+      execute "source #{venv_path}/bin/activate"
       execute "python3.6 #{release_path}/PayPixPlace/manage.py migrate"
     end
   end
