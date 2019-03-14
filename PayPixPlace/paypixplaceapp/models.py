@@ -14,7 +14,7 @@ class User(AbstractUser):
     pix = models.IntegerField(default=200)
     max_ammo = models.IntegerField(default=3)
     ammo = models.IntegerField(default=3)
-    last_ammo_usage = models.IntegerField(null=True)
+    last_ammo_reload = models.DateTimeField(null=True)
     ammo_reloading_seconds = models.IntegerField(default=60)   
     role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True) 
     owns = models.ManyToManyField(Color)
@@ -42,7 +42,7 @@ class Pixel(models.Model):
     x = models.IntegerField()
     y = models.IntegerField()
     hex = models.CharField(max_length=9)
-    end_protection_date = models.DateField(null=True)
+    end_protection_date = models.DateTimeField(null=True)
     canvas = models.ForeignKey(Canvas, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True) 
 

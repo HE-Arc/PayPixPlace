@@ -3,14 +3,31 @@ from django.views.generic import ListView, DetailView
 from django.contrib import messages
 from .models import User, Canvas, Pixel
 from .forms import CreateCanvas
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.core import serializers
+from django.utils import timezone
+
+from background_task import background
+
+@background(schedule=60)
+def refill_user_ammo(id):
+    user = User.objects.get(id=id)
+    now = timezone.now()
+    if user:
+        if user.last_ammo_reload is None:
+            user.last_ammo_reload = now
+        while user.last_ammo_reload < now and user.ammo < user.max_ammo:
+            user.ammo += 1
+            user.last_ammo_reload = user.last_ammo_reload + timedelta(seconds=user.ammo_reloading_seconds)
+            user.save()
+
 
 def home(request):
     context = {
         'title': 'Home',
     }
+    refill_user_ammo(request.user.id, repeat=10)
     return render(request, 'paypixplaceapp/home.html', context)
 
 class CanvasView(ListView):
@@ -101,8 +118,6 @@ def change_pixel_color(request):
     hex = request.GET.get('hex')
     user = request.user
 
-    current_date = datetime.now()
-
     modification_valid = False
 
     pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
@@ -110,8 +125,8 @@ def change_pixel_color(request):
         pixel.hex = hex
         pixel.user = user
         pixel.save()
-        # user.ammo -= 1 TODO remove after enabling ammo recuperation
-        # user.save()
+        user.ammo -= 1 #TODO remove after enabling ammo recuperation
+        user.save()
         modification_valid = True
 
     # TODO send user confirmation
@@ -121,6 +136,7 @@ def change_pixel_color(request):
     return JsonResponse(data)
 
 def can_modify_pixel(pixel, user):
+    current_date = datetime.now()
     return (pixel.end_protection_date is None or current_date > pixel.end_protection_date) and (user.ammo > 0)
 
 def get_json(request):
