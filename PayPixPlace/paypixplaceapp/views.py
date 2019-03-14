@@ -6,6 +6,11 @@ from .forms import CreateCanvas
 from datetime import datetime
 from django.http import JsonResponse
 from django.core import serializers
+from enum import IntEnum
+
+class Place(IntEnum):
+    PUBLIC = 0
+    COMMUNITY = 1
 
 def home(request):
     context = {
@@ -22,15 +27,15 @@ class CanvasView(ListView):
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context['title'] = 'Community Canvas'
-        context['canvas'] = getCanvas()
+        context['canvas'] = getCanvas(Place.COMMUNITY)
         return context
 
 class CanvasDetailsView(DetailView):
     model = Canvas
     template_name = 'paypixplaceapp/canvas/canvas_detail.html'
 
-def getCanvas():
-    canvas = Canvas.objects.all()
+def getCanvas(place):
+    canvas = Canvas.objects.filter(place=int(place))
     for c in canvas:
         c.pixels = Pixel.objects.filter(canvas=c.id)
     return canvas
@@ -53,7 +58,11 @@ def createCanvas(request):
                 Pixel.objects.bulk_create(instances)  
 
                 messages.success(request, f'You create a new canvas successfully!')
-                return redirect('canvas-community')
+
+                if canvas.place == int(Place.COMMUNITY):
+                    return redirect('canvas-community')
+                else:
+                    return redirect('canvas-public')
             else:
                 messages.error(request, f'The place is invalid!')
 
@@ -71,6 +80,7 @@ def createCanvas(request):
 def publicCanvas(request):
     context = {
         'title': 'Public Canvas',
+        'canvas': getCanvas(Place.PUBLIC)
     }
     return render(request, 'paypixplaceapp/canvas/public_canvas.html', context)
 
