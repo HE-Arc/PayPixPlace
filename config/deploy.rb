@@ -43,14 +43,26 @@ end
 after 'deploy:published', 'django:migrate'
 
 namespace :django do
+  
+  def venv_path
+    File.join(shared_path, 'env')
+  end
 
   desc 'Migrate database'
   task :migrate do
     on roles([:app, :web]) do |h|
-      execute "source #{venv_path}/bin/activate"
-      execute "python3.6 #{release_path}/PayPixPlace/manage.py migrate"
+      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py migrate --noinput --ignore-ghost-migrations"
     end
   end
+
+  desc 'Collect static files'
+  task :migrate do
+    on roles([:app, :web]) do |h|
+      execute "#{venv_path}/bin/python #{release_path}/PayPixPlace/manage.py collectstatic"
+    end
+  end
+
+
 end
 
 # Default branch is :master
