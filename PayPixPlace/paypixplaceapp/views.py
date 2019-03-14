@@ -4,11 +4,12 @@ from django.contrib import messages
 from .models import User, Canvas, Pixel
 from .forms import CreateCanvas
 from datetime import datetime
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.http.response import Http404
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
+from PIL import Image, ImageDraw
 
 def home(request):
     context = {
@@ -142,3 +143,34 @@ def get_json(request):
         'pixels': [model_to_dict(pixel) for pixel in pixels]
     }
     return JsonResponse(data, safe=False)
+
+def get_img(request):
+    id = request.GET.get('id')
+    if not id:
+        raise Http404()
+
+    try:
+        canvas = Canvas.objects.get(id=id)
+    except ObjectDoesNotExist:
+        raise Http404()
+
+    pixels = [model_to_dict(pixel) for pixel in canvas.pixel_set.all()]
+    imgSize = 1000
+    img = Image.new('RGB', (imgSize, imgSize))
+    pixelSize = imgSize // model_to_dict(canvas)["width"]
+
+    draw = ImageDraw.Draw(img)
+    for pixel in pixels:
+        draw.rectangle(
+            (
+                pixel["x"] * pixelSize,
+                pixel["y"] * pixelSize,
+                pixel["x"] * pixelSize + pixelSize,
+                pixel["y"] * pixelSize + pixelSize
+            ), fill=pixel["hex"]
+        )
+    del draw
+
+    response = HttpResponse(content_type="image/png")
+    img.save(response, "PNG")
+    return response
