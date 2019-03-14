@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.http.response import Http404
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms import model_to_dict
 
 def home(request):
     context = {
@@ -136,5 +137,8 @@ def get_json(request):
         raise Http404()
 
     pixels = canvas.pixel_set.all()
-    pixels_obj = serializers.serialize('json', list(pixels), fields=('x','y', 'hex', 'user'))
-    return JsonResponse(pixels_obj, safe=False)
+    data = {
+        'canvas': model_to_dict(canvas),
+        'pixels': [model_to_dict(pixel) for pixel in pixels]
+    }
+    return JsonResponse(data, safe=False)

@@ -6,6 +6,7 @@ let displayGrid;
 let drawingColor;
 let pickers;
 let colors;
+let pixelWidth;
 
 /**
  * Loads the pixels of the actual canvas from the database
@@ -21,7 +22,8 @@ function loadPixels() {
         },
         dataType: 'json',
         success: function (data) {
-            pixels = JSON.parse(data);
+            pixels = data.pixels;
+            pixelWidth = 4000 / data.canvas.width;
             drawPixels();
         }
     });
@@ -34,9 +36,9 @@ function drawPixels() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     for (let i = 0 ; i < pixels.length ; i++) {
-        let x = pixels[i].fields.x;
-        let y = pixels[i].fields.y;
-        let hex = pixels[i].fields.hex;
+        let x = pixels[i].x;
+        let y = pixels[i].y;
+        let hex = pixels[i].hex;
 
         ctx.fillStyle = hex;
         ctx.fillRect(
