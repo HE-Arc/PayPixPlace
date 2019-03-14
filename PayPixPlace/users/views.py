@@ -1,15 +1,21 @@
-from django.shortcuts import render, redirect
-from .forms import RegisterForm, UpdateForm
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+
+from .forms import RegisterForm, UpdateForm
 
 def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, f'Your account has been created! You are now able to log in')
-            return redirect('login')
+            new_user = form.save()
+            messages.success(request, "Thank you for registering. You are now logged in.")
+            new_user = authenticate(username=form.cleaned_data['username'],
+                                    password=form.cleaned_data['password1'],
+                                    )
+            login(request, new_user)
+            return redirect('paypixplace-home')
     else:
         form = RegisterForm()
 
