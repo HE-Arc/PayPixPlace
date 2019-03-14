@@ -5,7 +5,9 @@ from .models import User, Canvas, Pixel
 from .forms import CreateCanvas
 from datetime import datetime
 from django.http import JsonResponse
+from django.http.response import Http404
 from django.core import serializers
+from django.core.exceptions import ObjectDoesNotExist
 
 def home(request):
     context = {
@@ -126,9 +128,13 @@ def can_modify_pixel(pixel, user):
 def get_json(request):
     id = request.GET.get('id')
     if not id:
-        raise Http404
+        raise Http404()
 
-    canvas = Canvas.objects.get(id=id)
+    try:
+        canvas = Canvas.objects.get(id=id)
+    except ObjectDoesNotExist:
+        raise Http404()
+
     pixels = canvas.pixel_set.all()
     pixels_obj = serializers.serialize('json', list(pixels), fields=('x','y', 'hex', 'user'))
     return JsonResponse(pixels_obj, safe=False)
