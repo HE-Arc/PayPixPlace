@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
-from .models import User, Canvas, Pixel
+from .models import User, Canvas, Pixel, Pixie
 from .forms import CreateCanvas
 from datetime import datetime
 from django.http import JsonResponse
@@ -90,9 +90,14 @@ def privateCanvas(request):
     }
     return render(request, 'paypixplaceapp/canvas/private_canvas.html', context)
 
+def get_pixies_info():
+    pixies = Pixie.objects.all()
+    return pixies
+
 def purchasePix(request):
     context = {
-        'title': 'Purchase PIX'
+        'title': 'Purchase PIX',
+        'pixies': get_pixies_info()
     }
     return render(request, 'paypixplaceapp/purchase_pix.html', context)        
       
