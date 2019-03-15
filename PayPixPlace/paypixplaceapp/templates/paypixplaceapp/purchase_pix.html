@@ -2,5 +2,15 @@
 {% block content %}
     
     <h1>Purchase PIX</h1>
+
+    {% for pixie in pixies %}
+    <div>
+        <h2>{{ pixie.title }}</h2>
+        <p>{{ pixie.price }} CHF</p>
+        <p>{{ pixie.number }} PIX</p>
+        <p>+{{ pixie.bonus }} bonus PIX</p>
+        <p>{{ pixie.number|add:pixie.bonus }} PIX</p>
+    </div>
+    {% endfor %}
     
 {% endblock content %}
