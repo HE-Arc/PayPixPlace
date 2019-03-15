@@ -1,4 +1,5 @@
 {% extends "paypixplaceapp/base.html" %}
+{% load staticfiles %}
 {% block content %}
     
     <h1>Community Canvas</h1>
@@ -9,10 +10,9 @@
                 <h2>{{ c.name }}</h2>
                 <img
                     class="w-25 img-fluid img-thumbnail"
-                    src="{% url 'canvas-img' c.id%}"
+                    src="{% url 'canvas-img' c.id %}"
                     alt="canvas named {{c.name}}"/>        
             </a>
         </div>
     {% endfor %}
-
 {% endblock content %}
