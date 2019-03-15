@@ -16,10 +16,7 @@ function loadPixels() {
     // Load pixels from database
     $.ajax({
         type: 'GET',
-        url: '/canvas/json',
-        data: {
-            'id': canvasId,
-        },
+        url: '/canvas/json/'+canvasId,
         dataType: 'json',
         success: function (data) {
             pixels = data.pixels;

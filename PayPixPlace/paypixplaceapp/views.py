@@ -127,8 +127,7 @@ def change_pixel_color(request):
 def can_modify_pixel(pixel, user):
     return (pixel.end_protection_date is None or current_date > pixel.end_protection_date) and (user.ammo > 0)
 
-def get_json(request):
-    id = request.GET.get('id')
+def get_json(request, id):
     if not id:
         raise Http404()
 
@@ -144,8 +143,7 @@ def get_json(request):
     }
     return JsonResponse(data, safe=False)
 
-def get_img(request):
-    id = request.GET.get('id')
+def get_img(request, id):
     if not id:
         raise Http404()
 
