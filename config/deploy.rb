@@ -4,13 +4,6 @@ lock "~> 3.11.0"
 set :application, "PayPixPlace"
 set :repo_url, "https://github.com/HE-Arc/PayPixPlace.git"
 
-task :restart_sidekiq do
-  on roles(:worker) do
-    execute :service, "sidekiq restart"
-  end
-end
-after "deploy:published", "restart_sidekiq"
-
 after 'deploy:publishing', 'uwsgi:restart'
 after 'deploy:publishing', 'nginx:restart'
 
@@ -18,7 +11,7 @@ namespace :uwsgi do
   desc 'Restart application'
   task :restart do
     on roles(:web) do |h|
-      execute :sudo, 'sv reload uwsgi'
+      execute :sudo, 'sv restart uwsgi'
     end
   end
 end
@@ -27,7 +20,7 @@ namespace :nginx do
   desc 'Restart nginx'
   task :restart do
     on roles(:web) do |h|
-      execute :sudo, 'sv reload nginx'
+      execute :sudo, 'sv restart nginx'
     end
   end
 end
