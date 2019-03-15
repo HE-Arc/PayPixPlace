@@ -22,6 +22,15 @@ namespace :uwsgi do
   end
 end
 
+namespace :nginx do
+  desc 'Restart nginx'
+  task :restart do
+    on roles(:web) do |h|
+      execute :sudo, 'nginx -s reload'
+    end
+  end
+end
+
 after 'deploy:updating', 'python:create_venv'
 
 namespace :python do
