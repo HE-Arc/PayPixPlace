@@ -6,32 +6,36 @@ let displayGrid;
 let drawingColor;
 let pickers;
 let colors;
+let pixelWidth;
 
-
+/**
+ * Loads the pixels of the actual canvas from the database
+ * Load as JSON
+ */
 function loadPixels() {
     // Load pixels from database
     $.ajax({
         type: 'GET',
-        url: '/canvas/json',
-        data: {
-            'id': canvasId,
-        },
+        url: '/canvas/' + canvasId + '/json/',
         dataType: 'json',
         success: function (data) {
-            pixels = JSON.parse(data);
+            pixels = data.pixels;
+            pixelWidth = 4000 / data.canvas.width;
             drawPixels();
         }
     });
 }
 
+/**
+ * Draw the pixels on the screen
+ */
 function drawPixels() {
-    // draw pixels on screen
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     for (let i = 0 ; i < pixels.length ; i++) {
-        let x = pixels[i].fields.x;
-        let y = pixels[i].fields.y;
-        let hex = pixels[i].fields.hex;
+        let x = pixels[i].x;
+        let y = pixels[i].y;
+        let hex = pixels[i].hex;
 
         ctx.fillStyle = hex;
         ctx.fillRect(
@@ -54,14 +58,25 @@ function drawPixels() {
     }
 }
 
+/**
+ * Sets the scale of the js canvas
+ */
 function setCanvasScale() {
     canvas.style.transform = "scale(" + scale + ")";
 }
 
+/**
+ * Sets the current drawing color
+ * @param {Integer} id 
+ */
 function setDrawingColor(id) {
     drawingColor = colors[id];
 }
 
+/**
+ * Transforms a Hex color in rgb format
+ * @param {String} hex : example: #FFFFFF 
+ */
 function hexToRgb(hex) {
     let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
@@ -71,6 +86,9 @@ function hexToRgb(hex) {
     } : null;
 }
 
+/**
+ * Initialise the paramters of the page
+ */
 function initParams() {
     pixels = [];
     scale = 0.1;
@@ -97,6 +115,7 @@ function initParams() {
     }
 }
 
+// Execute when the page is fully loaded
 $(document).ready(function(){
     canvas  = document.getElementById("canvas");
     ctx = canvas.getContext("2d");

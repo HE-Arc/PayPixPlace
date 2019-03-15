@@ -4,9 +4,13 @@ from django.contrib import messages
 from .models import User, Canvas, Pixel
 from .forms import CreateCanvas
 from datetime import datetime
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.http.response import Http404
 from django.core import serializers
 from enum import IntEnum
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms import model_to_dict
+from PIL import Image, ImageDraw
 
 class Place(IntEnum):
     PUBLIC = 0
@@ -133,12 +137,48 @@ def change_pixel_color(request):
 def can_modify_pixel(pixel, user):
     return (pixel.end_protection_date is None or current_date > pixel.end_protection_date) and (user.ammo > 0)
 
-def get_json(request):
-    id = request.GET.get('id')
+def get_json(request, id):
     if not id:
-        raise Http404
+        raise Http404()
 
-    canvas = Canvas.objects.get(id=id)
+    try:
+        canvas = Canvas.objects.get(id=id)
+    except ObjectDoesNotExist:
+        raise Http404()
+
     pixels = canvas.pixel_set.all()
-    pixels_obj = serializers.serialize('json', list(pixels), fields=('x','y', 'hex', 'user'))
-    return JsonResponse(pixels_obj, safe=False)
+    data = {
+        'canvas': model_to_dict(canvas),
+        'pixels': [model_to_dict(pixel) for pixel in pixels]
+    }
+    return JsonResponse(data, safe=False)
+
+def get_img(request, id):
+    if not id:
+        raise Http404()
+
+    try:
+        canvas = Canvas.objects.get(id=id)
+    except ObjectDoesNotExist:
+        raise Http404()
+
+    pixels = [model_to_dict(pixel) for pixel in canvas.pixel_set.all()]
+    imgSize = 1000
+    img = Image.new('RGB', (imgSize, imgSize))
+    pixelSize = imgSize // model_to_dict(canvas)["width"]
+
+    draw = ImageDraw.Draw(img)
+    for pixel in pixels:
+        draw.rectangle(
+            (
+                pixel["x"] * pixelSize,
+                pixel["y"] * pixelSize,
+                pixel["x"] * pixelSize + pixelSize,
+                pixel["y"] * pixelSize + pixelSize
+            ), fill=pixel["hex"]
+        )
+    del draw
+
+    response = HttpResponse(content_type="image/png")
+    img.save(response, "PNG")
+    return response
