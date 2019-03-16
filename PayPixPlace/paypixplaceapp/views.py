@@ -55,7 +55,7 @@ def createCanvas(request):
             canvas.user = request.user
 
             # Check if the given place is a valid one
-            if canvas.place >= 0 and canvas.place <= 2:
+            if canvas.place >= 0 and canvas.place <= 1:
                 canvas.save()
 
                 instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
@@ -87,12 +87,6 @@ def publicCanvas(request):
         'canvas': getCanvas(Place.PUBLIC)
     }
     return render(request, 'paypixplaceapp/canvas/public_canvas.html', context)
-
-def privateCanvas(request):
-    context = {
-        'title': 'Private Canvas'
-    }
-    return render(request, 'paypixplaceapp/canvas/private_canvas.html', context)
 
 def get_pixies_info():
     pixies = Pixie.objects.all()
