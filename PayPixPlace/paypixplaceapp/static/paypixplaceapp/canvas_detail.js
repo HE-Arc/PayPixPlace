@@ -5,9 +5,24 @@ let scale;
 let displayGrid;
 let drawingColor;
 let pickers;
-let colors;
 let pixelWidth;
 let showGridCB;
+let currentDefaultColorCase;
+
+function openCustomColorPicker(id) {
+    currentDefaultColorCase = id;
+}
+
+function changeDefaultColor(newColor) {
+    let currentPicker = document.getElementById("picker" + currentDefaultColorCase);
+
+    currentPicker.style.backgroundColor = newColor;
+    currentPicker.addEventListener('click', function() {
+        drawingColor = newColor;
+    }, false);
+    
+    drawingColor = newColor;
+}
 
 /**
  * Loads the pixels of the actual canvas from the database
@@ -99,13 +114,9 @@ function initParams() {
     pickers = [
         document.getElementById("picker1"),
         document.getElementById("picker2"),
-        document.getElementById("picker3")
-    ];
-
-    colors = [
-        "#FF0000",
-        "#00FF00",
-        "#0000FF"
+        document.getElementById("picker3"),
+        document.getElementById("picker4"),
+        document.getElementById("picker5")
     ];
 
     for (let i = 0 ; i < pickers.length ; i++) {

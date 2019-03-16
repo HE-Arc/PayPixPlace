@@ -2,8 +2,6 @@
 {% load staticfiles %}
 {% block content %}
     
-    <h1>Community Canvas</h1>
-    
     <h2>{{ object.name }}</h2>
     <p>Canvas Theme : {{ object.theme }}</p>
     <p>Canvas Place : 
@@ -16,21 +14,29 @@
         {% endif %}
     </p>
     <p>Is Profit On : {{ object.is_profit_on }}</p>
-    
+
     {% for color in user.owns.all %}
         {{ color.hex }}
     {% endfor %}
 
-    <div class="colorSelector">
-        <div id="picker1">
+    {% for slot in slots %}
+        {{ slot.color.hex }}
+    {% endfor %}
 
-        </div>
-        <div id="picker2">
+    <div class="colorSelector col-12">
+        <div id="picker1"></div>
+        <div id="picker2"></div>
+        <div id="picker3"></div>
+        <div id="picker4"></div>
+        <div id="picker5"></div>
+    </div>
 
-        </div>
-        <div id="picker3">
-
-        </div>
+    <div class="colorSelector col-12">
+        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="openCustomColorPicker(1)">v</button>
+        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="openCustomColorPicker(2)">v</button>
+        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="openCustomColorPicker(3)">v</button>
+        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="openCustomColorPicker(4)">v</button>
+        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="openCustomColorPicker(5)">v</button>
     </div>
 
     <input id="showGridCB" type="checkbox">Show Grid</input>
@@ -39,6 +45,21 @@
         <canvas id="canvas" width="4000" height="4000">
                 Canvas are not supported
         </canvas>
+    </div>
+
+    <div id="color-picker-modal2" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body" style="display: inline-block;">
+                    {% for color in user.owns.all %}
+                        <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeDefaultColor('{{ color.hex }}')"></div>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <style>
@@ -52,16 +73,35 @@
             height: 50px;
             background-color: blueviolet;
             display: inline-block;
-            margin: 10px;
+            margin-left: 10px;
             cursor: pointer;
         }
         .colorSelector > div:hover {
             border: solid 2px black;
         }
+        .ppp-btn-color-picker {
+            width: 50px;
+            display: inline-block;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .ppp-color-case {
+            width: 50px;
+            height: 50px;
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+        }
     </style>
 
     <script>
         const canvasId = "{{ object.id }}";
+
+        colors = [];
+        {% for slot in slots %}
+        colors.push('{{ slot.color.hex }}')
+        {% endfor %}
+        console.log(colors);
     </script>
 
     <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>

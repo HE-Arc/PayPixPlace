@@ -1,16 +1,19 @@
-from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView
-from django.contrib import messages
-from .models import User, Canvas, Pixel, Pixie
-from .forms import CreateCanvas
 from datetime import datetime
-from django.http import JsonResponse, HttpResponse
-from django.http.response import Http404
-from django.core import serializers
 from enum import IntEnum
+
+from django.contrib import messages
+from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
+from django.http import HttpResponse, JsonResponse
+from django.http.response import Http404
+from django.shortcuts import redirect, render
+from django.views.generic import DetailView, ListView
 from PIL import Image, ImageDraw
+
+from .forms import CreateCanvas
+from .models import Canvas, Pixel, Pixie, User, Slot
+
 
 class Place(IntEnum):
     PUBLIC = 0
@@ -37,6 +40,13 @@ class CanvasView(ListView):
 class CanvasDetailsView(DetailView):
     model = Canvas
     template_name = 'paypixplaceapp/canvas/canvas_detail.html'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['slots'] = Slot.objects.filter(user=self.request.user.id)
+        return context
 
 def getCanvas(place):
     canvas = Canvas.objects.filter(place=int(place))
