@@ -7,6 +7,7 @@ let drawingColor;
 let pickers;
 let colors;
 let pixelWidth;
+let showGridCB;
 
 /**
  * Loads the pixels of the actual canvas from the database
@@ -119,6 +120,12 @@ function initParams() {
 $(document).ready(function(){
     canvas  = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
+
+    showGridCB = document.getElementById("showGridCB");
+    showGridCB.addEventListener('click', function(event) {
+        displayGrid = showGridCB.checked;
+        drawPixels();
+    });
 
     canvas.addEventListener('click', function(event) {
         let x = parseInt((event.offsetX) / pixelWidth);
