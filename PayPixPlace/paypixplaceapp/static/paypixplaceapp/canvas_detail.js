@@ -8,6 +8,8 @@ let pickers;
 let colors;
 let pixelWidth;
 let showGridCB;
+let canvasX;
+let canvasY;
 
 /**
  * Loads the pixels of the actual canvas from the database
@@ -62,13 +64,13 @@ function drawPixels() {
 /**
  * Sets the scale of the js canvas
  */
-function setCanvasScale() {
-    canvas.style.transform = "scale(" + scale + ")";
+function setCanvasTranform() {
+    canvas.style.transform = "scale("+scale+") translate("+canvasX+"px, "+canvasY+"px)";
 }
 
 /**
  * Sets the current drawing color
- * @param {Integer} id 
+ * @param {Integer} id
  */
 function setDrawingColor(id) {
     drawingColor = colors[id];
@@ -99,13 +101,15 @@ function initParams() {
     pickers = [
         document.getElementById("picker1"),
         document.getElementById("picker2"),
-        document.getElementById("picker3")
+        document.getElementById("picker3"),
+        document.getElementById("picker4")
     ];
 
     colors = [
         "#FF0000",
         "#00FF00",
-        "#0000FF"
+        "#0000FF",
+        "#FFFFFF"
     ];
 
     for (let i = 0 ; i < pickers.length ; i++) {
@@ -114,6 +118,9 @@ function initParams() {
             setDrawingColor(i);
         }, false);
     }
+
+    canvasX = 0;
+    canvasY = 0;
 }
 
 // Execute when the page is fully loaded
@@ -126,30 +133,42 @@ $(document).ready(function(){
         displayGrid = showGridCB.checked;
         drawPixels();
     });
+    canvas.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+    });
 
-    canvas.addEventListener('click', function(event) {
-        let x = parseInt((event.offsetX) / pixelWidth);
-        let y = parseInt((event.offsetY) / pixelWidth);
-    
-        $.ajax({
-            type: 'GET',
-            url: '/change_pixel_color/',
-            data: {
-                'canvas_id': canvasId,
-                'x': x,
-                'y': y,
-                'hex': drawingColor,
-            },
-            dataType: 'json',
-            success: function (data) {
-                if (data.is_valid) {
-                    loadPixels();
+    canvas.addEventListener('mousedown', function(event) {
+        if (event.button == 0) {
+            let x = parseInt((event.offsetX) / pixelWidth);
+            let y = parseInt((event.offsetY) / pixelWidth);
+        
+            $.ajax({
+                type: 'GET',
+                url: '/change_pixel_color/',
+                data: {
+                    'canvas_id': canvasId,
+                    'x': x,
+                    'y': y,
+                    'hex': drawingColor,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.is_valid) {
+                        loadPixels();
+                    }
                 }
-            }
-        });
-    
+            });  
+        } else if (event.button == 2) {
+            console.log("moving");
+        }
     }, false);
     
+    canvas.addEventListener("mouseup", function(event) {
+        if (event.button == 2) {
+            console.log("not moving");
+        }
+    });
+
     canvas.addEventListener("mousemove", function() {
         let x = parseInt((event.offsetX) / pixelWidth);
         let y = parseInt((event.offsetY) / pixelWidth);
@@ -177,12 +196,12 @@ $(document).ready(function(){
     
     canvas.addEventListener("wheel", function(e) {
         e.deltaY < 0 ? scale *= 1.2 : scale /= 1.2;
-        setCanvasScale();
+        setCanvasTranform();
         e.preventDefault();
     }, false);
 
     initParams();
 
     loadPixels();
-    setCanvasScale();
+    setCanvasTranform();
 });

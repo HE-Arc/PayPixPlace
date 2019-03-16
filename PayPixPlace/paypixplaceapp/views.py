@@ -119,7 +119,7 @@ def change_pixel_color(request):
     modification_valid = False
 
     pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
-    if can_modify_pixel(pixel, user):
+    if can_modify_pixel(pixel, user, current_date):
         pixel.hex = hex
         pixel.user = user
         pixel.save()
@@ -133,10 +133,11 @@ def change_pixel_color(request):
     }
     return JsonResponse(data)
 
-def can_modify_pixel(pixel, user):
+def can_modify_pixel(pixel, user, current_date):
     return (pixel.end_protection_date is None or current_date > pixel.end_protection_date) and (user.ammo > 0)
 
 def get_json(request, id):
+    """returns the canvas and all its pixels by its id in a json format"""
     if not id:
         raise Http404()
 
@@ -153,6 +154,7 @@ def get_json(request, id):
     return JsonResponse(data, safe=False)
 
 def get_img(request, id):
+    """returns the canvas by its id, as an PNG img"""
     if not id:
         raise Http404()
 
