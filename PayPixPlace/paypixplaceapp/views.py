@@ -1,15 +1,20 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
-from .models import User, Canvas, Pixel
+from .models import User, Canvas, Pixel, Pixie
 from .forms import CreateCanvas
 from datetime import datetime
 from django.http import JsonResponse, HttpResponse
 from django.http.response import Http404
 from django.core import serializers
+from enum import IntEnum
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
 from PIL import Image, ImageDraw
+
+class Place(IntEnum):
+    PUBLIC = 0
+    COMMUNITY = 1
 
 def home(request):
     context = {
@@ -26,15 +31,15 @@ class CanvasView(ListView):
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context['title'] = 'Community Canvas'
-        context['canvas'] = getCanvas()
+        context['canvas'] = getCanvas(Place.COMMUNITY)
         return context
 
 class CanvasDetailsView(DetailView):
     model = Canvas
     template_name = 'paypixplaceapp/canvas/canvas_detail.html'
 
-def getCanvas():
-    canvas = Canvas.objects.all()
+def getCanvas(place):
+    canvas = Canvas.objects.filter(place=int(place))
     for c in canvas:
         c.pixels = Pixel.objects.filter(canvas=c.id)
     return canvas
@@ -50,14 +55,18 @@ def createCanvas(request):
             canvas.user = request.user
 
             # Check if the given place is a valid one
-            if canvas.place >= 0 and canvas.place <= 2:
+            if canvas.place >= 0 and canvas.place <= 1:
                 canvas.save()
 
                 instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
                 Pixel.objects.bulk_create(instances)  
 
                 messages.success(request, f'You create a new canvas successfully!')
-                return redirect('canvas-community')
+
+                if canvas.place == int(Place.COMMUNITY):
+                    return redirect('canvas-community')
+                else:
+                    return redirect('canvas-public')
             else:
                 messages.error(request, f'The place is invalid!')
 
@@ -75,18 +84,18 @@ def createCanvas(request):
 def publicCanvas(request):
     context = {
         'title': 'Public Canvas',
+        'canvas': getCanvas(Place.PUBLIC)
     }
     return render(request, 'paypixplaceapp/canvas/public_canvas.html', context)
 
-def privateCanvas(request):
-    context = {
-        'title': 'Private Canvas'
-    }
-    return render(request, 'paypixplaceapp/canvas/private_canvas.html', context)
+def get_pixies_info():
+    pixies = Pixie.objects.all()
+    return pixies
 
 def purchasePix(request):
     context = {
-        'title': 'Purchase PIX'
+        'title': 'Purchase PIX',
+        'pixies': get_pixies_info()
     }
     return render(request, 'paypixplaceapp/purchase_pix.html', context)        
       

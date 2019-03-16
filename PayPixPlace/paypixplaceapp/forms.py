@@ -6,8 +6,7 @@ from .models import Canvas
 
 class CreateCanvas(forms.ModelForm):
     CHOICES=[(0,'Public'),
-         (1,'Community'),
-         (2,'Private')]
+         (1,'Community')]
 
     place = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect, initial=1)
 
