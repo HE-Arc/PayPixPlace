@@ -12,12 +12,22 @@ end
 after "deploy:published", "restart_sidekiq"
 
 after 'deploy:publishing', 'uwsgi:restart'
+after 'deploy:publishing', 'nginx:restart'
 
 namespace :uwsgi do
   desc 'Restart application'
   task :restart do
     on roles(:web) do |h|
       execute :sudo, 'sv reload uwsgi'
+    end
+  end
+end
+
+namespace :nginx do
+  desc 'Restart nginx'
+  task :restart do
+    on roles(:web) do |h|
+      execute :sudo, 'sv reload nginx'
     end
   end
 end
