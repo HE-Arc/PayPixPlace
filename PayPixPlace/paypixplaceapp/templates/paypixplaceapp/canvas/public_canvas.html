@@ -5,23 +5,13 @@
 
     {% for c in canvas %}
         <div class="text-center">
-            <h2><a href="{% url 'canvas-detail' c.id %}">{{ c.name }}</a></h2>
-    
-            <canvas id="{{c.name}}" width="{% widthratio c.width 1 10 %}" height="{% widthratio c.width 1 10 %}" style="border:1px solid #000000;">
-                Canvas are not supported
-            </canvas>
-
-            <script>
-                var canva = document.getElementById("{{c.name}}");
-                var ctx = canva.getContext("2d");
-                
-                {% for p in c.pixels %}
-                    x = {% widthratio p.x 1 10 %};
-                    y = {% widthratio p.y 1 10 %};
-                    ctx.fillStyle = "{{p.hex}}";
-                    ctx.fillRect(x, y, 10, 10);
-                {% endfor %}
-            </script>
+            <a href="{% url 'canvas-detail' c.id %}">
+                <h2>{{ c.name }}</h2>
+                <img
+                    class="w-25 img-fluid img-thumbnail"
+                    src="{% url 'canvas-img' c.id %}"
+                    alt="canvas named {{c.name}}"/>        
+            </a>
         </div>
     {% endfor %}
     
