@@ -33,16 +33,23 @@
 
         </div>
     </div>
-    <input id="showGridCB" type="checkbox">Show Grid</input>
-    <div style="overflow : hidden;">
+    <div class="form-check">
+        <input id="showGridCB" type="checkbox" class="form-check-input" >
+        <label for="showGridCB" clas="form-check-label" style="user-select: node;">Show Grid</label>
+    </div>
+    <div id="canvasContainer" class="w-50 h-100 border" style="overflow : hidden hidden; position: sticky;">
         <canvas id="canvas" width="4000" height="4000">
                 Canvas are not supported
         </canvas>
     </div>
+    <ul class="list-unstyled">
+        <li>Hold right click to move canvas</li>
+        <li>Use mousewheel to zoom</li>
+        <li>Click to change the color of pixels</li>    
+    </ul>
     <style>
         #canvas {
             border:50px solid #000000;
-            transform-origin: 0 0;
             cursor: pointer;
         }
         .colorSelector > div {
