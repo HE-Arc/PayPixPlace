@@ -6,8 +6,10 @@ let displayGrid;
 let drawingColor;
 let pickers;
 let pixelWidth;
-let showGridCB;
 let currentSlot;
+let isMoving;
+let offset;
+let canvasContainer;
 
 /**
  * Change the current slot
@@ -25,17 +27,17 @@ function changeSlotColor(newColor) {
     let currentPicker = document.getElementById("picker" + currentSlot);
 
     currentPicker.style.backgroundColor = newColor;
-    currentPicker.addEventListener('click', function() {
+    currentPicker.addEventListener("click", function() {
         drawingColor = newColor;
     }, false);
     
     drawingColor = newColor;
 
     $.ajax({
-        type: 'POST',
-        url: '/change_user_slot_color/',
+        type: "POST",
+        url: "/change_user_slot_color/",
         data: {slot: currentSlot, color: newColor, userId: userId, csrfmiddlewaretoken: window.CSRF_TOKEN},
-        dataType: 'json',
+        dataType: "json",
         success: function(data) {
             console.log(data)
         }
@@ -49,9 +51,9 @@ function changeSlotColor(newColor) {
 function loadPixels() {
     // Load pixels from database
     $.ajax({
-        type: 'GET',
-        url: '/canvas/' + canvasId + '/json/',
-        dataType: 'json',
+        type: "GET",
+        url: "/canvas/" + canvasId + "/json/",
+        dataType: "json",
         success: function (data) {
             pixels = data.pixels;
             pixelWidth = 4000 / data.canvas.width;
@@ -78,8 +80,11 @@ function drawPixels() {
             pixelWidth,
             pixelWidth
         );
-        
-        if (displayGrid) {
+    }
+    if (displayGrid) {
+        for (let i = 0 ; i < pixels.length ; i++) {
+            let x = pixels[i].x;
+            let y = pixels[i].y;
             ctx.lineWidth = 1 / scale;
             ctx.strokeStyle = "rgba( 128, 128, 128, 0.1)";
             ctx.strokeRect(
@@ -95,13 +100,13 @@ function drawPixels() {
 /**
  * Sets the scale of the js canvas
  */
-function setCanvasScale() {
-    canvas.style.transform = "scale(" + scale + ")";
+function setCanvasTranform() {
+    canvas.style.transform = "scale("+scale+")";
 }
 
 /**
  * Sets the current drawing color
- * @param {Integer} id 
+ * @param {Integer} id
  */
 function setDrawingColor(id) {
     drawingColor = colors[id];
@@ -121,6 +126,13 @@ function hexToRgb(hex) {
 }
 
 /**
+ * function used to prevent the default action on an event
+ */
+function preventDefault(event) {
+    event.preventDefault();
+}
+
+/**
  * Initialise the paramters of the page
  */
 function initParams() {
@@ -128,21 +140,9 @@ function initParams() {
     scale = 0.1;
     displayGrid = false;
     drawingColor = "#FF0000";
-
-    pickers = [
-        document.getElementById("picker1"),
-        document.getElementById("picker2"),
-        document.getElementById("picker3"),
-        document.getElementById("picker4"),
-        document.getElementById("picker5")
-    ];
-
-    for (let i = 0 ; i < pickers.length ; i++) {
-        pickers[i].style.backgroundColor = colors[i];
-        pickers[i].addEventListener('click', function() {
-            setDrawingColor(i);
-        }, false);
-    }
+    isMoving = false;
+    canvas.style.position = "absolute";
+    canvas.style.transformOrigin = "0 0";
 }
 
 // Execute when the page is fully loaded
@@ -150,36 +150,75 @@ $(document).ready(function(){
     canvas  = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
 
-    showGridCB = document.getElementById("showGridCB");
-    showGridCB.addEventListener('click', function(event) {
-        displayGrid = showGridCB.checked;
+    canvasContainer = document.getElementById("canvasContainer");
+
+    document.getElementById("showGridCB").addEventListener("click", function(event) {
+        displayGrid = this.checked;
         drawPixels();
     });
 
-    canvas.addEventListener('click', function(event) {
-        let x = parseInt((event.offsetX) / pixelWidth);
-        let y = parseInt((event.offsetY) / pixelWidth);
-    
-        $.ajax({
-            type: 'GET',
-            url: '/change_pixel_color/',
-            data: {
-                'canvas_id': canvasId,
-                'x': x,
-                'y': y,
-                'hex': drawingColor,
-            },
-            dataType: 'json',
-            success: function (data) {
-                if (data.is_valid) {
-                    loadPixels();
+    canvasContainer.addEventListener("contextmenu", preventDefault, false);
+
+    canvas.addEventListener("mousedown", function(event) {
+        if (event.button == 0) {
+            let x = parseInt((event.offsetX) / pixelWidth);
+            let y = parseInt((event.offsetY) / pixelWidth);
+        
+            $.ajax({
+                type: "GET",
+                url: "/change_pixel_color/",
+                data: {
+                    "canvas_id": canvasId,
+                    "x": x,
+                    "y": y,
+                    "hex": drawingColor,
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data.is_valid) {
+                        loadPixels();
+                    }
                 }
-            }
-        });
-    
+            });
+        }
     }, false);
     
-    canvas.addEventListener("mousemove", function() {
+    document.addEventListener("mouseup", function(event) {
+        if (event.button == 2) {
+            isMoving = false;
+            function removeContextMenu(event) {
+                document.removeEventListener("contextmenu", preventDefault, false);
+                document.removeEventListener("contextmenu", removeContextMenu, false);
+            }
+            document.addEventListener("contextmenu", removeContextMenu, false);
+        }
+    });
+
+    canvasContainer.addEventListener("mousedown", function(event){
+        if (event.button == 2) {
+            document.addEventListener("contextmenu", preventDefault, false);
+            isMoving = true;
+            offset =  {
+                "x" : canvas.offsetLeft - event.clientX,
+                "y" : canvas.offsetTop - event.clientY
+            };
+        }
+    }, false);
+
+    canvasContainer.addEventListener("mousemove", function(event) {
+        if (isMoving) {
+            mousePosition = {
+
+                x : event.clientX,
+                y : event.clientY
+    
+            };
+            canvas.style.left = (mousePosition.x + offset.x) + "px";
+            canvas.style.top  = (mousePosition.y + offset.y) + "px";
+        }
+    }, false);
+
+    canvas.addEventListener("mousemove", function(event) {
         let x = parseInt((event.offsetX) / pixelWidth);
         let y = parseInt((event.offsetY) / pixelWidth);
         drawPixels();
@@ -204,14 +243,14 @@ $(document).ready(function(){
         drawPixels();
     }, false);
     
-    canvas.addEventListener("wheel", function(e) {
+    canvasContainer.addEventListener("wheel", function(e) {
         e.deltaY < 0 ? scale *= 1.2 : scale /= 1.2;
-        setCanvasScale();
+        setCanvasTranform();
         e.preventDefault();
     }, false);
 
     initParams();
 
     loadPixels();
-    setCanvasScale();
+    setCanvasTranform();
 });
