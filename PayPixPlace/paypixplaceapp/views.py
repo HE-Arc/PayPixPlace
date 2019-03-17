@@ -15,6 +15,9 @@ from PIL import Image, ImageDraw
 from .forms import CreateCanvas
 from .models import Canvas, Pixel, Pixie, User, Slot, Color
 
+import stripe 
+
+stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
 class Place(IntEnum):
     PUBLIC = 0
@@ -249,3 +252,31 @@ def get_img(request, id):
     response = HttpResponse(content_type="image/png")
     img.save(response, "PNG")
     return response
+
+def buy(request, number, price):
+    token = request.POST['stripeToken']
+
+    charge = stripe.Charge.create(
+        amount=price,
+        currency='chf',
+        description='Buying ' + str(number) + ' PIX',
+        source=token,
+    )
+
+    # TODO modify the user pix numbers
+
+def buy200(request):
+    buy(request, 200, 100)
+    return JsonResponse("OK", safe=False)
+
+def buy400(request):
+    buy(request, 400, 200)
+    return JsonResponse("OK", safe=False)
+
+def buy1100(request):
+    buy(request, 1100, 500)
+    return JsonResponse("OK", safe=False)
+
+def buy6000(request):
+    buy(request, 6000, 2000)
+    return JsonResponse("OK", safe=False)

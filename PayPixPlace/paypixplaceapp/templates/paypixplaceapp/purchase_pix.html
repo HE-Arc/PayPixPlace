@@ -1,4 +1,5 @@
 {% extends "paypixplaceapp/base.html" %}
+{% load staticfiles %}
 {% block content %}
     
     <h1>Purchase PIX</h1>
@@ -14,11 +15,19 @@
                     <h5 class="card-title mb-3 font-weight-bold">{{ pixie.price }} CHF</h5>
                     <p class="card-text mb-0">{{ pixie.number }} PIX</p>
                     <p class="card-text mt-0">+{{ pixie.bonus }} bonus PIX</p>
-                    <a href="{% url 'pix-add' id=pixie.id %}" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">{{ pixie.number|add:pixie.bonus }} PIX</a>
+                    <button id='buy{{ pixie.number }}' type="submit" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">{{ pixie.number|add:pixie.bonus }} PIX</button>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+        purchaseOptions = [];
+        {% for pixie in pixies %}
+            purchaseOptions.push({name:'buy{{ pixie.number }}', amount:{% widthratio pixie.price 1 100 %}})
+        {% endfor %}
+    </script>
     
+    <script type="text/javascript" src="{% static 'paypixplaceapp/payment.js' %}"></script>
 {% endblock content %}
