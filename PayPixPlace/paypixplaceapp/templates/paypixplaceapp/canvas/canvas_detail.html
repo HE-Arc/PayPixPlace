@@ -4,53 +4,65 @@
 
     <div class="row">
         <div class="col-md-4">
-            <h2>{{ object.name }}</h2>
-            <p>Canvas Theme : {{ object.theme }}</p>
-            <p>Canvas Place : 
-                {% if object.place == 0 %}
-                    Public
-                {% elif object.place == 1 %}
-                    Community
-                {% else %}
-                    Invalid
-                {% endif %}
-            </p>
-            <p>
-                {% if object.is_profit_on %}
-                    Profit is ON
-                {% else %}
-                    Profit is OFF
-                {% endif %}
-            </p>
 
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="showGridCB">
-                <label class="form-check-label" for="showGridCB">
-                    Show Grid
-                </label>
-            </div>
-    
-            <div class="row my-3 px-3">
-                <div class="col-4 col-md-6 my-3 p-0">
-                    <div id="picker1" class="ppp-picker ppp-picker-selected"></div>
-                    <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
+            <div class="card">
+                <div class="card-header">
+                    <h2>{{ object.name }}</h2>
                 </div>
-                <div class="col-4 col-md-6 my-3 p-0">
-                    <div id="picker2" class="ppp-picker"></div>
-                    <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
-                </div>
-                <div class="col-4 col-md-6 my-3 p-0">
-                    <div id="picker3" class="ppp-picker"></div>
-                    <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
-                </div>
-                <div class="col-4 col-md-6 my-3 p-0">
-                    <div id="picker4" class="ppp-picker"></div>
-                    <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
-                </div>
-                <div class="col-4 col-md-6 my-3 p-0">
-                    <div id="picker5" class="ppp-picker"></div>
-                    <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(5)">></button>
-                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <div class="row my-3 px-3">
+                            <div class="col-4 col-md-6 my-3 p-0">
+                                <div id="picker1" class="ppp-picker ppp-picker-selected"></div>
+                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
+                            </div>
+                            <div class="col-4 col-md-6 my-3 p-0">
+                                <div id="picker2" class="ppp-picker"></div>
+                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
+                            </div>
+                            <div class="col-4 col-md-6 my-3 p-0">
+                                <div id="picker3" class="ppp-picker"></div>
+                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
+                            </div>
+                            <div class="col-4 col-md-6 my-3 p-0">
+                                <div id="picker4" class="ppp-picker"></div>
+                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
+                            </div>
+                            <div class="col-4 col-md-6 my-3 p-0">
+                                <div id="picker5" class="ppp-picker"></div>
+                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(5)">></button>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <label class="font-weight-bold">Show Grid</label>
+                        <label class="switch">
+                            <input type="checkbox" id="showGridCB" class="default">
+                            <span class="slider round"></span>
+                        </label>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="form-group">
+                            <label for="canvasTheme" class="font-weight-bold">Canvas Theme</label>
+                            <input type="text" class="form-control font-weight-bold" id="canvasTheme" value="{{ object.theme }}" disabled>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="form-group">
+                            <label for="canvasTheme" class="font-weight-bold">Canvas Place</label>
+                            <input type="text" class="form-control font-weight-bold" id="canvasTheme" value="{{ place_text }}" disabled>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="form-group">
+                            {% if object.is_profit_on %}
+                                <label class="font-weight-bold">Profit ON</label>
+                            {% else %}
+                                <label class="font-weight-bold">Profit OFF</label>
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
 

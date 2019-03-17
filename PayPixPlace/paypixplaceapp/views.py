@@ -47,6 +47,14 @@ class CanvasDetailsView(DetailView):
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context['slots'] = Slot.objects.filter(user=self.request.user.id)
+
+        if self.object.place == 0:
+            place_text = "Public"
+        elif self.object.place == 1:
+            place_text = "Community"
+        else:
+            place_text = "Invalid"
+        context['place_text'] = place_text
         return context
 
 def getCanvas(page, place):
