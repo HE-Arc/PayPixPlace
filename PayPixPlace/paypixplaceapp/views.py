@@ -119,11 +119,11 @@ def create_pixel(x, y, hex, canvas_id):
 
 def change_user_slot_color(request):
     if request.is_ajax():
-        if request.method == 'GET':
+        if request.method == 'POST':
 
-            user = User.objects.get(id=request.GET.get('userId'))
-            slotId = request.GET.get('slot')
-            color = Color.objects.get(hex=request.GET.get('color'))
+            user = User.objects.get(id=request.POST.get('userId'))
+            slotId = request.POST.get('slot')
+            color = Color.objects.get(hex=request.POST.get('color'))
 
             slot = Slot.objects.filter(
                 user=user,
