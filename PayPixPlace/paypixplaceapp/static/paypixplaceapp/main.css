@@ -1,3 +1,9 @@
 .invalid-feedback {
     display: block;
 }
+
+.ppp-btn-rounded {
+    border-radius: 1.2em;
+    border: 0.2em solid rgb(38, 41, 38);
+    font-size: 1.5em;
+}

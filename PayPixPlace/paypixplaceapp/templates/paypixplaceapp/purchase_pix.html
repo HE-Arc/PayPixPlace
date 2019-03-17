@@ -3,14 +3,22 @@
     
     <h1>Purchase PIX</h1>
 
-    {% for pixie in pixies %}
-    <div>
-        <h2>{{ pixie.title }}</h2>
-        <p>{{ pixie.price }} CHF</p>
-        <p>{{ pixie.number }} PIX</p>
-        <p>+{{ pixie.bonus }} bonus PIX</p>
-        <p>{{ pixie.number|add:pixie.bonus }} PIX</p>
+    <div class="row">
+        {% for pixie in pixies %}
+        <div class="col-md-6 p-3">
+            <div class="card text-center p-0">
+                <div class="card-header">
+                    <h2>{{ pixie.title }}</h2>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title mb-3 font-weight-bold">{{ pixie.price }} CHF</h5>
+                    <p class="card-text mb-0">{{ pixie.number }} PIX</p>
+                    <p class="card-text mt-0">+{{ pixie.bonus }} bonus PIX</p>
+                    <a href="{% url 'pix-add' %}" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">{{ pixie.number|add:pixie.bonus }} PIX</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
     
 {% endblock content %}

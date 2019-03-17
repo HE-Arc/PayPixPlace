@@ -107,7 +107,10 @@ def purchasePix(request):
         'title': 'Purchase PIX',
         'pixies': get_pixies_info()
     }
-    return render(request, 'paypixplaceapp/purchase_pix.html', context)        
+    return render(request, 'paypixplaceapp/purchase_pix.html', context)
+
+def addPix(request):
+    pass
       
 def create_pixel(x, y, hex, canvas_id):
     p = Pixel()
