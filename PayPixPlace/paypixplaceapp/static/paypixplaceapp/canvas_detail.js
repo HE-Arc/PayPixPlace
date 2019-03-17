@@ -9,10 +9,18 @@ let pixelWidth;
 let showGridCB;
 let currentSlot;
 
-function openCustomColorPicker(id) {
+/**
+ * Change the current slot
+ * @param {int} id 
+ */
+function changeCurrentSlot(id) {
     currentSlot = id;
 }
 
+/**
+ * Change the color for the selected slot and in the data base
+ * @param {string} newColor 
+ */
 function changeSlotColor(newColor) {
     let currentPicker = document.getElementById("picker" + currentSlot);
 
@@ -24,9 +32,9 @@ function changeSlotColor(newColor) {
     drawingColor = newColor;
 
     $.ajax({
-        type: 'GET',
+        type: 'POST',
         url: '/change_user_slot_color/',
-        data: {slot: currentSlot, color: newColor, userId: userId},
+        data: {slot: currentSlot, color: newColor, userId: userId, csrfmiddlewaretoken: window.CSRF_TOKEN},
         dataType: 'json',
         success: function(data) {
             console.log(data)
