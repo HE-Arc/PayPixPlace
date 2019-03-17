@@ -109,7 +109,15 @@ function setCanvasTranform() {
  * @param {Integer} id
  */
 function setDrawingColor(id) {
+    let currentPicker = document.getElementById("picker" + (id + 1));
+
     drawingColor = colors[id];
+    
+    for (let i = 0 ; i < pickers.length ; i++) {
+        pickers[i].classList.remove("ppp-picker-selected");
+    }
+    
+    currentPicker.classList.add("ppp-picker-selected");
 }
 
 /**
@@ -139,10 +147,24 @@ function initParams() {
     pixels = [];
     scale = 0.1;
     displayGrid = false;
-    drawingColor = "#FF0000";
     isMoving = false;
     canvas.style.position = "absolute";
     canvas.style.transformOrigin = "0 0";
+    drawingColor = colors[0];
+
+    pickers = [
+        document.getElementById("picker1"),
+        document.getElementById("picker2"),
+        document.getElementById("picker3"),
+        document.getElementById("picker4")
+    ];
+
+    for (let i = 0 ; i < pickers.length ; i++) {
+        pickers[i].style.backgroundColor = colors[i];
+        pickers[i].addEventListener('click', function() {
+            setDrawingColor(i);
+        }, false);
+    }
 }
 
 // Execute when the page is fully loaded
