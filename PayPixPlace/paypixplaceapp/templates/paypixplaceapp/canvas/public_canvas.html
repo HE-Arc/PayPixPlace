@@ -1,18 +1,4 @@
-{% extends "paypixplaceapp/base.html" %}
-{% block content %}
-    
+{% extends "paypixplaceapp/canvas_list.html" %}
+{% block title %}
     <h1>Public Canvas</h1>
-
-    {% for c in canvas %}
-        <div class="text-center">
-            <a href="{% url 'canvas-detail' c.id %}">
-                <h2>{{ c.name }}</h2>
-                <img
-                    class="w-25 img-fluid img-thumbnail"
-                    src="{% url 'canvas-img' c.id %}"
-                    alt="canvas named {{c.name}}"/>        
-            </a>
-        </div>
-    {% endfor %}
-    
-{% endblock content %}
+{% endblock title %}

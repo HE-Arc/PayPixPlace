@@ -9,6 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.http.response import Http404
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
+from django.core.paginator import Paginator
 from PIL import Image, ImageDraw
 
 from .forms import CreateCanvas
@@ -34,7 +35,7 @@ class CanvasView(ListView):
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context['title'] = 'Community Canvas'
-        context['canvas'] = getCanvas(Place.COMMUNITY)
+        context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
         return context
 
 class CanvasDetailsView(DetailView):
@@ -48,8 +49,10 @@ class CanvasDetailsView(DetailView):
         context['slots'] = Slot.objects.filter(user=self.request.user.id)
         return context
 
-def getCanvas(place):
-    canvas = Canvas.objects.filter(place=int(place))
+def getCanvas(page, place):
+    canvas_list = Canvas.objects.filter(place=int(place))
+    paginator = Paginator(canvas_list, 2) # Get 10 canvas per page
+    canvas = paginator.get_page(page)
     for c in canvas:
         c.pixels = Pixel.objects.filter(canvas=c.id)
     return canvas
@@ -94,7 +97,7 @@ def createCanvas(request):
 def publicCanvas(request):
     context = {
         'title': 'Public Canvas',
-        'canvas': getCanvas(Place.PUBLIC)
+        'canvas': getCanvas(request.GET.get('page'), Place.PUBLIC)
     }
     return render(request, 'paypixplaceapp/canvas/public_canvas.html', context)
 
