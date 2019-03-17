@@ -1,0 +1,39 @@
+{% extends "paypixplaceapp/base.html" %}
+{% block content %}
+    {% block title %}
+    
+    {% endblock title %}
+
+    {% for c in canvas %}
+        <div class="text-center">
+            <a href="{% url 'canvas-detail' c.id %}">
+                <h2>{{ c.name }}</h2>
+                <img
+                    class="w-25 img-fluid img-thumbnail"
+                    src="{% url 'canvas-img' c.id %}"
+                    alt="canvas named {{c.name}}"/>        
+            </a>
+        </div>
+    {% endfor %}
+
+    <div class="fixed-bottom container mb-3">
+        <div class="pagination">
+            <span class="step-links">
+                {% if canvas.has_previous %}
+                    <a role="button" href="?page=1" class="btn btn-outline-dark">&laquo; first</a>
+                    <a role="button" href="?page={{ canvas.previous_page_number }}" class="btn btn-outline-dark">previous</a>
+                {% endif %}
+        
+                <span class="current font-weight-bold">
+                    Page {{ canvas.number }} of {{ canvas.paginator.num_pages }}
+                </span>
+        
+                {% if canvas.has_next %}
+                    <a role="button" href="?page={{ canvas.next_page_number }}" class="btn btn-outline-dark">next</a>
+                    <a role="button" href="?page={{ canvas.paginator.num_pages }}" class="btn btn-outline-dark">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    
+{% endblock content %}
