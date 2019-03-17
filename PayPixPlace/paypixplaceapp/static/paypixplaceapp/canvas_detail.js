@@ -7,14 +7,14 @@ let drawingColor;
 let pickers;
 let pixelWidth;
 let showGridCB;
-let currentDefaultColorCase;
+let currentSlot;
 
 function openCustomColorPicker(id) {
-    currentDefaultColorCase = id;
+    currentSlot = id;
 }
 
-function changeDefaultColor(newColor) {
-    let currentPicker = document.getElementById("picker" + currentDefaultColorCase);
+function changeSlotColor(newColor) {
+    let currentPicker = document.getElementById("picker" + currentSlot);
 
     currentPicker.style.backgroundColor = newColor;
     currentPicker.addEventListener('click', function() {
@@ -22,6 +22,16 @@ function changeDefaultColor(newColor) {
     }, false);
     
     drawingColor = newColor;
+
+    $.ajax({
+        type: 'GET',
+        url: '/change_user_slot_color/',
+        data: {slot: currentSlot, color: newColor, userId: userId},
+        dataType: 'json',
+        success: function(data) {
+            console.log(data)
+        }
+    });
 }
 
 /**

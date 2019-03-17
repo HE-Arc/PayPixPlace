@@ -12,7 +12,7 @@ from django.views.generic import DetailView, ListView
 from PIL import Image, ImageDraw
 
 from .forms import CreateCanvas
-from .models import Canvas, Pixel, Pixie, User, Slot
+from .models import Canvas, Pixel, Pixie, User, Slot, Color
 
 
 class Place(IntEnum):
@@ -116,6 +116,31 @@ def create_pixel(x, y, hex, canvas_id):
     p.hex = hex
     p.canvas_id = canvas_id
     return p
+
+def change_user_slot_color(request):
+    if request.is_ajax():
+        if request.method == 'GET':
+
+            user = User.objects.get(id=request.GET.get('userId'))
+            slotId = request.GET.get('slot')
+            color = Color.objects.get(hex=request.GET.get('color'))
+
+            slot = Slot.objects.filter(
+                user=user,
+                place_num=slotId
+            ).first()
+            
+            if(slot == None):
+                slot = Slot()
+                slot.user = user
+                slot.place_num = slotId
+                
+            slot.color = color
+            slot.save()
+            
+            return JsonResponse({
+                'is_valid': True,
+            })
 
 def change_pixel_color(request):
     canvas_id = request.GET.get('canvas_id')

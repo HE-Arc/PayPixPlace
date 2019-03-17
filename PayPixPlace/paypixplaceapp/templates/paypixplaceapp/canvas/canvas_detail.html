@@ -15,14 +15,6 @@
     </p>
     <p>Is Profit On : {{ object.is_profit_on }}</p>
 
-    {% for color in user.owns.all %}
-        {{ color.hex }}
-    {% endfor %}
-
-    {% for slot in slots %}
-        {{ slot.color.hex }}
-    {% endfor %}
-
     <div class="colorSelector col-12">
         <div id="picker1"></div>
         <div id="picker2"></div>
@@ -52,7 +44,7 @@
             <div class="modal-content">
                 <div class="modal-body" style="display: inline-block;">
                     {% for color in user.owns.all %}
-                        <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeDefaultColor('{{ color.hex }}')"></div>
+                        <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeSlotColor('{{ color.hex }}')"></div>
                     {% endfor %}
                 </div>
                 <div class="modal-footer">
@@ -96,12 +88,12 @@
 
     <script>
         const canvasId = "{{ object.id }}";
+        const userId = "{{ user.id }}";
 
         colors = [];
         {% for slot in slots %}
-        colors.push('{{ slot.color.hex }}')
+            colors.push('{{ slot.color.hex }}')
         {% endfor %}
-        console.log(colors);
     </script>
 
     <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>
