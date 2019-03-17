@@ -13,5 +13,5 @@ urlpatterns = [
     path('change_pixel_color/', views.change_pixel_color, name='change-pixel-color'),
     path('change_user_slot_color/', views.change_user_slot_color, name='change_user_slot_color'),
     path('pix/purchase/', views.purchasePix, name='pix-purchase'),
-    path('pix/add/', views.addPix, name='pix-add'),
+    path('pix/add/<int:id>/', views.addPix, name='pix-add'),
 ]

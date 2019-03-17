@@ -109,8 +109,25 @@ def purchasePix(request):
     }
     return render(request, 'paypixplaceapp/purchase_pix.html', context)
 
-def addPix(request):
-    pass
+def addPix(request, id):
+
+    pixie = Pixie.objects.filter(id=id).first()
+
+    if pixie == None:
+        messages.error(request, f'An error occured!')
+    else:
+        totalPix = pixie.number + pixie.bonus
+
+        request.user.pix += totalPix
+        request.user.save()
+
+        messages.success(request, f'You received {totalPix} PIX. Thank you for you purchase!')
+
+    context = {
+        'title': 'Home',
+    }
+
+    return render(request, 'paypixplaceapp/home.html', context)
       
 def create_pixel(x, y, hex, canvas_id):
     p = Pixel()
