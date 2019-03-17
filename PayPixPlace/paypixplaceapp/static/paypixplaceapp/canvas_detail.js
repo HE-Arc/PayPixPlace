@@ -104,7 +104,15 @@ function setCanvasScale() {
  * @param {Integer} id 
  */
 function setDrawingColor(id) {
+    let currentPicker = document.getElementById("picker" + (id + 1));
+
     drawingColor = colors[id];
+    
+    for (let i = 0 ; i < pickers.length ; i++) {
+        pickers[i].classList.remove("ppp-picker-selected");
+    }
+    
+    currentPicker.classList.add("ppp-picker-selected");
 }
 
 /**
@@ -127,7 +135,7 @@ function initParams() {
     pixels = [];
     scale = 0.1;
     displayGrid = false;
-    drawingColor = "#FF0000";
+    drawingColor = colors[0];
 
     pickers = [
         document.getElementById("picker1"),

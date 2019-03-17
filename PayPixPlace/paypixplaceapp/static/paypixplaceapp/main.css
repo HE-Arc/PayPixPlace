@@ -7,3 +7,41 @@
     border: 0.2em solid rgb(38, 41, 38);
     font-size: 1.5em;
 }
+
+#canvas {
+    border: 50px solid #000000;
+    transform-origin: 0 0;
+    cursor: pointer;
+}
+
+.ppp-btn-color-picker {
+    height: 50px;
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.ppp-color-case {
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.ppp-picker {
+    width: 50px;
+    height: 50px;
+    background-color: blueviolet;
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.ppp-picker:hover {
+    border: solid 2px black;
+}
+
+.ppp-picker-selected {
+    border: solid 2px black;
+}
