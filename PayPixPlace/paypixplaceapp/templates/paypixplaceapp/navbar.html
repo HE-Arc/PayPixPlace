@@ -1,7 +1,8 @@
+{% load static %}
 <nav class="navbar navbar-expand-md navbar-dark bg-dark navbar-laravel">
     <div class="container">
         <a class="navbar-brand p-0" href="{% url 'paypixplace-home' %}">
-            Pay Pix Place
+            <img class="ppp-logo" src="{% static 'paypixplaceapp/logoPPP.png' %}" alt="Pay Pix Place">
         </a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +38,7 @@
                             </span>
                             <span>
                                 <i class="fas fa-dollar-sign mr-1"></i>
-                                <span id="userAmmo">{{ user.pix }}</span>
+                                <span id="userPix">{{ user.pix }}</span>
                             </span>
                         </a>
                     </li>

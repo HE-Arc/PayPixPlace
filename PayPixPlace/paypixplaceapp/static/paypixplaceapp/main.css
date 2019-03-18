@@ -49,6 +49,16 @@
     display: inline-block;
 }
 
+.ppp-logo {
+    width: 20px;
+    height: auto;
+}
+
+.ppp-currency {
+    width: 14px;
+    height: auto;
+}
+
 /* START SOURCE : https://bootsnipp.com/snippets/GaxR2 */
 
 /* The switch - the box around the slider */
