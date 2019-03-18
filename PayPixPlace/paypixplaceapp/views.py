@@ -116,7 +116,7 @@ def get_pixies_info():
     pixies = Pixie.objects.all()
     return pixies
 
-def purchasePix(request):
+def purchase(request):
     context = {
         'title': 'Purchase PIX',
         'pixies': get_pixies_info()
