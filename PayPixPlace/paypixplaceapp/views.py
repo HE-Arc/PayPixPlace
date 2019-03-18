@@ -62,7 +62,7 @@ class CanvasDetailsView(DetailView):
 
 def getCanvas(page, place):
     canvas_list = Canvas.objects.filter(place=int(place))
-    paginator = Paginator(canvas_list, 2) # Get 10 canvas per page
+    paginator = Paginator(canvas_list, 5)
     canvas = paginator.get_page(page)
     for c in canvas:
         c.pixels = Pixel.objects.filter(canvas=c.id)
@@ -122,26 +122,6 @@ def purchasePix(request):
         'pixies': get_pixies_info()
     }
     return render(request, 'paypixplaceapp/purchase_pix.html', context)
-
-def addPix(request, id):
-
-    pixie = Pixie.objects.filter(id=id).first()
-
-    if pixie == None:
-        messages.error(request, f'An error occured!')
-    else:
-        totalPix = pixie.number + pixie.bonus
-
-        request.user.pix += totalPix
-        request.user.save()
-
-        messages.success(request, f'You received {totalPix} PIX. Thank you for you purchase!')
-
-    context = {
-        'title': 'Home',
-    }
-
-    return render(request, 'paypixplaceapp/home.html', context)
       
 def create_pixel(x, y, hex, canvas_id):
     p = Pixel()
@@ -253,30 +233,24 @@ def get_img(request, id):
     img.save(response, "PNG")
     return response
 
-def buy(request, number, price):
+def buy(request, id):
+    pixie = Pixie.objects.filter(id=id).first()
     token = request.POST['stripeToken']
+    price = pixie.price * 100
+    totalPix = pixie.number + pixie.bonus
 
     charge = stripe.Charge.create(
         amount=price,
         currency='chf',
-        description='Buying ' + str(number) + ' PIX',
+        description='Buying ' + str(totalPix) + ' PIX',
         source=token,
     )
 
-    # TODO modify the user pix numbers
+    request.user.pix += totalPix
+    request.user.save()
+    
+    messages.success(request, f'You received {totalPix} PIX. Thank you for you purchase!')
 
-def buy200(request):
-    buy(request, 200, 100)
-    return JsonResponse("OK", safe=False)
-
-def buy400(request):
-    buy(request, 400, 200)
-    return JsonResponse("OK", safe=False)
-
-def buy1100(request):
-    buy(request, 1100, 500)
-    return JsonResponse("OK", safe=False)
-
-def buy6000(request):
-    buy(request, 6000, 2000)
+def payment(request, id):
+    buy(request, id)
     return JsonResponse("OK", safe=False)

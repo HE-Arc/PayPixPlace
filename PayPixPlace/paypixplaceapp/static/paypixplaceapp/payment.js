@@ -12,11 +12,12 @@ $.getScript('https://checkout.stripe.com/checkout.js', function()
               // Get the token ID to your server-side code for use.
               $.ajax({
                 type: "POST",
-                url: "/pix/purchase/" + purchaseOptions[i].name,
+                url: "/pix/purchase/" + purchaseOptions[i].id + "/",
                 data: { csrfmiddlewaretoken: window.CSRF_TOKEN, stripeToken: token.id },
                 dataType: "json",
                 success: function (data) {
-                    // TODO notify the user that the payment was ok
+                  // do your redirect
+                  location.href="/"
                 }
             });
             }
@@ -25,16 +26,16 @@ $.getScript('https://checkout.stripe.com/checkout.js', function()
       
       purchaseOptions.forEach(purchaseOption=>
       {
-          document.getElementById(purchaseOption.name).addEventListener('click', function(e) {
+          document.getElementById(purchaseOption.id).addEventListener('click', function(e) {
               // Open Checkout with further options:
               purchaseOption.handler.open({
                 name: 'Paypixplace',
-                description: 'PIX',
+                description: purchaseOption.number + ' PIX + ' + purchaseOption.bonus + ' PIX bonus !',
                 zipCode: true,
                 billingAddress: false,
-                amount: purchaseOption.amount,
+                amount: purchaseOption.price,
                 currency: "CHF",
-                locale: true,
+                locale: "auto",
               });
               e.preventDefault();
             });
