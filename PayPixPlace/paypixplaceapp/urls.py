@@ -12,6 +12,6 @@ urlpatterns = [
     path('canvas/<int:id>/img/', views.get_img, name='canvas-img'),
     path('change_pixel_color/', views.change_pixel_color, name='change-pixel-color'),
     path('change_user_slot_color/', views.change_user_slot_color, name='change_user_slot_color'),
-    path('pix/purchase/', views.purchasePix, name='pix-purchase'),
+    path('pix/purchase/', views.purchase, name='pix-purchase'),
     path('pix/purchase/<int:id>/', views.payment, name='pix-payment'),
 ]
