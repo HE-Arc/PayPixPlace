@@ -10,6 +10,7 @@ let currentSlot;
 let isMoving;
 let offset;
 let canvasContainer;
+let pixelOwners;
 
 /**
  * Change the current slot
@@ -66,37 +67,40 @@ function loadPixels() {
     });
 }
 
+function getOwner(x,y) {
+    return pixels[x][y].username;
+}
+
 /**
  * Draw the pixels on the screen
  */
 function drawPixels() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    for (let i = 0 ; i < pixels.length ; i++) {
-        let x = pixels[i].x;
-        let y = pixels[i].y;
-        let hex = pixels[i].hex;
-
-        ctx.fillStyle = hex;
-        ctx.fillRect(
-            x * pixelWidth, 
-            y * pixelWidth, 
-            pixelWidth,
-            pixelWidth
-        );
-    }
-    if (displayGrid) {
-        for (let i = 0 ; i < pixels.length ; i++) {
-            let x = pixels[i].x;
-            let y = pixels[i].y;
-            ctx.lineWidth = 1 / scale;
-            ctx.strokeStyle = "rgba( 128, 128, 128, 0.1)";
-            ctx.strokeRect(
+    for (let x = 0 ; x < pixels.length ; x++) {
+        for (let y = 0 ; y < pixels[x].length ; y++) {
+            ctx.fillStyle = pixels[x][y].hex;
+            ctx.fillRect(
                 x * pixelWidth, 
                 y * pixelWidth, 
-                pixelWidth, 
+                pixelWidth,
                 pixelWidth
-            );
+            );    
+        }
+    }
+
+    if (displayGrid) {
+        for (let x = 0 ; x < pixels.length ; x++) {
+            for (let y = 0 ; y < pixels[x].length ; y++) {
+                ctx.lineWidth = 1 / scale;
+                ctx.strokeStyle = "rgba( 128, 128, 128, 0.1)";
+                ctx.strokeRect(
+                    x * pixelWidth, 
+                    y * pixelWidth, 
+                    pixelWidth, 
+                    pixelWidth
+                );
+            }
         }
     }
 }
@@ -243,10 +247,8 @@ $(document).ready(function(){
     canvasContainer.addEventListener("mousemove", function(event) {
         if (isMoving) {
             mousePosition = {
-
                 x : event.clientX,
                 y : event.clientY
-    
             };
             canvas.style.left = (mousePosition.x + offset.x) + "px";
             canvas.style.top  = (mousePosition.y + offset.y) + "px";
@@ -267,12 +269,17 @@ $(document).ready(function(){
             pixelWidth,
             pixelWidth
         );
+        ctx.strokeStyle = "rgba( 128, 128, 128, 0.5)";
         ctx.strokeRect(
             x * pixelWidth, 
             y * pixelWidth, 
             pixelWidth, 
             pixelWidth
         );
+        let owner = getOwner(x,y);
+        if (owner != null) {
+            // TODO create html tooltip above mouse
+        }
     }, false);
     
     // redraw the canvas when the mouse leaves the area
