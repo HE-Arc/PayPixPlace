@@ -10,6 +10,7 @@ from django.http.response import Http404
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 from django.core.paginator import Paginator
+from django.db.models import Prefetch
 from PIL import Image, ImageDraw
 
 from .forms import CreateCanvas
@@ -157,10 +158,10 @@ def change_user_slot_color(request):
             })
 
 def change_pixel_color(request):
-    canvas_id = request.GET.get('canvas_id')
-    x = request.GET.get('x')
-    y = request.GET.get('y')
-    hex = request.GET.get('hex')
+    canvas_id = request.POST['canvas_id']
+    x = request.POST['x']
+    y = request.POST['y']
+    hex = request.POST['hex']
     user = request.user
 
     current_date = datetime.now()
@@ -195,10 +196,16 @@ def get_json(request, id):
     except ObjectDoesNotExist:
         raise Http404()
 
-    pixels = canvas.pixel_set.all()
+    pixels = list(Pixel.objects.filter(canvas=id).values('x', 'y', 'hex', 'user__username'))
+    pixels2Darray = [list(range(canvas.width)) for p in pixels if p["x"] == 0]
+    for pixel in pixels:
+        pixels2Darray[pixel["x"]][pixel["y"]] = {
+            "hex" : pixel["hex"],
+            "username" : pixel["user__username"] 
+        }
     data = {
         'canvas': model_to_dict(canvas),
-        'pixels': [model_to_dict(pixel) for pixel in pixels]
+        'pixels': pixels2Darray
     }
     return JsonResponse(data, safe=False)
 
