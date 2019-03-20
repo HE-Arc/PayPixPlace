@@ -1,10 +1,9 @@
 source env/Scripts/activate && echo "env activated";
 pip install -r requirements.txt > /dev/null && echo "dependencies installed";
-rm PayPixPlace/db.sqlite3 && echo "db cleaned";
 echo "starting migrations...";
 python PayPixPlace/manage.py migrate > /dev/null && echo "migrations done";
 code .;
 echo "server running";
 start chrome http://localhost:8000/;
 alias rs="python PayPixPlace/manage.py runserver;"
-rs;
+rs
