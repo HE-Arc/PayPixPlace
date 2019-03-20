@@ -4,18 +4,66 @@
     <div class="row">
         {% for c in canvas %}
 
-            <div class="text-center col-12 col-sm-6 col-lg-4 mb-3">
-                <a href="{% url 'canvas-detail' c.id %}">
-                    <h2>{{ c.name }}</h2>
-                    <img
-                        class="w-100 img-fluid img-thumbnail"
-                        src="{% url 'canvas-img' c.id %}"
-                        alt="canvas named {{c.name}}"
-                    />        
-                </a>
+            <div class="col-12 col-sm-6 col-lg-4 mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <a href="{% url 'canvas-detail' c.id %}"><h2>{{ c.name }}</h2></a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <span class="font-weight-bold">Theme : </span>{{ c.theme }}
+                            </div>
+                            <div class="col-6 text-right">
+                                <span class="font-weight-bold">Size : </span>{{ c.width }} x {{ c.width }}
+                            </div>
+                            <hr class="w-100">
+                            <div class="col-12 mt-2">
+                                <span class="font-weight-bold">Is profit on : </span>
+                                <label class="switch">
+                                    {% if c.is_profit_on %}
+                                        <input type="checkbox" class="default showGridCB" disabled checked>
+                                    {% else %}
+                                        <input type="checkbox" class="default showGridCB">
+                                    {% endif %}
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="col-12">
+                                <a href="{% url 'canvas-detail' c.id %}">
+                                    <img
+                                        class="w-100 img-fluid img-thumbnail"
+                                        src="{% url 'canvas-img' c.id %}"
+                                        alt="canvas named {{c.name}}"
+                                    >        
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         {% endfor %}
+    </div>
+
+    <div class="fixed-bottom container mb-3">
+        <div class="pagination">
+            <span class="step-links">
+                {% if canvas.has_previous %}
+                    <a role="button" href="?page=1" class="btn btn-outline-dark">&laquo; first</a>
+                    <a role="button" href="?page={{ canvas.previous_page_number }}" class="btn btn-outline-dark">previous</a>
+                {% endif %}
+        
+                <span class="current font-weight-bold">
+                    Page {{ canvas.number }} of {{ canvas.paginator.num_pages }}
+                </span>
+        
+                {% if canvas.has_next %}
+                    <a role="button" href="?page={{ canvas.next_page_number }}" class="btn btn-outline-dark">next</a>
+                    <a role="button" href="?page={{ canvas.paginator.num_pages }}" class="btn btn-outline-dark">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
     </div>
     
 {% endblock content %}
