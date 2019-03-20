@@ -50,13 +50,27 @@
 }
 
 .ppp-logo {
-    width: 20px;
+    width: 280px;
     height: auto;
 }
 
 .ppp-currency {
-    width: 14px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ppp-currency-md {
+    width: 10px;
     height: auto;
+}
+
+.ppp-currency-lg {
+    width: 18px;
+    height: auto;
+}
+
+.ppp-icon {
+    width: 20px;
 }
 
 /* START SOURCE : https://bootsnipp.com/snippets/GaxR2 */
