@@ -157,10 +157,10 @@ def change_user_slot_color(request):
             })
 
 def change_pixel_color(request):
-    canvas_id = request.GET.get('canvas_id')
-    x = request.GET.get('x')
-    y = request.GET.get('y')
-    hex = request.GET.get('hex')
+    canvas_id = request.POST['canvas_id']
+    x = request.POST['x']
+    y = request.POST['y']
+    hex = request.POST['hex']
     user = request.user
 
     current_date = datetime.now()

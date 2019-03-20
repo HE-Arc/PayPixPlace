@@ -36,7 +36,11 @@ function changeSlotColor(newColor) {
     $.ajax({
         type: "POST",
         url: "/change_user_slot_color/",
-        data: {slot: currentSlot, color: newColor, userId: userId, csrfmiddlewaretoken: window.CSRF_TOKEN},
+        data: {
+            slot: currentSlot, 
+            color: newColor, 
+            userId: userId
+        },
         dataType: "json",
         success: function(data) {
             console.log(data)
@@ -144,6 +148,11 @@ function preventDefault(event) {
  * Initialise the paramters of the page
  */
 function initParams() {
+    canvas  = document.getElementById("canvas");
+    ctx = canvas.getContext("2d");
+
+    canvasContainer = document.getElementById("canvasContainer");
+    
     pixels = [];
     scale = 0.1;
     displayGrid = false;
@@ -169,25 +178,26 @@ function initParams() {
 
 // Execute when the page is fully loaded
 $(document).ready(function(){
-    canvas  = document.getElementById("canvas");
-    ctx = canvas.getContext("2d");
-
-    canvasContainer = document.getElementById("canvasContainer");
-
+    
+    initParams();
+    
+    // display the grid when the checkbox is checked
     document.getElementById("showGridCB").addEventListener("click", function(event) {
         displayGrid = this.checked;
         drawPixels();
     });
 
+    // prevent the opening of the context menu on the canvas container 
     canvasContainer.addEventListener("contextmenu", preventDefault, false);
 
+    // mouse left click on the canvas, to draw pixels
     canvas.addEventListener("mousedown", function(event) {
         if (event.button == 0) {
             let x = parseInt((event.offsetX) / pixelWidth);
             let y = parseInt((event.offsetY) / pixelWidth);
         
             $.ajax({
-                type: "GET",
+                type: "POST",
                 url: "/change_pixel_color/",
                 data: {
                     "canvas_id": canvasId,
@@ -205,6 +215,7 @@ $(document).ready(function(){
         }
     }, false);
     
+    // mouse right click up on the document
     document.addEventListener("mouseup", function(event) {
         if (event.button == 2) {
             isMoving = false;
@@ -216,6 +227,7 @@ $(document).ready(function(){
         }
     });
 
+    // mouse right click on the canvas container
     canvasContainer.addEventListener("mousedown", function(event){
         if (event.button == 2) {
             document.addEventListener("contextmenu", preventDefault, false);
@@ -227,6 +239,7 @@ $(document).ready(function(){
         }
     }, false);
 
+    // moves the canvas when the user is clicking
     canvasContainer.addEventListener("mousemove", function(event) {
         if (isMoving) {
             mousePosition = {
@@ -240,6 +253,7 @@ $(document).ready(function(){
         }
     }, false);
 
+    // redraw the canvas when the mouse hovering, with the pixel below highlighted
     canvas.addEventListener("mousemove", function(event) {
         let x = parseInt((event.offsetX) / pixelWidth);
         let y = parseInt((event.offsetY) / pixelWidth);
@@ -261,17 +275,31 @@ $(document).ready(function(){
         );
     }, false);
     
+    // redraw the canvas when the mouse leaves the area
     canvas.addEventListener("mouseleave", function() {
         drawPixels();
     }, false);
     
+    // zoom on the canvas with the mouse wheel
     canvasContainer.addEventListener("wheel", function(e) {
         e.deltaY < 0 ? scale *= 1.2 : scale /= 1.2;
         setCanvasTranform();
-        e.preventDefault();
+        preventDefault(e);
     }, false);
 
-    initParams();
+    // send the csrf token for POST requests
+    // source : https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", window.CSRF_TOKEN);
+            }
+        }
+    });
 
     loadPixels();
     setCanvasTranform();
