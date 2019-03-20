@@ -10,7 +10,7 @@ let currentSlot;
 let isMoving;
 let offset;
 let canvasContainer;
-let pixelOwners;
+let tooltipName;
 
 /**
  * Change the current slot
@@ -156,7 +156,8 @@ function initParams() {
     ctx = canvas.getContext("2d");
 
     canvasContainer = document.getElementById("canvasContainer");
-    
+    tooltipName = document.getElementById("tooltipName");
+
     pixels = [];
     scale = 0.1;
     displayGrid = false;
@@ -276,9 +277,14 @@ $(document).ready(function(){
             pixelWidth, 
             pixelWidth
         );
-        let owner = getOwner(x,y);
-        if (owner != null) {
+        let ownerName = getOwner(x,y);
+        if (ownerName != null) {
             // TODO create html tooltip above mouse
+            tooltipName.style.display = "block";
+            tooltipName.innerHTML = ownerName;
+            tooltipName.style.top = event.offsetY*scale + "px";
+            tooltipName.style.left = event.offsetX*scale + "px";
+            
         }
     }, false);
     
