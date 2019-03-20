@@ -3,8 +3,9 @@
 }
 
 .ppp-btn-rounded {
-    border-radius: 1.2em;
-    border: 0.2em solid rgb(38, 41, 38);
+    border-radius: 0.8em;
+    border: 0em solid rgb(54, 54, 54);
+    box-shadow: #3a3a3a 0em 0em 0.6em;
     font-size: 1.5em;
 }
 
@@ -60,17 +61,44 @@
 }
 
 .ppp-currency-md {
-    width: 10px;
+    width: 0.7em;
     height: auto;
 }
 
 .ppp-currency-lg {
-    width: 18px;
+    width: 0.7em;
     height: auto;
 }
 
 .ppp-icon {
-    width: 20px;
+    width: 1em;
+}
+
+.ppp-purchase-title-legend {
+    height: 1.5em;
+}
+
+.ppp-purchase-title-lord {
+    display:inline-block;
+    vertical-align:middle;
+    height: 1em;
+}
+
+.ppp-purchase-header-lg {
+    height:100%;
+    line-height:80px;
+}
+
+.ppp-purchase-header-md {
+    height:100%;
+    line-height:40px;
+}
+
+.ppp-purchase-title {
+    display:inline-block;
+    vertical-align:middle;
+    line-height:1.25em;
+    font-size: 2.2em !important;
 }
 
 /* START SOURCE : https://bootsnipp.com/snippets/GaxR2 */
