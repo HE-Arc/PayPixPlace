@@ -24,12 +24,14 @@ function changeCurrentSlot(id) {
  * @param {string} newColor 
  */
 function changeSlotColor(newColor) {
-    let currentPicker = document.getElementById("picker" + currentSlot);
+    let currentPicker = document.getElementsByClassName("picker" + currentSlot);
 
-    currentPicker.style.backgroundColor = newColor;
-    currentPicker.addEventListener("click", function() {
-        drawingColor = newColor;
-    }, false);
+    for (let i = 0; i < currentPicker.length; i++) {
+        currentPicker[i].style.backgroundColor = newColor;
+        currentPicker[i].addEventListener("click", function() {
+            drawingColor = newColor;
+        }, false);
+    }
     
     drawingColor = newColor;
 
@@ -109,15 +111,21 @@ function setCanvasTranform() {
  * @param {Integer} id
  */
 function setDrawingColor(id) {
-    let currentPicker = document.getElementById("picker" + (id + 1));
+    let currentPicker = document.getElementsByClassName("picker" + (id + 1));
 
     drawingColor = colors[id];
     
     for (let i = 0 ; i < pickers.length ; i++) {
-        pickers[i].classList.remove("ppp-picker-selected");
+        localPicker = pickers[i];
+
+        for (let j = 0; j < localPicker.length; j++) {
+            localPicker[j].classList.remove("ppp-picker-selected");
+        }
     }
     
-    currentPicker.classList.add("ppp-picker-selected");
+    for (let i = 0; i < currentPicker.length; i++) {
+        currentPicker[i].classList.remove("ppp-picker-selected");
+    }
 }
 
 /**
@@ -145,6 +153,7 @@ function preventDefault(event) {
  */
 function initParams() {
     pixels = [];
+    pickers = [];
     scale = 0.1;
     displayGrid = false;
     isMoving = false;
@@ -152,18 +161,20 @@ function initParams() {
     canvas.style.transformOrigin = "0 0";
     drawingColor = colors[0];
 
-    pickers = [
-        document.getElementById("picker1"),
-        document.getElementById("picker2"),
-        document.getElementById("picker3"),
-        document.getElementById("picker4")
-    ];
+    pickers.push(document.getElementsByClassName("picker1"));
+    pickers.push(document.getElementsByClassName("picker2"));
+    pickers.push(document.getElementsByClassName("picker3"));
+    pickers.push(document.getElementsByClassName("picker4"));
 
     for (let i = 0 ; i < pickers.length ; i++) {
-        pickers[i].style.backgroundColor = colors[i];
-        pickers[i].addEventListener('click', function() {
-            setDrawingColor(i);
-        }, false);
+        currentPicker = pickers[i];
+
+        for (let j = 0; j < currentPicker.length; j++) {
+            currentPicker[j].style.backgroundColor = colors[i];
+            currentPicker[j].addEventListener('click', function() {
+                setDrawingColor(i);
+            }, false);
+        }
     }
 }
 
@@ -174,10 +185,15 @@ $(document).ready(function(){
 
     canvasContainer = document.getElementById("canvasContainer");
 
-    document.getElementById("showGridCB").addEventListener("click", function(event) {
-        displayGrid = this.checked;
-        drawPixels();
-    });
+    let showGridCBs = document.getElementsByClassName("showGridCB");
+
+    for (let index = 0; index < showGridCBs.length; index++) {
+        showGridCBs[index].addEventListener("click", function(event) {
+            displayGrid = this.checked;
+            drawPixels();
+        });
+        
+    }
 
     canvasContainer.addEventListener("contextmenu", preventDefault, false);
 
