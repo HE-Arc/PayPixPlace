@@ -62,7 +62,7 @@ class CanvasDetailsView(DetailView):
 
 def getCanvas(page, place):
     canvas_list = Canvas.objects.filter(place=int(place))
-    paginator = Paginator(canvas_list, 5)
+    paginator = Paginator(canvas_list, 6)
     canvas = paginator.get_page(page)
     for c in canvas:
         c.pixels = Pixel.objects.filter(canvas=c.id)

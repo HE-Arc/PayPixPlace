@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark navbar-laravel">
     <div class="container">
         <a class="navbar-brand p-0" href="{% url 'paypixplace-home' %}">
-            <img class="ppp-logo" src="{% static 'paypixplaceapp/logoPPP.png' %}" alt="Pay Pix Place">
+            <img class="ppp-logo" src="{% static 'paypixplaceapp/images/logoPPP.png' %}" alt="Pay Pix Place">
         </a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@
                                 <span id="userAmmo">{{ user.ammo }}</span>
                             </span>
                             <div style="display: inline-block;">
-                                <img class="ppp-currency ppp-currency-md" src="{% static 'paypixplaceapp/currencyPPP.png' %}" alt="P">
+                                <img class="ppp-currency ppp-currency-md" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                                 <div id="userPix" style="display: inline-block;">{{ user.pix }}</div>
                             </div>
                         </a>
@@ -59,7 +59,7 @@
                             </a>
 
                             <a class="nav-link" href="{% url 'pix-purchase' %}">
-                                <img class="ppp-currency ppp-currency-md mr-2" src="{% static 'paypixplaceapp/currencyPPP.png' %}" alt="P">
+                                <img class="ppp-currency ppp-currency-md mr-2" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                                 Purchase PIX
                             </a>
 
@@ -86,7 +86,7 @@
                                             <span id="userAmmo">{{ user.ammo }}</span>
                                         </span>
                                         <div style="display: inline-block;">
-                                            <img class="ppp-currency ppp-currency-md" src="{% static 'paypixplaceapp/currencyPPP.png' %}" alt="P">
+                                            <img class="ppp-currency ppp-currency-md" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                                             <div id="userPix" style="display: inline-block;">{{ user.pix }}</div>
                                         </div>
                                     </a> 
@@ -105,7 +105,7 @@
                                 </a>
 
                                 <a class="dropdown-item" href="{% url 'pix-purchase' %}">
-                                    <img class="ppp-currency ppp-currency-md mr-2" src="{% static 'paypixplaceapp/currencyPPP.png' %}" alt="P">
+                                    <img class="ppp-currency ppp-currency-md mr-2" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                                     Purchase PIX
                                 </a>
 
