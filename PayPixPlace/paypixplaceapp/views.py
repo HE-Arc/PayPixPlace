@@ -112,6 +112,13 @@ def officialCanvas(request):
     }
     return render(request, 'paypixplaceapp/canvas/official_canvas.html', context)
 
+def userCanvas(request):
+    context = {
+        'title': 'User\'s Canvas',
+        'canvas': Canvas.objects.filter(user=request.user)
+    }
+    return render(request, 'paypixplaceapp/canvas/user_canvas.html', context)
+
 def get_pixies_info():
     pixies = Pixie.objects.all()
     return pixies
