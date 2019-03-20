@@ -20,7 +20,7 @@ import stripe
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
 class Place(IntEnum):
-    PUBLIC = 0
+    OFFICIAL = 0
     COMMUNITY = 1
 
 def home(request):
@@ -53,7 +53,7 @@ class CanvasDetailsView(DetailView):
 
         place_text = "Invalid"
         if self.object.place == 0:
-            place_text = "Public"
+            place_text = "Official"
         elif self.object.place == 1:
             place_text = "Community"
 
@@ -90,7 +90,7 @@ def createCanvas(request):
                 if canvas.place == int(Place.COMMUNITY):
                     return redirect('canvas-community')
                 else:
-                    return redirect('canvas-public')
+                    return redirect('canvas-official')
             else:
                 messages.error(request, f'The place is invalid!')
 
@@ -105,12 +105,12 @@ def createCanvas(request):
 
     return render(request, 'paypixplaceapp/canvas/create_canvas.html', context)
 
-def publicCanvas(request):
+def officialCanvas(request):
     context = {
-        'title': 'Public Canvas',
-        'canvas': getCanvas(request.GET.get('page'), Place.PUBLIC)
+        'title': 'Official Canvas',
+        'canvas': getCanvas(request.GET.get('page'), Place.OFFICIAL)
     }
-    return render(request, 'paypixplaceapp/canvas/public_canvas.html', context)
+    return render(request, 'paypixplaceapp/canvas/official_canvas.html', context)
 
 def get_pixies_info():
     pixies = Pixie.objects.all()
