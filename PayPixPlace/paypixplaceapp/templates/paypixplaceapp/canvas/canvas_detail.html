@@ -2,42 +2,55 @@
 {% load staticfiles %}
 {% block content %}
 
-    <div class="row mb-3">
-        <div class="col-md-4">
+    <div class="row">
+        <div class="col-md-4 mb-3">
 
             <div class="card">
                 <div class="card-header">
                     <h2>{{ object.name }}</h2>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
+                    <li class="list-group-item d-none d-md-block">
                         <div class="row my-3 px-3">
-                            <div class="col-4 col-md-12 col-lg-6 my-3 p-0">
-                                <div id="picker1" class="ppp-picker ppp-picker-selected"></div>
+                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                                <div class="picker1 ppp-picker ppp-picker-selected"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
                             </div>
-                            <div class="col-4 col-md-12 col-lg-6 my-3 p-0">
-                                <div id="picker2" class="ppp-picker"></div>
+                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                                <div class="picker2 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
                             </div>
-                            <div class="col-4 col-md-12 col-lg-6 my-3 p-0">
-                                <div id="picker3" class="ppp-picker"></div>
+                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                                <div class="picker3 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
                             </div>
-                            <div class="col-4 col-md-12 col-lg-6 my-3 p-0">
-                                <div id="picker4" class="ppp-picker"></div>
+                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                                <div class="picker4 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
                             </div>
                         </div>
                     </li>
-                    <li class="list-group-item">
+                    <li class="list-group-item d-none d-md-block">
                         <label class="font-weight-bold">Show Grid</label>
                         <label class="switch">
-                            <input type="checkbox" id="showGridCB" class="default">
+                            <input type="checkbox" class="default showGridCB">
                             <span class="slider round"></span>
                         </label>
                     </li>
-                    <li class="list-group-item">
+                    <li class="list-group-item d-none d-md-block">
+                        <label class="font-weight-bold">Hovered Pixel Informations</label>
+                        <table class="table">
+                            <tr>
+                                <td>Owner : </td>
+                                <td class="pixelOwner"></td>
+                            </tr>
+                            <tr>
+                                <td>Protected : </td>
+                                <td class="pixelProtected"></td>
+                            </tr>
+                        </table>
+                    </li>
+                    <li class="list-group-item d-none d-md-block">
                         <label class="font-weight-bold">Canvas Controls</label>
                         <ul class="pl-3">
                             <li>Hold right click to move canvas</li>
@@ -66,20 +79,53 @@
                             {% endif %}
                         </div>
                     </li>
+                    <li class="list-group-item d-block d-md-none">
+                        <label class="font-weight-bold">Canvas Controls</label>
+                        <ul class="pl-3">
+                            <li>Hold right click to move canvas</li>
+                            <li>Use mousewheel to zoom</li>
+                            <li>Click to change the color of pixels</li>    
+                        </ul>
+                    </li>
+                    <li class="list-group-item d-block d-md-none">
+                        <label class="font-weight-bold">Show Grid</label>
+                        <label class="switch">
+                            <input type="checkbox" class="default showGridCB">
+                            <span class="slider round"></span>
+                        </label>
+                    </li>
+                    <li class="list-group-item d-block d-md-none">
+                        <div class="row my-3 px-3">
+                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                                <div class="picker1 ppp-picker ppp-picker-selected"></div>
+                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
+                            </div>
+                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                                <div class="picker2 ppp-picker"></div>
+                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
+                            </div>
+                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                                <div class="picker3 ppp-picker"></div>
+                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
+                            </div>
+                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                                <div class="picker4 ppp-picker"></div>
+                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
 
-        <div class="col-md-8">
-            <div id="canvasContainer" class="w-100 h-100 border" style="overflow : hidden hidden; position: sticky;">
+        <div class="col-md-8 mb-3">
+            <div id="canvasContainer" class="border" style="overflow : hidden hidden; position: sticky;">
                 <canvas id="canvas" width="4000" height="4000">
                         Canvas are not supported
                 </canvas>
-                <div id="tooltipName" style="display:none; position:relative;"></div>
             </div>
         </div>
     </div>
-    
     
     <div id="color-picker-modal2" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm">

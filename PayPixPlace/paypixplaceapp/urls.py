@@ -5,8 +5,9 @@ from . import views
 urlpatterns = [
     path('', views.home, name='paypixplace-home'),
     path('canvas/create/', views.createCanvas, name='canvas-create'),
-    path('canvas/public/', views.publicCanvas, name='canvas-public'),
+    path('canvas/official/', views.officialCanvas, name='canvas-official'),
     path('canvas/community/', CanvasView.as_view(), name='canvas-community'),
+    path('canvas/user/', views.userCanvas, name='canvas-user'),
     path('canvas/<int:pk>/', CanvasDetailsView.as_view(), name='canvas-detail'),
     path('canvas/<int:id>/json/', views.get_json, name='canvas-json'),
     path('canvas/<int:id>/img/', views.get_img, name='canvas-img'),

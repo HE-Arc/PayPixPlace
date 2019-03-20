@@ -1,6 +1,7 @@
 let canvas;
 let ctx;
 let pixels;
+let canvasWidth;
 let scale;
 let displayGrid;
 let drawingColor;
@@ -10,7 +11,7 @@ let currentSlot;
 let isMoving;
 let offset;
 let canvasContainer;
-let tooltipName;
+let pixelInfoDisplay;
 
 /**
  * Change the current slot
@@ -25,12 +26,14 @@ function changeCurrentSlot(id) {
  * @param {string} newColor 
  */
 function changeSlotColor(newColor) {
-    let currentPicker = document.getElementById("picker" + currentSlot);
+    let currentPicker = document.getElementsByClassName("picker" + currentSlot);
 
-    currentPicker.style.backgroundColor = newColor;
-    currentPicker.addEventListener("click", function() {
-        drawingColor = newColor;
-    }, false);
+    for (let i = 0; i < currentPicker.length; i++) {
+        currentPicker[i].style.backgroundColor = newColor;
+        currentPicker[i].addEventListener("click", function() {
+            drawingColor = newColor;
+        }, false);
+    }
     
     drawingColor = newColor;
 
@@ -61,7 +64,8 @@ function loadPixels() {
         dataType: "json",
         success: function (data) {
             pixels = data.pixels;
-            pixelWidth = 4000 / data.canvas.width;
+            canvasWidth = data.canvas.width;
+            pixelWidth = 4000 / canvasWidth;
             drawPixels();
         }
     });
@@ -103,6 +107,7 @@ function drawPixels() {
             }
         }
     }
+    canvas.style.border = 2 / scale + "px solid #AAAAAA";
 }
 
 /**
@@ -117,15 +122,21 @@ function setCanvasTranform() {
  * @param {Integer} id
  */
 function setDrawingColor(id) {
-    let currentPicker = document.getElementById("picker" + (id + 1));
+    let currentPicker = document.getElementsByClassName("picker" + (id + 1));
 
     drawingColor = colors[id];
     
     for (let i = 0 ; i < pickers.length ; i++) {
-        pickers[i].classList.remove("ppp-picker-selected");
+        localPicker = pickers[i];
+
+        for (let j = 0; j < localPicker.length; j++) {
+            localPicker[j].classList.remove("ppp-picker-selected");
+        }
     }
     
-    currentPicker.classList.add("ppp-picker-selected");
+    for (let i = 0; i < currentPicker.length; i++) {
+        currentPicker[i].classList.remove("ppp-picker-selected");
+    }
 }
 
 /**
@@ -148,6 +159,15 @@ function preventDefault(event) {
     event.preventDefault();
 }
 
+function displayInfos(owner="", protected="") {
+    for (let i = 0 ; i < pixelInfoDisplay.owner.length ; i++) {
+        pixelInfoDisplay.owner[i].innerHTML = owner;
+    }
+    for (let i = 0 ; i < pixelInfoDisplay.protected.length ; i++) {
+        pixelInfoDisplay.protected[i].innerHTML = protected;
+    }
+}
+
 /**
  * Initialise the paramters of the page
  */
@@ -156,9 +176,13 @@ function initParams() {
     ctx = canvas.getContext("2d");
 
     canvasContainer = document.getElementById("canvasContainer");
-    tooltipName = document.getElementById("tooltipName");
+    pixelInfoDisplay = {
+        owner : document.getElementsByClassName("pixelOwner"),
+        protected : document.getElementsByClassName("pixelProtected"),
+    }
 
     pixels = [];
+    pickers = [];
     scale = 0.1;
     displayGrid = false;
     isMoving = false;
@@ -166,18 +190,20 @@ function initParams() {
     canvas.style.transformOrigin = "0 0";
     drawingColor = colors[0];
 
-    pickers = [
-        document.getElementById("picker1"),
-        document.getElementById("picker2"),
-        document.getElementById("picker3"),
-        document.getElementById("picker4")
-    ];
+    pickers.push(document.getElementsByClassName("picker1"));
+    pickers.push(document.getElementsByClassName("picker2"));
+    pickers.push(document.getElementsByClassName("picker3"));
+    pickers.push(document.getElementsByClassName("picker4"));
 
     for (let i = 0 ; i < pickers.length ; i++) {
-        pickers[i].style.backgroundColor = colors[i];
-        pickers[i].addEventListener('click', function() {
-            setDrawingColor(i);
-        }, false);
+        currentPicker = pickers[i];
+
+        for (let j = 0; j < currentPicker.length; j++) {
+            currentPicker[j].style.backgroundColor = colors[i];
+            currentPicker[j].addEventListener('click', function() {
+                setDrawingColor(i);
+            }, false);
+        }
     }
 }
 
@@ -187,10 +213,13 @@ $(document).ready(function(){
     initParams();
     
     // display the grid when the checkbox is checked
-    document.getElementById("showGridCB").addEventListener("click", function(event) {
-        displayGrid = this.checked;
-        drawPixels();
-    });
+    let showGridCBs = document.getElementsByClassName("showGridCB");
+    for (let index = 0; index < showGridCBs.length; index++) {
+        showGridCBs[index].addEventListener("click", function(event) {
+            displayGrid = this.checked;
+            drawPixels();
+        });
+    }
 
     // prevent the opening of the context menu on the canvas container 
     canvasContainer.addEventListener("contextmenu", preventDefault, false);
@@ -260,6 +289,9 @@ $(document).ready(function(){
     canvas.addEventListener("mousemove", function(event) {
         let x = parseInt((event.offsetX) / pixelWidth);
         let y = parseInt((event.offsetY) / pixelWidth);
+        x < 0 ? x = 0 : "";x > canvasWidth-1 ? x = canvasWidth-1 : "";
+        y < 0 ? y = 0 : "";y > canvasWidth-1 ? y = canvasWidth-1 : "";
+
         drawPixels();
         ctx.lineWidth = 1 / scale;
         let c = hexToRgb(drawingColor);
@@ -279,24 +311,23 @@ $(document).ready(function(){
         );
         let ownerName = getOwner(x,y);
         if (ownerName != null) {
-            // TODO create html tooltip above mouse
-            tooltipName.style.display = "block";
-            tooltipName.innerHTML = ownerName;
-            tooltipName.style.top = event.offsetY*scale + "px";
-            tooltipName.style.left = event.offsetX*scale + "px";
-            
+            displayInfos(ownerName, "False");
+        } else {
+            displayInfos();
         }
     }, false);
     
     // redraw the canvas when the mouse leaves the area
     canvas.addEventListener("mouseleave", function() {
         drawPixels();
+        displayInfos();
     }, false);
     
     // zoom on the canvas with the mouse wheel
     canvasContainer.addEventListener("wheel", function(e) {
         e.deltaY < 0 ? scale *= 1.2 : scale /= 1.2;
         setCanvasTranform();
+        drawPixels();
         preventDefault(e);
     }, false);
 
