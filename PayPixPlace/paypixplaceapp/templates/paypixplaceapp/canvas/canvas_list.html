@@ -4,17 +4,22 @@
     
     {% endblock title %}
 
-    {% for c in canvas %}
-        <div class="text-center">
-            <a href="{% url 'canvas-detail' c.id %}">
-                <h2>{{ c.name }}</h2>
-                <img
-                    class="w-25 img-fluid img-thumbnail"
-                    src="{% url 'canvas-img' c.id %}"
-                    alt="canvas named {{c.name}}"/>        
-            </a>
-        </div>
-    {% endfor %}
+    <div class="row">
+        {% for c in canvas %}
+
+            <div class="text-center col-12 col-sm-6 col-lg-4 mb-3">
+                <a href="{% url 'canvas-detail' c.id %}">
+                    <h2>{{ c.name }}</h2>
+                    <img
+                        class="w-100 img-fluid img-thumbnail"
+                        src="{% url 'canvas-img' c.id %}"
+                        alt="canvas named {{c.name}}"
+                    />        
+                </a>
+            </div>
+
+        {% endfor %}
+    </div>
 
     <div class="fixed-bottom container mb-3">
         <div class="pagination">
