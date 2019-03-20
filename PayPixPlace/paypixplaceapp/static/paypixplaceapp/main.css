@@ -51,7 +51,7 @@
 }
 
 .ppp-logo {
-    width: 280px;
+    width: 14em;
     height: auto;
 }
 
@@ -79,26 +79,78 @@
 }
 
 .ppp-purchase-title-lord {
-    display:inline-block;
-    vertical-align:middle;
+    display: inline-block;
+    vertical-align: middle;
     height: 1em;
 }
 
+.ppp-purchase-title {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1.25em;
+    font-size: 2.2em;
+}
+
 .ppp-purchase-header-lg {
-    height:100%;
-    line-height:80px;
+    height: 100%;
+    line-height: 5em;
 }
 
 .ppp-purchase-header-md {
-    height:100%;
-    line-height:40px;
+    height: 100%;
+    line-height: 2.5em;
 }
 
-.ppp-purchase-title {
-    display:inline-block;
-    vertical-align:middle;
-    line-height:1.25em;
-    font-size: 2.2em !important;
+/* Extra large devices (large desktops, 1200px and down) */
+@media (max-width: 1200px) {
+    
+    .ppp-purchase-title {
+        font-size: 1.8em;
+    }
+
+    .ppp-purchase-title-lord {
+        height: 1.2em;
+    }
+}
+
+/* Large devices (desktops, 992px and down) */
+@media (max-width: 992px) {
+    
+    .ppp-purchase-title {
+        font-size: 1.3em;
+    }
+
+    .ppp-purchase-title-lord {
+        height: 1.5em;
+    }
+}
+
+/* Medium devices (tablets, 768px and down) */
+@media (max-width: 768px) {
+    
+    .ppp-purchase-title {
+        font-size: 2em;
+    }
+
+    .ppp-purchase-title-lord {
+        height: 1em;
+    }
+}
+
+/* Small devices (landscape phones, 576px and down) */
+@media (max-width: 576px) {
+    
+    .ppp-purchase-title {
+        font-size: 1.5em;
+    }
+
+    .ppp-purchase-title-lord {
+        height: 1.5em;
+    }
+
+    .ppp-logo {
+        width: 10em;
+    }
 }
 
 /* START SOURCE : https://bootsnipp.com/snippets/GaxR2 */
