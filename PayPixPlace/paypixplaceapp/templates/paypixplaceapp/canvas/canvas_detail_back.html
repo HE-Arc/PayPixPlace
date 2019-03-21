@@ -1,16 +1,10 @@
-{% extends "paypixplaceapp/base_fullscreen.html" %}
+{% extends "paypixplaceapp/base.html" %}
 {% load staticfiles %}
 {% block content %}
 
-    <div class="ppp-main-container">
-        <div id="canvasContainer" class="border ppp-canvas-container" style="overflow : hidden hidden; position: sticky;">
-            <canvas id="canvas" width="4000" height="4000">
-                    Canvas are not supported
-            </canvas>
-        </div>
-    
-        <div class="ppp-side-bar">
-    
+    <div class="row">
+        <div class="col-md-4 mb-3">
+
             <div class="card">
                 <div class="card-header">
                     <h2>{{ object.name }}</h2>
@@ -121,6 +115,14 @@
                         </div>
                     </li>
                 </ul>
+            </div>
+        </div>
+
+        <div class="col-md-8 mb-3">
+            <div id="canvasContainer" class="border" style="overflow : hidden hidden; position: sticky;">
+                <canvas id="canvas" width="4000" height="4000">
+                        Canvas are not supported
+                </canvas>
             </div>
         </div>
     </div>
