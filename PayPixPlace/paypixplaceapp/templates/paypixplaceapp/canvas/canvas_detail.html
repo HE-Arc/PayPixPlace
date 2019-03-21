@@ -1,30 +1,35 @@
-{% extends "paypixplaceapp/base.html" %}
+{% extends "paypixplaceapp/base_fullscreen.html" %}
 {% load staticfiles %}
 {% block content %}
+    
+    <div id="sidebarContainer" class="ppp-sidebar-container">
 
-    <div class="row">
-        <div class="col-md-4 mb-3">
+        <div id="sidebarTrigger" class="ppp-sidebar-trigger">
+            <i id="sidebarTriggerOpen" class="fas fa-caret-square-left ppp-icon ppp-sidebar-trigger-icon align-top"></i>
+            <i id="sidebarTriggerClose" class="fas fa-caret-square-right ppp-icon ppp-sidebar-trigger-icon align-top" hidden></i>
+        </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h2>{{ object.name }}</h2>
-                </div>
+        <div id="sidebarContent" class="card text-white bg-dark ppp-sidebar-content text-center align-middle">
+            <div class="card-header">
+                <h2>{{ object.name }}</h2>
+            </div>
+            <div class="card-body">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-none d-md-block">
-                        <div class="row my-3 px-3">
-                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                    <li class="list-group-item text-white bg-dark">
+                        <div class="row">
+                            <div class="col-6 mb-3 p-0">
                                 <div class="picker1 ppp-picker ppp-picker-selected"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
                             </div>
-                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                            <div class="col-6 mb-3 p-0">
                                 <div class="picker2 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
                             </div>
-                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                            <div class="col-6 p-">
                                 <div class="picker3 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
                             </div>
-                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
+                            <div class="col-6 p-0">
                                 <div class="picker4 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
                             </div>
@@ -33,110 +38,101 @@
                             </div>
                         </div>
                     </li>
-                    <li class="list-group-item d-none d-md-block">
-                        <label class="font-weight-bold">Show Grid</label>
-                        <label class="switch">
+                    <li class="list-group-item text-white bg-dark">
+                        <label class="font-weight-bold m-0 align-middle">Show Grid</label>
+                        <label class="switch m-0">
                             <input type="checkbox" class="default showGridCB">
                             <span class="slider round"></span>
                         </label>
                     </li>
-                    <li class="list-group-item d-none d-md-block">
-                        <label class="font-weight-bold">Hovered Pixel Informations</label>
-                        <table class="table">
-                            <tr>
-                                <td class="w-50">Owner : </td>
-                                <td class="pixelOwner w-50"></td>
-                            </tr>
-                            <tr>
-                                <td class="w-50">Protected : </td>
-                                <td class="pixelProtected w-50"></td>
-                            </tr>
-                        </table>
-                    </li>
-                    <li class="list-group-item d-none d-md-block">
-                        <label class="font-weight-bold">Canvas Controls</label>
-                        <ul class="pl-3">
-                            <li>Hold right click to move canvas</li>
-                            <li>Use mousewheel to zoom</li>
-                            <li>Click to change the color of pixels</li>    
-                        </ul>
-                    </li>
-                    <li class="list-group-item">
+                    <li class="list-group-item text-white bg-dark">
+                        <!--<div class="form-group">
+                            <label for="canvasTheme" class="font-weight-bold">Pixel Owner</label>
+                            <input type="text" class="form-control font-weight-bold pixelOwner" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="canvasTheme" class="font-weight-bold">Pixel Protection</label>
+                            <input type="text" class="form-control font-weight-bold pixelProtected" disabled>
+                        </div>-->
                         <div class="form-group">
                             <label for="canvasTheme" class="font-weight-bold">Canvas Theme</label>
                             <input type="text" class="form-control font-weight-bold" id="canvasTheme" value="{{ object.theme }}" disabled>
                         </div>
-                    </li>
-                    <li class="list-group-item">
                         <div class="form-group">
                             <label for="canvasTheme" class="font-weight-bold">Canvas Place</label>
                             <input type="text" class="form-control font-weight-bold" id="canvasTheme" value="{{ place_text }}" disabled>
                         </div>
                     </li>
-                    <li class="list-group-item">
-                        <div class="form-group">
-                            {% if object.is_profit_on %}
-                                <label class="font-weight-bold">Profit ON</label>
-                            {% else %}
-                                <label class="font-weight-bold">Profit OFF</label>
-                            {% endif %}
-                        </div>
-                    </li>
-                    <li class="list-group-item d-block d-md-none">
-                        <label class="font-weight-bold">Canvas Controls</label>
-                        <ul class="pl-3">
-                            <li>Hold right click to move canvas</li>
-                            <li>Use mousewheel to zoom</li>
-                            <li>Click to change the color of pixels</li>    
-                        </ul>
-                    </li>
-                    <li class="list-group-item d-block d-md-none">
-                        <label class="font-weight-bold">Show Grid</label>
-                        <label class="switch">
-                            <input type="checkbox" class="default showGridCB">
-                            <span class="slider round"></span>
-                        </label>
-                    </li>
-                    <li class="list-group-item d-block d-md-none">
-                        <div class="row my-3 px-3">
-                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
-                                <div class="picker1 ppp-picker ppp-picker-selected"></div>
-                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
-                            </div>
-                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
-                                <div class="picker2 ppp-picker"></div>
-                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
-                            </div>
-                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
-                                <div class="picker3 ppp-picker"></div>
-                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
-                            </div>
-                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
-                                <div class="picker4 ppp-picker"></div>
-                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
-                            </div>
-                        </div>
+                    <li class="list-group-item text-white bg-dark">
+                        <button class="btn btn-sm btn-outline-info d-inline" data-toggle="modal" data-target=".canvas-control-modal">
+                            <i class="fas fa-info-circle ppp-canvas-control"></i>
+                        </button>
                     </li>
                 </ul>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-8 mb-3">
-            <div id="canvasContainer" class="border" style="overflow : hidden hidden; position: sticky;">
-                <canvas id="canvas" width="4000" height="4000">
-                        Canvas are not supported
-                </canvas>
+    <div id="downbarContainer" class="ppp-downbar-container">
+        <div class="row p-1">
+            <div class="col-12 col-md-8 offset-0 offset-md-2">
+                <div class="row">
+                    <div class="col-3 d-inline-block">
+                        <div class="picker1 ppp-picker-sm ppp-picker-selected"></div>
+                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
+                    </div>
+                    <div class="col-3 d-inline-block">
+                        <div class="picker2 ppp-picker-sm"></div>
+                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
+                    </div>
+                    <div class="col-3 d-inline-block">
+                        <div class="picker3 ppp-picker-sm"></div>
+                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
+                    </div>
+                    <div class="col-3 d-inline-block">
+                        <div class="picker4 ppp-picker-sm"></div>
+                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <div id="canvasContainer" class="ppp-canvas-wrapper">
+        <canvas id="canvas" width="4000" height="4000">
+                Canvas are not supported
+        </canvas>
+    </div>
     
-    <div id="color-picker-modal2" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-body" style="display: inline-block;">
                     {% for color in user.owns.all %}
                         <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeSlotColor('{{ color.hex }}')"></div>
                     {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="canvas-control-modal" class="modal fade canvas-control-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body" style="display: inline-block;">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <label class="font-weight-bold">Canvas Controls</label>
+                            <ul class="pl-3 text-left">
+                                <li>Hold right click to move canvas</li>
+                                <li>Use mousewheel to zoom</li>
+                                <li>Click to change the color of pixels</li>    
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>

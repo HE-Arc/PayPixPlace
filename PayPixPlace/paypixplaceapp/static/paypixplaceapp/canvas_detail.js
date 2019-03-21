@@ -15,6 +15,8 @@ let pixelInfoDisplay;
 let pickerMove;
 let isColoring;
 let hasMoved;
+let sidebarTrigger;
+let isSidebarHidden;
 
 /**
  * Change the current slot
@@ -143,7 +145,7 @@ function setDrawingColor(id) {
     }
     
     for (let i = 0; i < currentPicker.length; i++) {
-        currentPicker[i].classList.remove("ppp-picker-selected");
+        currentPicker[i].classList.add("ppp-picker-selected");
     }
 
     isColoring = true;
@@ -177,10 +179,10 @@ function preventDefault(event) {
  */
 function displayInfos(owner="", protected="") {
     for (let i = 0 ; i < pixelInfoDisplay.owner.length ; i++) {
-        pixelInfoDisplay.owner[i].innerHTML = owner;
+        pixelInfoDisplay.owner[i].value = owner;
     }
     for (let i = 0 ; i < pixelInfoDisplay.protected.length ; i++) {
-        pixelInfoDisplay.protected[i].innerHTML = protected;
+        pixelInfoDisplay.protected[i].value = protected;
     }
 }
 
@@ -319,6 +321,9 @@ function initParams() {
     canvas  = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
 
+    isSidebarHidden = false;
+    sidebarTrigger = document.getElementById("sidebarTrigger");
+
     canvasContainer = document.getElementById("canvasContainer");
     pixelInfoDisplay = {
         owner : document.getElementsByClassName("pixelOwner"),
@@ -371,6 +376,22 @@ $(document).ready(function(){
             drawPixels();
         });
     }
+
+    sidebarTrigger.addEventListener('click', function() {
+        isSidebarHidden = !isSidebarHidden;
+
+        if(isSidebarHidden) {
+            document.getElementById("sidebarTriggerOpen").hidden = true;
+            document.getElementById("sidebarTriggerClose").hidden = false;
+            document.getElementById("sidebarContainer").classList.add("ppp-sidebar-container-close");
+            document.getElementById("downbarContainer").classList.add("ppp-downbar-container-open");
+        } else {
+            document.getElementById("sidebarTriggerOpen").hidden = false;
+            document.getElementById("sidebarTriggerClose").hidden = true;
+            document.getElementById("sidebarContainer").classList.remove("ppp-sidebar-container-close");
+            document.getElementById("downbarContainer").classList.remove("ppp-downbar-container-open");
+        }
+    });
 
     // prevent the opening of the context menu on the canvas container 
     canvasContainer.addEventListener("contextmenu", preventDefault, false);

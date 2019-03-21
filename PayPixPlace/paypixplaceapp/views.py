@@ -114,9 +114,13 @@ def officialCanvas(request):
     return render(request, 'paypixplaceapp/canvas/official_canvas.html', context)
 
 def userCanvas(request):
+    canvas_list = Canvas.objects.filter(user=request.user)
+    paginator = Paginator(canvas_list, 6)
+    canvas = paginator.get_page(request.GET.get('page'))
+
     context = {
         'title': 'User\'s Canvas',
-        'canvas': Canvas.objects.filter(user=request.user)
+        'canvas': canvas
     }
     return render(request, 'paypixplaceapp/canvas/user_canvas.html', context)
 
