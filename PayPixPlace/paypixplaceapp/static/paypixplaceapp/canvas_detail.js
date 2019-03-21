@@ -12,6 +12,9 @@ let isMoving;
 let offset;
 let canvasContainer;
 let pixelInfoDisplay;
+let pickerMove;
+let isColoring;
+let hasMoved;
 
 /**
  * Change the current slot
@@ -54,7 +57,7 @@ function changeSlotColor(newColor) {
 
 /**
  * Loads the pixels of the actual canvas from the database
- * Load as JSON
+ * Loaded as JSON
  */
 function loadPixels() {
     // Load pixels from database
@@ -71,12 +74,17 @@ function loadPixels() {
     });
 }
 
+/**
+ * returns the name of the owner of the pixel at the given position
+ * @param {Integer} x 
+ * @param {Integer} y 
+ */
 function getOwner(x,y) {
     return pixels[x][y].username;
 }
 
 /**
- * Draw the pixels on the screen
+ * Draw the pixels on the canvas
  */
 function drawPixels() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -137,6 +145,8 @@ function setDrawingColor(id) {
     for (let i = 0; i < currentPicker.length; i++) {
         currentPicker[i].classList.remove("ppp-picker-selected");
     }
+
+    isColoring = true;
 }
 
 /**
@@ -159,6 +169,12 @@ function preventDefault(event) {
     event.preventDefault();
 }
 
+/**
+ * display new informations about the selected pixels
+ * call without params to clear
+ * @param {String} owner 
+ * @param {String} protected 
+ */
 function displayInfos(owner="", protected="") {
     for (let i = 0 ; i < pixelInfoDisplay.owner.length ; i++) {
         pixelInfoDisplay.owner[i].innerHTML = owner;
@@ -166,6 +182,134 @@ function displayInfos(owner="", protected="") {
     for (let i = 0 ; i < pixelInfoDisplay.protected.length ; i++) {
         pixelInfoDisplay.protected[i].innerHTML = protected;
     }
+}
+
+/**
+ * handle the click on the button for moving the canvas
+ */
+function clickMove() {
+    isColoring = false;
+    // TODO adapt style to be selected etc.. 
+}
+
+/**
+ * code executed when the user moves the mouse above the canvas
+ * @param {MouseEvent} event 
+ */
+function canvasMouseMove(event) {
+    let x = parseInt((event.offsetX) / pixelWidth);
+    let y = parseInt((event.offsetY) / pixelWidth);
+    x < 0 ? x = 0 : "";x > canvasWidth-1 ? x = canvasWidth-1 : "";
+    y < 0 ? y = 0 : "";y > canvasWidth-1 ? y = canvasWidth-1 : "";
+
+    drawPixels();
+    ctx.lineWidth = 1 / scale;
+    let c = hexToRgb(drawingColor);
+    ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
+    ctx.fillRect(
+        x * pixelWidth, 
+        y * pixelWidth, 
+        pixelWidth,
+        pixelWidth
+    );
+    ctx.strokeStyle = "rgba( 128, 128, 128, 0.5)";
+    ctx.strokeRect(
+        x * pixelWidth, 
+        y * pixelWidth, 
+        pixelWidth, 
+        pixelWidth
+    );
+    let ownerName = getOwner(x,y);
+    if (ownerName != null) {
+        displayInfos(ownerName, "False");
+    } else {
+        displayInfos();
+    }
+}
+
+/**
+ * moves the canvas around
+ * @param {Event} event 
+ */
+function moveCanvas(event) {
+    if (isMoving) {
+        hasMoved = true;
+        //console.log(event.changedTouches[0].clientX);
+        let position = {
+            x: (event.changedTouches) ? event.changedTouches[0].clientX : event.clientX,
+            y: (event.changedTouches) ? event.changedTouches[0].clientY : event.clientY
+        };
+        canvas.style.left = (position.x + offset.x) + "px";
+        canvas.style.top  = (position.y + offset.y) + "px";
+    }
+}
+
+function clickDown(event) {
+    isMoving = true;
+    offset =  {
+        "x" : canvas.offsetLeft - event.clientX,
+        "y" : canvas.offsetTop - event.clientY
+    };
+    preventDefault(event);
+}
+
+/**
+ * get the OffsetX and offsetY of a click or touch inside an element
+ * @param {Event} evt 
+ */
+function getOffsetPosition(evt){
+    let position = {
+        x: (evt.changedTouches) ? evt.changedTouches[0].pageX : evt.pageX,
+        y: (evt.changedTouches) ? evt.changedTouches[0].pageY : evt.pageY
+    };
+    let rect = evt.target.getBoundingClientRect();
+    position.x -= rect.x;
+    position.y -= rect.y;
+
+    position.x /= scale;
+    position.y /= scale;
+
+    return position;
+}
+
+/**
+ * action to fill a pixel (used to respond to events)
+ * @param {Event} event 
+ */
+function fillPixel(event) {
+    let pos = getOffsetPosition(event);
+    let x = parseInt((pos.x) / pixelWidth);
+    let y = parseInt((pos.y) / pixelWidth);
+    if (x < 0 || y < 0 || x > canvasWidth-1 || y > canvasWidth-1) {
+        return;
+    }
+    $.ajax({
+        type: "POST",
+        url: "/change_pixel_color/",
+        data: {
+            "canvas_id": canvasId,
+            "x": x,
+            "y": y,
+            "hex": drawingColor,
+        },
+        dataType: "json",
+        success: function (data) {
+            if (data.is_valid) {
+                loadPixels();
+            }
+        }
+    });
+}
+
+/**
+ * prevent the context menu from showing when exiting the canvas area with right click pressed
+ */
+function preventContextMenu() {
+    function removeContextMenu(event) {
+        document.removeEventListener("contextmenu", preventDefault, false);
+        document.removeEventListener("contextmenu", removeContextMenu, false);
+    }
+    document.addEventListener("contextmenu", removeContextMenu, false);
 }
 
 /**
@@ -186,6 +330,8 @@ function initParams() {
     scale = 0.1;
     displayGrid = false;
     isMoving = false;
+    isColoring = true;
+    hasMoved = false;
     canvas.style.position = "absolute";
     canvas.style.transformOrigin = "0 0";
     drawingColor = colors[0];
@@ -204,6 +350,11 @@ function initParams() {
                 setDrawingColor(i);
             }, false);
         }
+    }
+
+    pickerMove = document.getElementsByClassName("pickerMove");
+    for (let i = 0; i < pickerMove.length; i++) {
+        pickerMove[i].addEventListener("click", clickMove, false);
     }
 }
 
@@ -226,96 +377,62 @@ $(document).ready(function(){
 
     // mouse left click on the canvas, to draw pixels
     canvas.addEventListener("mousedown", function(event) {
-        if (event.button == 0) {
-            let x = parseInt((event.offsetX) / pixelWidth);
-            let y = parseInt((event.offsetY) / pixelWidth);
-        
-            $.ajax({
-                type: "POST",
-                url: "/change_pixel_color/",
-                data: {
-                    "canvas_id": canvasId,
-                    "x": x,
-                    "y": y,
-                    "hex": drawingColor,
-                },
-                dataType: "json",
-                success: function (data) {
-                    if (data.is_valid) {
-                        loadPixels();
-                    }
-                }
-            });
-        }
+        hasMoved = false;
+        isMoving = true;
+        clickDown(event);
     }, false);
     
     // mouse right click up on the document
     document.addEventListener("mouseup", function(event) {
-        if (event.button == 2) {
-            isMoving = false;
-            function removeContextMenu(event) {
-                document.removeEventListener("contextmenu", preventDefault, false);
-                document.removeEventListener("contextmenu", removeContextMenu, false);
-            }
-            document.addEventListener("contextmenu", removeContextMenu, false);
-        }
+        isMoving = false;
+        preventContextMenu();
     });
 
     // mouse right click on the canvas container
     canvasContainer.addEventListener("mousedown", function(event){
-        if (event.button == 2) {
+        if (event.buttons == 2 || event.buttons == 3) {
             document.addEventListener("contextmenu", preventDefault, false);
-            isMoving = true;
-            offset =  {
-                "x" : canvas.offsetLeft - event.clientX,
-                "y" : canvas.offsetTop - event.clientY
-            };
         }
+        clickDown(event);
     }, false);
 
     // moves the canvas when the user is clicking
     canvasContainer.addEventListener("mousemove", function(event) {
-        if (isMoving) {
-            mousePosition = {
-                x : event.clientX,
-                y : event.clientY
-            };
-            canvas.style.left = (mousePosition.x + offset.x) + "px";
-            canvas.style.top  = (mousePosition.y + offset.y) + "px";
+        moveCanvas(event);
+    }, false);
+
+    canvas.addEventListener("touchstart", function(event){
+        hasMoved = false;
+        isMoving = true;
+        clickDown(event);
+    }, false);
+
+    canvas.addEventListener("touchend", function(event){
+        isMoving = false;
+        if (!hasMoved) {
+            fillPixel(event);
         }
     }, false);
+
+    canvas.addEventListener("mouseup", function(event){
+        isMoving = false;
+        if (!hasMoved) {
+            fillPixel(event);
+        }
+    }, false);
+    
+    canvasContainer.addEventListener("touchmove", function(event){
+        moveCanvas(event);
+        preventDefault(event);
+    }, false);
+
+    document.addEventListener("touchend", function(event){
+        isMoving = false;
+    }, false);
+    
 
     // redraw the canvas when the mouse hovering, with the pixel below highlighted
-    canvas.addEventListener("mousemove", function(event) {
-        let x = parseInt((event.offsetX) / pixelWidth);
-        let y = parseInt((event.offsetY) / pixelWidth);
-        x < 0 ? x = 0 : "";x > canvasWidth-1 ? x = canvasWidth-1 : "";
-        y < 0 ? y = 0 : "";y > canvasWidth-1 ? y = canvasWidth-1 : "";
-
-        drawPixels();
-        ctx.lineWidth = 1 / scale;
-        let c = hexToRgb(drawingColor);
-        ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
-        ctx.fillRect(
-            x * pixelWidth, 
-            y * pixelWidth, 
-            pixelWidth,
-            pixelWidth
-        );
-        ctx.strokeStyle = "rgba( 128, 128, 128, 0.5)";
-        ctx.strokeRect(
-            x * pixelWidth, 
-            y * pixelWidth, 
-            pixelWidth, 
-            pixelWidth
-        );
-        let ownerName = getOwner(x,y);
-        if (ownerName != null) {
-            displayInfos(ownerName, "False");
-        } else {
-            displayInfos();
-        }
-    }, false);
+    canvas.addEventListener("mousemove", canvasMouseMove, false);
     
     // redraw the canvas when the mouse leaves the area
     canvas.addEventListener("mouseleave", function() {
@@ -331,7 +448,7 @@ $(document).ready(function(){
         preventDefault(e);
     }, false);
 
-    // send the csrf token for POST requests
+    // send the csrf token before POST requests
     // source : https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
     function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
