@@ -283,6 +283,26 @@ def payment(request, id):
 def user_has_enough_pix(user, price):
     return user.pix >= price
 
+def buy_fix_color(hex, user):
+    result_message = ""
+    transaction_success = False
+    
+    try:
+        color = user.owns.all().get(hex=hex)
+        # The user already owns the color
+        result_message = "You already own this color!"
+    except Color.DoesNotExist:
+        # The user does not own the color
+        try:
+            color = Color.objects.get(hex=hex)
+            user.owns.add(color)
+        except Color.DoesNotExist:
+            user.owns.create(hex=hex)   
+        result_message = "Color successfuly added!"
+        transaction_success = True
+
+    return transaction_success, result_message
+
 def buy(request, id):
     user = request.user
     price = PixPrice.objects.get(num_type=id).price
@@ -293,22 +313,7 @@ def buy(request, id):
     if user_has_enough_pix(user, price):
     
         if id == int(PixPriceNumType.FIX_COLOR):
-            hex = request.POST["hex"]
-            try:
-                color = user.owns.all().get(hex=hex)
-                # The user already owns the color
-                result_message = "You already own this color!"
-            except Color.DoesNotExist:
-                # The user does not own the color
-                try:
-                    color = Color.objects.get(hex=hex)
-                    user.owns.add(color)
-                except Color.DoesNotExist:
-                    user.owns.create(hex=hex)   
-                result_message = "Color successfuly added!"
-                transaction_success = True
-            
-        
+            transaction_success, result_message = buy_fix_color(request.POST["hex"], user)
     else:
         result_message = "You do not have enough pix!"
 
