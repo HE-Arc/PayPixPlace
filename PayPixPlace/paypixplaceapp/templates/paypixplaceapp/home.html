@@ -24,6 +24,22 @@
         </button>
     </div>
 
+    <div>
+        {% for color_pack in colors_pack %}
+            <div>
+                {{ color_pack.name }}
+                {% for color in color_pack.contains.all %}
+                    <div class="ppp-color-case" style="background-color: {{ color.hex }}; border-style: solid;" ></div>
+                {% endfor %}
+                <button>
+                    {% with color_pack_price=prices|get_item:1 %}
+                    {{ color_pack_price.price }}
+                    {% endwith %} PIX
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
     <script>
         window.CSRF_TOKEN = "{{ csrf_token }}";
     </script>

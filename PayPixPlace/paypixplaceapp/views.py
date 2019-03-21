@@ -14,7 +14,7 @@ from django.template.defaulttags import register
 from PIL import Image, ImageDraw
 
 from .forms import CreateCanvas
-from .models import Canvas, Pixel, Pixie, User, Slot, Color, PixPrice
+from .models import Canvas, Pixel, Pixie, User, Slot, Color, PixPrice, Colors_pack
 
 import stripe 
 import random
@@ -52,6 +52,8 @@ def home(request):
     context = {
         'title': 'Home',
         'prices': get_pix_price,
+        'colors_pack': Colors_pack.objects.all()
+
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
