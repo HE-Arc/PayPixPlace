@@ -17,6 +17,7 @@ from .forms import CreateCanvas
 from .models import Canvas, Pixel, Pixie, User, Slot, Color, PixPrice
 
 import stripe 
+import random
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
@@ -283,6 +284,13 @@ def payment(request, id):
 def user_has_enough_pix(user, price):
     return user.pix >= price
 
+def add_color_to_user(hex, user):
+    try:
+        color = Color.objects.get(hex=hex)
+        user.owns.add(color)
+    except Color.DoesNotExist:
+        user.owns.create(hex=hex)   
+
 def buy_fix_color(hex, user):
     result_message = ""
     transaction_success = False
@@ -293,15 +301,31 @@ def buy_fix_color(hex, user):
         result_message = "You already own this color!"
     except Color.DoesNotExist:
         # The user does not own the color
-        try:
-            color = Color.objects.get(hex=hex)
-            user.owns.add(color)
-        except Color.DoesNotExist:
-            user.owns.create(hex=hex)   
+        add_color_to_user(hex, user)
         result_message = "Color successfuly added!"
         transaction_success = True
 
     return transaction_success, result_message
+
+def buy_random_color(user):
+    result_message = ""
+    transaction_success = False
+    
+    while not transaction_success:
+        r = lambda: random.randint(0,255)
+        hex = ('#%02X%02X%02X' % (r(),r(),r()))
+    
+        try:
+            color = user.owns.all().get(hex=hex)
+            # The user already owns the color
+            result_message = "You already own this color!"
+        except Color.DoesNotExist:
+            add_color_to_user(hex, user)
+            result_message = "Color successfuly added! (" + hex + ")"
+            transaction_success = True
+
+    return transaction_success, result_message
+
 
 def buy(request, id):
     user = request.user
@@ -314,6 +338,9 @@ def buy(request, id):
     
         if id == int(PixPriceNumType.FIX_COLOR):
             transaction_success, result_message = buy_fix_color(request.POST["hex"], user)
+        elif id == int(PixPriceNumType.RANDOM_COLOR):
+            transaction_success, result_message = buy_random_color(user)
+
     else:
         result_message = "You do not have enough pix!"
 
