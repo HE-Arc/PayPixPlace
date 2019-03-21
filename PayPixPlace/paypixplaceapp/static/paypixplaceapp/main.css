@@ -212,7 +212,7 @@ html, body {
 }
   
 input.default:checked + .slider {
-    background-color: #444;
+    background-color: rgb(104, 104, 104);
 }
 input.primary:checked + .slider {
     background-color: #2196F3;
