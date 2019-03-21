@@ -10,22 +10,47 @@ from django.http.response import Http404
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 from django.core.paginator import Paginator
+from django.template.defaulttags import register
 from PIL import Image, ImageDraw
 
 from .forms import CreateCanvas
-from .models import Canvas, Pixel, Pixie, User, Slot, Color
+from .models import Canvas, Pixel, Pixie, User, Slot, Color, PixPrice
 
 import stripe 
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+
+@register.filter
+def get_enum_value(value):
+    return int(value)
+
 class Place(IntEnum):
     PUBLIC = 0
     COMMUNITY = 1
 
+class PixPriceNumType(IntEnum):
+    FIX_COLOR = 0
+    COLOR_PACK = 1
+    RANDOM_COLOR = 2
+    UNLOCK_SLOT = 3
+    CANVAS_COLOR_PACK = 4
+
+def get_pix_price():
+    pix_prices = PixPrice.objects.all()
+    prices = {}
+    for price in pix_prices:
+        prices[price.num_type] = price
+    return prices
+
+
 def home(request):
     context = {
         'title': 'Home',
+        'prices': get_pix_price,
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
@@ -254,3 +279,41 @@ def buy(request, id):
 def payment(request, id):
     buy(request, id)
     return JsonResponse("OK", safe=False)
+
+def user_has_enough_pix(user, price):
+    return user.pix >= price
+
+def buy(request, id):
+    user = request.user
+    price = PixPrice.objects.get(num_type=id).price
+
+    result_message = ""
+    transaction_success = False
+
+    if user_has_enough_pix(user, price):
+    
+        if id == int(PixPriceNumType.FIX_COLOR):
+            hex = request.POST["hex"]
+            try:
+                color = user.owns.all().get(hex=hex)
+                # The user already owns the color
+                result_message = "You already own this color!"
+            except Color.DoesNotExist:
+                # The user does not own the color
+                try:
+                    color = Color.objects.get(hex=hex)
+                    user.owns.add(color)
+                except Color.DoesNotExist:
+                    user.owns.create(hex=hex)   
+                result_message = "Color successfuly added!"
+                transaction_success = True
+            
+        
+    else:
+        result_message = "You do not have enough pix!"
+
+    if transaction_success:
+        user.pix -= price
+        user.save()
+    
+    return JsonResponse({'Result' : result_message, 'UserPix' : user.pix}, safe=False)

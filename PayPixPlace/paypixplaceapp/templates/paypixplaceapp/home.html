@@ -1,6 +1,22 @@
 {% extends "paypixplaceapp/base.html" %}
+{% load staticfiles %}
 {% block content %}
     
     <h1>Home</h1>
     
+    <div>
+        <input type="color" id="fix_color" name="fix_color"
+           value="#e66465">
+        <label for="fix_color">Buy a color</label>
+        <button id="btnFixColor">Purchase Color 
+            ({% with fix_color=prices|get_item:0 %}
+            {{ fix_color.price }}
+            {% endwith %} PIX)</button>
+        </div>
+    
+        <script>
+            window.CSRF_TOKEN = "{{ csrf_token }}";
+        </script>
+        
+        <script type="text/javascript" src="{% static 'paypixplaceapp/buy_with_pix.js' %}"></script>
 {% endblock content %}
