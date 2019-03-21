@@ -2,21 +2,18 @@ let canvas;
 let ctx;
 let pixels;
 let canvasWidth;
-let scale;
 let displayGrid;
 let drawingColor;
 let pickers;
 let pixelWidth;
 let currentSlot;
-let isMoving;
-let offset;
+let canMove;
+let hasMoved;
 let canvasContainer;
 let pixelInfoDisplay;
-let pickerMove;
-let isColoring;
-let hasMoved;
 let sidebarTrigger;
 let isSidebarHidden;
+let pinchZoom;
 
 /**
  * Change the current slot
@@ -106,7 +103,7 @@ function drawPixels() {
     if (displayGrid) {
         for (let x = 0 ; x < pixels.length ; x++) {
             for (let y = 0 ; y < pixels[x].length ; y++) {
-                ctx.lineWidth = 1 / scale;
+                ctx.lineWidth = 1 / pinchZoom.scale;
                 ctx.strokeStyle = "rgba( 128, 128, 128, 0.1)";
                 ctx.strokeRect(
                     x * pixelWidth, 
@@ -117,14 +114,24 @@ function drawPixels() {
             }
         }
     }
-    canvas.style.border = 2 / scale + "px solid #AAAAAA";
+    canvas.style.border = 2 / pinchZoom.scale + "px solid #AAAAAA";
 }
 
 /**
  * Sets the scale of the js canvas
+ * @param {FLoat} x 
+ * @param {Float} y 
  */
-function setCanvasTranform() {
-    canvas.style.transform = "scale("+scale+")";
+function setCanvasTranform(x=0,y=0) {
+    canvas.style.transformOrigin = x + "px " + y + "px";
+    let posCanvas = canvas.getBoundingClientRect()
+    
+    canvas.style.left = 0 + "px";
+    canvas.style.top  = 0 + "px";
+    //canvas.style.transform = "scale("+scale+")";
+
+    canvas.style.left = posCanvas.left + "px";
+    canvas.style.top  = posCanvas.top + "px";
 }
 
 /**
@@ -198,14 +205,14 @@ function clickMove() {
  * code executed when the user moves the mouse above the canvas
  * @param {MouseEvent} event 
  */
-function canvasMouseMove(event) {
+function canvasMouseMoveHover(event) {
     let x = parseInt((event.offsetX) / pixelWidth);
     let y = parseInt((event.offsetY) / pixelWidth);
     x < 0 ? x = 0 : "";x > canvasWidth-1 ? x = canvasWidth-1 : "";
     y < 0 ? y = 0 : "";y > canvasWidth-1 ? y = canvasWidth-1 : "";
 
     drawPixels();
-    ctx.lineWidth = 1 / scale;
+    ctx.lineWidth = 1 / pinchZoom.scale;
     let c = hexToRgb(drawingColor);
     ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
     ctx.fillRect(
@@ -230,46 +237,21 @@ function canvasMouseMove(event) {
 }
 
 /**
- * moves the canvas around
- * @param {Event} event 
- */
-function moveCanvas(event) {
-    if (isMoving) {
-        hasMoved = true;
-        //console.log(event.changedTouches[0].clientX);
-        let position = {
-            x: (event.changedTouches) ? event.changedTouches[0].clientX : event.clientX,
-            y: (event.changedTouches) ? event.changedTouches[0].clientY : event.clientY
-        };
-        canvas.style.left = (position.x + offset.x) + "px";
-        canvas.style.top  = (position.y + offset.y) + "px";
-    }
-}
-
-function clickDown(event) {
-    isMoving = true;
-    offset =  {
-        "x" : canvas.offsetLeft - event.clientX,
-        "y" : canvas.offsetTop - event.clientY
-    };
-    preventDefault(event);
-}
-
-/**
  * get the OffsetX and offsetY of a click or touch inside an element
  * @param {Event} evt 
+ * @param {DOMObject} target 
  */
-function getOffsetPosition(evt){
+function getOffsetPosition(evt, target){
     let position = {
         x: (evt.changedTouches) ? evt.changedTouches[0].pageX : evt.pageX,
         y: (evt.changedTouches) ? evt.changedTouches[0].pageY : evt.pageY
     };
-    let rect = evt.target.getBoundingClientRect();
+    let rect = target.getBoundingClientRect();
     position.x -= rect.x;
     position.y -= rect.y;
 
-    position.x /= scale;
-    position.y /= scale;
+    position.x /= pinchZoom.scale;
+    position.y /= pinchZoom.scale;
 
     return position;
 }
@@ -279,7 +261,7 @@ function getOffsetPosition(evt){
  * @param {Event} event 
  */
 function fillPixel(event) {
-    let pos = getOffsetPosition(event);
+    let pos = getOffsetPosition(event, canvas);
     let x = parseInt((pos.x) / pixelWidth);
     let y = parseInt((pos.y) / pixelWidth);
     if (x < 0 || y < 0 || x > canvasWidth-1 || y > canvasWidth-1) {
@@ -314,8 +296,20 @@ function preventContextMenu() {
     document.addEventListener("contextmenu", removeContextMenu, false);
 }
 
+function resetTransform() {
+    let rectCanvas = canvas.getBoundingClientRect();
+    let rectContainer = canvasContainer.getBoundingClientRect();
+    pinchZoom.setTransform({
+        scale: 0.1,
+        x: (rectContainer.width - rectCanvas.width/10)/2,
+        y: (rectContainer.height - rectCanvas.height/10)/4,
+        // Fire a 'change' event if values are different to current values
+        allowChangeEvent: true,
+    });
+}
+
 /**
- * Initialise the paramters of the page
+ * Initialise the parameters of the page
  */
 function initParams() {
     canvas  = document.getElementById("canvas");
@@ -332,13 +326,10 @@ function initParams() {
 
     pixels = [];
     pickers = [];
-    scale = 0.1;
+    pinchZoom = document.querySelector(".pinch-zoom");
     displayGrid = false;
-    isMoving = false;
-    isColoring = true;
+    canMove = false;
     hasMoved = false;
-    canvas.style.position = "absolute";
-    canvas.style.transformOrigin = "0 0";
     drawingColor = colors[0];
 
     pickers.push(document.getElementsByClassName("picker1"));
@@ -393,67 +384,77 @@ $(document).ready(function(){
         }
     });
 
-    // prevent the opening of the context menu on the canvas container 
-    canvasContainer.addEventListener("contextmenu", preventDefault, false);
+    resetTransform();
+    window.addEventListener('resize', evt => {
+        resetTransform();
+    });
 
+    
     // mouse left click on the canvas, to draw pixels
     canvas.addEventListener("mousedown", function(event) {
         hasMoved = false;
-        isMoving = true;
-        clickDown(event);
+        canMove = true;
     }, false);
     
-    // mouse right click up on the document
-    document.addEventListener("mouseup", function(event) {
-        isMoving = false;
-        preventContextMenu();
-    });
+    canvas.addEventListener("mouseup", function(event) {
+        canMove = false;
+        if (!hasMoved) {
+            fillPixel(event);
+        }
+    }, false);
 
     // mouse right click on the canvas container
     canvasContainer.addEventListener("mousedown", function(event){
         if (event.buttons == 2 || event.buttons == 3) {
             document.addEventListener("contextmenu", preventDefault, false);
         }
-        clickDown(event);
+        hasMoved = false;
+        canMove = true;
     }, false);
-
+    
     // moves the canvas when the user is clicking
     canvasContainer.addEventListener("mousemove", function(event) {
-        moveCanvas(event);
+        if (canMove) {
+            hasMoved = true;
+        }
     }, false);
+    
 
+    // prevent the opening of the context menu on the canvas container 
+    canvasContainer.addEventListener("contextmenu", preventDefault, false);
+    // mouse right click up on the document
+    document.addEventListener("mouseup", function(event) {
+        canMove = false;
+        preventContextMenu();
+    });
+
+
+    // Mobile part
     canvas.addEventListener("touchstart", function(event){
         hasMoved = false;
-        isMoving = true;
-        clickDown(event);
+        canMove = true;
     }, false);
 
     canvas.addEventListener("touchend", function(event){
-        isMoving = false;
-        if (!hasMoved) {
-            fillPixel(event);
-        }
-    }, false);
-
-    canvas.addEventListener("mouseup", function(event){
-        isMoving = false;
+        canMove = false;
         if (!hasMoved) {
             fillPixel(event);
         }
     }, false);
     
     canvasContainer.addEventListener("touchmove", function(event){
-        moveCanvas(event);
-        preventDefault(event);
+        if (canMove) {
+            hasMoved = true;
+        }
     }, false);
 
     document.addEventListener("touchend", function(event){
-        isMoving = false;
+        canMove = false;
     }, false);
-    
+
 
     // redraw the canvas when the mouse hovering, with the pixel below highlighted
-    canvas.addEventListener("mousemove", canvasMouseMove, false);
+    canvas.addEventListener("mousemove", canvasMouseMoveHover, false);
     
     // redraw the canvas when the mouse leaves the area
     canvas.addEventListener("mouseleave", function() {
@@ -461,13 +462,6 @@ $(document).ready(function(){
         displayInfos();
     }, false);
     
-    // zoom on the canvas with the mouse wheel
-    canvasContainer.addEventListener("wheel", function(e) {
-        e.deltaY < 0 ? scale *= 1.2 : scale /= 1.2;
-        setCanvasTranform();
-        drawPixels();
-        preventDefault(e);
-    }, false);
 
     // send the csrf token before POST requests
     // source : https://docs.djangoproject.com/en/dev/ref/csrf/#ajax

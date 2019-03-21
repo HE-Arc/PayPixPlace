@@ -99,9 +99,11 @@
     </div>
 
     <div id="canvasContainer" class="ppp-canvas-wrapper">
-        <canvas id="canvas" width="4000" height="4000">
-                Canvas are not supported
-        </canvas>
+        <pinch-zoom class="pinch-zoom">
+            <canvas id="canvas" width="4000" height="4000">
+                    Canvas are not supported
+            </canvas>
+        </pinch-zoom>
     </div>
     
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
@@ -151,7 +153,7 @@
             colors.push('{{ slot.color.hex }}')
         {% endfor %}
     </script>
-
+    <script type="text/javascript" src="{% static 'paypixplaceapp/pinch-zoom-min.js' %}"></script>
     <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>
     
 {% endblock content %}
