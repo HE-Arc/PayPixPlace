@@ -53,6 +53,11 @@ html, body {
     height: 200px;
 }
 
+.ppp-buy-color-title {
+    font-size: 1.6em;
+    font-weight: bold;
+}
+
 .ppp-hr {
     color: #3a3a3a;
     background-color: #3a3a3a;
