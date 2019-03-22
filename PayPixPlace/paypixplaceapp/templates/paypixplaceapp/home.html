@@ -1,48 +1,70 @@
-{% extends "paypixplaceapp/base.html" %}
+{% extends "paypixplaceapp/base_standard.html" %}
 {% load staticfiles %}
 {% block content %}
     
     <h1>Home</h1>
-    
-    <div>
-        <input type="color" id="fix_color" name="fix_color"
-            value="#e66465">
-        <label for="fix_color">Buy a color</label>
-        <button id="btnFixColor">Purchase Color 
-            ({% with fix_color=prices|get_item:0 %}
-            {{ fix_color.price }}
-            {% endwith %} PIX)
-        </button>
-    </div>
 
-    <div>
-        Buy a random Color
-        <button id="btnRandomColor">
-            {% with random_color=prices|get_item:2 %}
-            {{ random_color.price }}
-            {% endwith %} PIX
-        </button>
-    </div>
+    <button class="btn btn-sm btn-outline-info" data-toggle="modal" data-target=".buy-color-modal">Buy a color</button>
 
-    <div>
-        {% for color_pack in colors_pack %}
-            <div>
-                {{ color_pack.name }}
-                {% for color in color_pack.contains.all %}
-                    <div class="ppp-color-case" style="background-color: {{ color.hex }}; border-style: solid;" ></div>
-                {% endfor %}
-                <button>
-                    {% with color_pack_price=prices|get_item:1 %}
-                    {{ color_pack_price.price }}
-                    {% endwith %} PIX
-                </button>
+    <div id="buy-color-modal" class="modal fade buy-color-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body" style="display: inline-block;">
+                    <div class="row">
+                        <div class="col-4">
+                            <input type="color" id="fix_color" name="fix_color"
+                                value="#e66465">
+                            <label for="fix_color">Buy a color</label>
+                            <button id="btnFixColor">Purchase Color 
+                                ({% with fix_color=prices|get_item:0 %}
+                                {{ fix_color.price }}
+                                {% endwith %} PIX)
+                            </button>
+                        </div>
+
+                        <div class="col-4 ppp-buy-color-pack">
+                            {% for color_pack in colors_pack %}
+                                <div class="text-center align-middle mb-3">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold d-block">{{ color_pack.name }}</label>
+                                        {% for color in color_pack.contains.all %}
+                                            <div class="ppp-buy-color-case" style="background-color: {{ color.hex }};"></div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <button class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                                        {% with color_pack_price=prices|get_item:1 %}
+                                        {{ color_pack_price.price }}
+                                        {% endwith %}
+                                        <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                                    </button>
+                                </div>
+                                
+                                {% if not forloop.last %}
+                                    <hr class="ppp-hr">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-4">
+                            Buy a random Color
+                            <button id="btnRandomColor">
+                                {% with random_color=prices|get_item:2 %}
+                                {{ random_color.price }}
+                                {% endwith %} PIX
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                </div>
             </div>
-        {% endfor %}
+        </div>
     </div>
 
     <script>
         window.CSRF_TOKEN = "{{ csrf_token }}";
     </script>
     
-    <script type="text/javascript" src="{% static 'paypixplaceapp/buy_with_pix.js' %}"></script>
 {% endblock content %}

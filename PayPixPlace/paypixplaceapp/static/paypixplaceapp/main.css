@@ -35,6 +35,30 @@ html, body {
     display: block;
 }
 
+.ppp-buy-color-pack {
+    height: 100%;
+    overflow-y: scroll;
+    border-right: 2px solid #3a3a3a;
+    border-left: 2px solid #3a3a3a;
+}
+
+.ppp-buy-color-case {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    border: 3px solid #3a3a3a;
+}
+
+.buy-color-modal .modal-body > .row {
+    height: 200px;
+}
+
+.ppp-hr {
+    color: #3a3a3a;
+    background-color: #3a3a3a;
+    height: 1px;
+}
+
 .ppp-btn-rounded {
     border-radius: 0.8em;
     border: 0em solid rgb(54, 54, 54);
@@ -43,10 +67,9 @@ html, body {
 }
 
 .ppp-color-case {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     display: inline-block;
-    margin: 10px;
     cursor: pointer;
 }
 
