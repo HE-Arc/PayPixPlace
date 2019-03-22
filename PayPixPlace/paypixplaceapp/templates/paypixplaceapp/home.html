@@ -1,6 +1,51 @@
 {% extends "paypixplaceapp/base_standard.html" %}
+{% load staticfiles %}
 {% block content %}
     
     <h1>Home</h1>
     
+    <div>
+        <input type="color" id="fix_color" name="fix_color"
+            value="#e66465">
+        <label for="fix_color">Buy a color</label>
+        <button id="btnFixColor">Purchase Color 
+            ({% with fix_color=prices|get_item:0 %}
+            {{ fix_color.price }}
+            {% endwith %} PIX)
+        </button>
+    </div>
+
+    <div>
+        Buy a random Color
+        <button id="btnRandomColor">
+            {% with random_color=prices|get_item:2 %}
+            {{ random_color.price }}
+            {% endwith %} PIX
+        </button>
+    </div>
+
+    <div>
+        {% for color_pack in colors_pack %}
+            <div>
+                <form action="buy/1" method="post" name="pack_form">
+                    <input type="hidden" name="pack_id" class="pack_id" value="{{ color_pack.id }}" />
+                    {{ color_pack.name }}
+                    {% for color in color_pack.contains.all %}
+                        <div class="ppp-color-case" style="background-color: {{ color.hex }}; border-style: solid;" ></div>
+                    {% endfor %}
+                    <button type="submit">
+                        {% with color_pack_price=prices|get_item:1 %}
+                        {{ color_pack_price.price }}
+                        {% endwith %} PIX
+                    </button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+    </script>
+    
+    <script type="text/javascript" src="{% static 'paypixplaceapp/buy_with_pix.js' %}"></script>
 {% endblock content %}
