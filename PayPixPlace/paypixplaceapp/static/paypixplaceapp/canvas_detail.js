@@ -180,14 +180,6 @@ function displayInfos(owner="", protected="") {
 }
 
 /**
- * handle the click on the button for moving the canvas
- */
-function clickMove() {
-    isColoring = false;
-    // TODO adapt style to be selected etc.. 
-}
-
-/**
  * code executed when the user moves the mouse above the canvas
  * @param {MouseEvent} event 
  */
@@ -286,11 +278,12 @@ function resetTransform() {
     let rectCanvas = canvas.getBoundingClientRect();
     let rectContainer = canvasContainer.getBoundingClientRect();
     
+    scale = 0.1;
     panZoomInstance.zoomAbs(
-        ((rectContainer.width-280) - rectCanvas.width*0.1) / 2 + 280, // initial x position
-        (rectContainer.height - rectCanvas.height*0.1) / 2, // initial y position
-        0.1  // initial zoom 
-      );
+        ((rectContainer.width-280) - rectCanvas.width*scale) / 2 + 280, // initial x position
+        (rectContainer.height - rectCanvas.height*scale) / 2, // initial y position
+        scale  // initial zoom 
+    );
 }
 
 /**
@@ -382,7 +375,6 @@ function initParams() {
 
     pixels = [];
     pickers = [];
-    scale = 1;
 
     panZoomInstance = panzoom(canvas, {
         maxZoom: 10,
