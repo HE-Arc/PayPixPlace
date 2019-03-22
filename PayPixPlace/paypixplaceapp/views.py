@@ -10,23 +10,51 @@ from django.http.response import Http404
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 from django.core.paginator import Paginator
+from django.template.defaulttags import register
 from django.db.models import Prefetch
 from PIL import Image, ImageDraw
 
 from .forms import CreateCanvas
-from .models import Canvas, Pixel, Pixie, User, Slot, Color
+from .models import Canvas, Pixel, Pixie, User, Slot, Color, PixPrice, Colors_pack
 
 import stripe 
+import random
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+
+@register.filter
+def get_enum_value(value):
+    return int(value)
 
 class Place(IntEnum):
     OFFICIAL = 0
     COMMUNITY = 1
 
+class PixPriceNumType(IntEnum):
+    FIX_COLOR = 0
+    COLOR_PACK = 1
+    RANDOM_COLOR = 2
+    UNLOCK_SLOT = 3
+    CANVAS_COLOR_PACK = 4
+
+def get_pix_price():
+    pix_prices = PixPrice.objects.all()
+    prices = {}
+    for price in pix_prices:
+        prices[price.num_type] = price
+    return prices
+
+
 def home(request):
     context = {
         'title': 'Home',
+        'prices': get_pix_price,
+        'colors_pack': Colors_pack.objects.all()
+
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
@@ -272,3 +300,72 @@ def buy(request, id):
 def payment(request, id):
     buy(request, id)
     return JsonResponse("OK", safe=False)
+
+def user_has_enough_pix(user, price):
+    return user.pix >= price
+
+def add_color_to_user(hex, user):
+    try:
+        color = Color.objects.get(hex=hex)
+        user.owns.add(color)
+    except Color.DoesNotExist:
+        user.owns.create(hex=hex)   
+
+def buy_fix_color(hex, user):
+    result_message = ""
+    transaction_success = False
+    
+    try:
+        color = user.owns.all().get(hex=hex)
+        # The user already owns the color
+        result_message = "You already own this color!"
+    except Color.DoesNotExist:
+        # The user does not own the color
+        add_color_to_user(hex, user)
+        result_message = "Color successfuly added!"
+        transaction_success = True
+
+    return transaction_success, result_message
+
+def buy_random_color(user):
+    result_message = ""
+    transaction_success = False
+    
+    while not transaction_success:
+        r = lambda: random.randint(0,255)
+        hex = ('#%02X%02X%02X' % (r(),r(),r()))
+    
+        try:
+            color = user.owns.all().get(hex=hex)
+            # The user already owns the color
+            result_message = "You already own this color!"
+        except Color.DoesNotExist:
+            add_color_to_user(hex, user)
+            result_message = "Color successfuly added! (" + hex + ")"
+            transaction_success = True
+
+    return transaction_success, result_message
+
+
+def buy(request, id):
+    user = request.user
+    price = PixPrice.objects.get(num_type=id).price
+
+    result_message = ""
+    transaction_success = False
+
+    if user_has_enough_pix(user, price):
+    
+        if id == int(PixPriceNumType.FIX_COLOR):
+            transaction_success, result_message = buy_fix_color(request.POST["hex"], user)
+        elif id == int(PixPriceNumType.RANDOM_COLOR):
+            transaction_success, result_message = buy_random_color(user)
+
+    else:
+        result_message = "You do not have enough pix!"
+
+    if transaction_success:
+        user.pix -= price
+        user.save()
+    
+    return JsonResponse({'Result' : result_message, 'UserPix' : user.pix}, safe=False)
