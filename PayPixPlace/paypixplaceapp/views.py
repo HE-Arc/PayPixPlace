@@ -42,6 +42,19 @@ class PixPriceNumType(IntEnum):
     UNLOCK_SLOT = 3
     CANVAS_COLOR_PACK = 4
 
+def get_highest_title(user):
+    purchases = Purchase.objects.filter(user=user)
+    title = "Pixer"
+    max_id = 0
+
+    for purchase in purchases:
+        if purchase.pixie.id > max_id:
+            title = purchase.pixie.title
+            max_id = purchase.pixie.id
+    
+    return title
+
+
 def get_pix_price():
     pix_prices = PixPrice.objects.all()
     prices = {}
@@ -54,7 +67,8 @@ def home(request):
     context = {
         'title': 'Home',
         'prices': get_pix_price,
-        'colors_pack': Colors_pack.objects.all()
+        'colors_pack': Colors_pack.objects.all(),
+        'user_title': get_highest_title(request.user)
 
     }
     return render(request, 'paypixplaceapp/home.html', context)
