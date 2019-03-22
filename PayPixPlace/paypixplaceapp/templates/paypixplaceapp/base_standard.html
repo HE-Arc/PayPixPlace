@@ -1,0 +1,26 @@
+{% extends "paypixplaceapp/base.html" %}
+{% block base %}
+
+    <main role="main" class="container ppp-main-container">
+        <div class="row">
+            <div class="col-12 mt-3">
+                <div id="alertMessages">
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if message.tags == 'error' %}
+                                <div class="alert alert-danger">
+                                    {{ message }}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-{{ message.tags }}">
+                                    {{ message }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% block content %}{% endblock content %}
+            </div>
+        </div>
+    </main>
+{% endblock base %}

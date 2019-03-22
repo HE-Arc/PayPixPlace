@@ -1,0 +1,101 @@
+.ppp-canvas-wrapper {
+    position: absolute;
+    width: 100%;
+    top: 56px;
+    bottom: 0px;
+}
+
+.ppp-sidebar-container {
+    position: absolute;
+    width: 280px;
+    top: 56px;
+    bottom: 0px;
+    z-index: 900;
+    transition: all 1s ease;
+}
+
+.ppp-sidebar-container-close {
+    margin-left: -280px;
+}
+
+.ppp-sidebar-content {
+    position: relative;
+    height: 100%;
+    overflow-y: auto;
+    border-radius: 0px 0px 0px 0px !important;
+}
+
+.ppp-sidebar-trigger {
+    position: absolute;
+    font-size: 40px;
+    top: 0px;
+    left: 280px;
+}
+
+.ppp-downbar-container {
+    position: absolute;
+    height: 50px;
+    width: 100%;
+    bottom: 0px;
+    margin-bottom: -50px;
+    background-color: #343a40;
+    z-index: 800;
+    transition: all 1s ease;
+}
+
+.ppp-downbar-container-open {
+    margin-bottom: 0px;
+}
+
+.ppp-picker {
+    width: 40px;
+    height: 40px;
+    background-color: blueviolet;
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.ppp-btn-color-picker {
+    height: 40px;
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.ppp-btn-color-picker-sm {
+    height: 40px;
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.ppp-picker-sm {
+    width: 40px;
+    height: 40px;
+    background-color: blueviolet;
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.ppp-picker:hover {
+    border: solid 3.5px black;
+}
+
+.ppp-picker-selected {
+    border: solid 3.5px black;
+}
+
+.ppp-sidebar-content .card-header {
+    border-color: rgb(180, 180, 180);
+    padding: 0.5rem 0.5rem;
+}
+
+.ppp-sidebar-content ul > li {
+    border-color: rgb(180, 180, 180);
+}
+
+.ppp-canvas-control {
+    font-size: 30px;
+}

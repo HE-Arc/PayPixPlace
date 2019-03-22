@@ -4,17 +4,29 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .forms import RegisterForm, UpdateForm, LoginForm
+from paypixplaceapp.models import Color
 
 def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Thank you for registering. You are now logged in.")
-            new_user = authenticate(username=form.cleaned_data['username'],
-                                    password=form.cleaned_data['password1'],
-                                    )
+            new_user = form.save()
+            new_user.owns.add(
+                Color.objects.get(hex="#fbae00"),
+                Color.objects.get(hex="#da5353"),
+                Color.objects.get(hex="#693f7b"),
+                Color.objects.get(hex="#39589a"),
+                Color.objects.get(hex="#338984")
+            )
+
+            new_user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1'],
+            )
             django_login(request, new_user)
+
+            messages.success(request, "Thank you for registering. You are now logged in.")
+
             return redirect('paypixplace-home')
     else:
         form = RegisterForm()
@@ -25,6 +37,7 @@ def register(request):
 def profile(request):
     if request.method == 'POST':
         form = UpdateForm(request.POST, instance=request.user)
+        
         if form.is_valid():
             form.save()
             messages.success(request, f'Your account has been updated!')
@@ -41,11 +54,13 @@ def profile(request):
 def login(request):
     if request.method == 'POST':
         form = LoginForm(data=request.POST)
+
         if form.is_valid():
             messages.success(request, "You are now logged in!")
-            user = authenticate(username=form.cleaned_data['username'],
-                                password=form.cleaned_data['password'],
-                                )
+            user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password'],
+            )
             django_login(request, user)
             return redirect('paypixplace-home')
     else:

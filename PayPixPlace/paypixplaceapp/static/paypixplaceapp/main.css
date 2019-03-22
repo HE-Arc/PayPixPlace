@@ -1,3 +1,252 @@
+#canvas {
+    cursor: pointer;
+}
+
+html, body {
+    position: relative;
+    height:100%;
+    margin:0;
+    padding:0;
+}
+
+.ppp-main-container-fullscreen {
+    position: relative;
+    overflow: hidden;
+    height:100%;
+    margin:0;
+    padding:0;
+}
+
+.ppp-main-container {
+    position: relative;
+    top: 56px;
+    bottom: 0px;
+}
+
+.ppp-navbar {
+    position: absolute;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 1000;
+}
+
 .invalid-feedback {
     display: block;
 }
+
+.ppp-btn-rounded {
+    border-radius: 0.8em;
+    border: 0em solid rgb(54, 54, 54);
+    box-shadow: #3a3a3a 0em 0em 0.6em;
+    font-size: 1.5em;
+}
+
+.ppp-color-case {
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.ppp-canvas-property {
+    display: inline-block;
+}
+
+.ppp-logo {
+    width: 14em;
+    height: auto;
+}
+
+.ppp-currency {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ppp-currency-md {
+    width: 0.7em;
+    height: auto;
+}
+
+.ppp-currency-lg {
+    width: 0.7em;
+    height: auto;
+}
+
+.ppp-icon {
+    width: 1em;
+}
+
+.ppp-purchase-title-legend {
+    height: 1.5em;
+}
+
+.ppp-purchase-title-lord {
+    display: inline-block;
+    vertical-align: middle;
+    height: 1em;
+}
+
+.ppp-purchase-title {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1.25em;
+    font-size: 2.2em;
+}
+
+.ppp-purchase-header-lg {
+    height: 100%;
+    line-height: 5em;
+}
+
+.ppp-purchase-header-md {
+    height: 100%;
+    line-height: 2.5em;
+}
+
+.ppp-section-title {
+    height: 5em;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Extra large devices (large desktops, 1200px and down) */
+@media (max-width: 1200px) {
+    
+    .ppp-purchase-title {
+        font-size: 1.8em;
+    }
+
+    .ppp-purchase-title-lord {
+        height: 1.2em;
+    }
+}
+
+/* Large devices (desktops, 992px and down) */
+@media (max-width: 992px) {
+    
+    .ppp-purchase-title {
+        font-size: 1.3em;
+    }
+
+    .ppp-purchase-title-lord {
+        height: 1.5em;
+    }
+}
+
+/* Medium devices (tablets, 768px and down) */
+@media (max-width: 768px) {
+    
+    .ppp-purchase-title {
+        font-size: 2em;
+    }
+
+    .ppp-purchase-title-lord {
+        height: 1em;
+    }
+
+    .ppp-section-title {
+        height: 3em;
+    }
+}
+
+/* Small devices (landscape phones, 576px and down) */
+@media (max-width: 576px) {
+    
+    .ppp-purchase-title {
+        font-size: 1.5em;
+    }
+
+    .ppp-purchase-title-lord {
+        height: 1.5em;
+    }
+
+    .ppp-logo {
+        width: 10em;
+    }
+
+    .ppp-section-title {
+        height: 2em;
+    }
+}
+
+/* START SOURCE : https://bootsnipp.com/snippets/GaxR2 */
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    float:right;
+}
+  
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+  
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+  
+input.default:checked + .slider {
+    background-color: rgb(104, 104, 104);
+}
+input.primary:checked + .slider {
+    background-color: #2196F3;
+}
+input.success:checked + .slider {
+    background-color: #8bc34a;
+}
+input.info:checked + .slider {
+    background-color: #3de0f5;
+}
+input.warning:checked + .slider {
+    background-color: #FFC107;
+}
+input.danger:checked + .slider {
+    background-color: #f44336;
+}
+  
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+  
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+  
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+  
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* END SOURCE */

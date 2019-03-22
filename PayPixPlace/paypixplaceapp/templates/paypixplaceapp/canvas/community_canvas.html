@@ -1,18 +1,5 @@
-{% extends "paypixplaceapp/base.html" %}
+{% extends "paypixplaceapp/canvas/canvas_list.html" %}
 {% load staticfiles %}
-{% block content %}
-    
-    <h1>Community Canvas</h1>
-
-    {% for c in canvas %}
-        <div class="text-center">
-            <a href="{% url 'canvas-detail' c.id %}">
-                <h2>{{ c.name }}</h2>
-                <img
-                    class="w-25 img-fluid img-thumbnail"
-                    src="{% url 'canvas-img' c.id %}"
-                    alt="canvas named {{c.name}}"/>        
-            </a>
-        </div>
-    {% endfor %}
-{% endblock content %}
+{% block title %}
+    <img class="ppp-section-title mb-3" src="{% static 'paypixplaceapp/images/communityPPP.png' %}" alt="Community">
+{% endblock title %}

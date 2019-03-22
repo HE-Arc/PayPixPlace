@@ -5,9 +5,8 @@ from crispy_forms.bootstrap import InlineRadios, PrependedText, StrictButton
 from .models import Canvas
 
 class CreateCanvas(forms.ModelForm):
-    CHOICES=[(0,'Public'),
-         (1,'Community'),
-         (2,'Private')]
+    CHOICES=[(0,'Official'),
+         (1,'Community')]
 
     place = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect, initial=1)
 

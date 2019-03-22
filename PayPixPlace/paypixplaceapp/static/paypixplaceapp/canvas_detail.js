@@ -2,75 +2,146 @@ let canvas;
 let ctx;
 let pixels;
 let scale;
+let canvasWidth;
 let displayGrid;
 let drawingColor;
 let pickers;
-let colors;
 let pixelWidth;
+let currentSlot;
+let canMove;
+let hasMoved;
+let canvasContainer;
+let pixelInfoDisplay;
+let sidebarTrigger;
+let isSidebarHidden;
+let panZoomInstance;
+
+const canvasPixelSize = 4000;
+
+/**
+ * Change the current slot
+ * @param {int} id 
+ */
+function changeCurrentSlot(id) {
+    currentSlot = id;
+}
+
+/**
+ * Change the color for the selected slot and in the data base
+ * @param {string} newColor 
+ */
+function changeSlotColor(newColor) {
+    let currentPicker = document.getElementsByClassName("picker" + currentSlot);
+
+    for (let i = 0; i < currentPicker.length; i++) {
+        currentPicker[i].style.backgroundColor = newColor;
+        currentPicker[i].addEventListener("click", function() {
+            drawingColor = newColor;
+        }, false);
+    }
+    
+    drawingColor = newColor;
+
+    $.ajax({
+        type: "POST",
+        url: "/change_user_slot_color/",
+        data: {
+            slot: currentSlot, 
+            color: newColor, 
+            userId: userId
+        },
+        dataType: "json",
+        success: function(data) {
+            console.log(data)
+        }
+    });
+}
 
 /**
  * Loads the pixels of the actual canvas from the database
- * Load as JSON
+ * Loaded as JSON
  */
 function loadPixels() {
     // Load pixels from database
     $.ajax({
-        type: 'GET',
-        url: '/canvas/' + canvasId + '/json/',
-        dataType: 'json',
+        type: "GET",
+        url: "/canvas/" + canvasId + "/json/",
+        dataType: "json",
         success: function (data) {
             pixels = data.pixels;
-            pixelWidth = 4000 / data.canvas.width;
+            canvasWidth = data.canvas.width;
+            pixelWidth = 4000 / canvasWidth;
             drawPixels();
         }
     });
 }
 
 /**
- * Draw the pixels on the screen
+ * returns the name of the owner of the pixel at the given position
+ * @param {Integer} x 
+ * @param {Integer} y 
+ */
+function getOwner(x,y) {
+    return pixels[x][y].username;
+}
+
+/**
+ * Draw the pixels on the canvas
  */
 function drawPixels() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    for (let i = 0 ; i < pixels.length ; i++) {
-        let x = pixels[i].x;
-        let y = pixels[i].y;
-        let hex = pixels[i].hex;
-
-        ctx.fillStyle = hex;
-        ctx.fillRect(
-            x * pixelWidth, 
-            y * pixelWidth, 
-            pixelWidth,
-            pixelWidth
-        );
-        
-        if (displayGrid) {
-            ctx.lineWidth = 1 / scale;
-            ctx.strokeStyle = "rgba( 128, 128, 128, 0.1)";
-            ctx.strokeRect(
+    for (let x = 0 ; x < pixels.length ; x++) {
+        for (let y = 0 ; y < pixels[x].length ; y++) {
+            ctx.fillStyle = pixels[x][y].hex;
+            ctx.fillRect(
                 x * pixelWidth, 
                 y * pixelWidth, 
-                pixelWidth, 
+                pixelWidth,
                 pixelWidth
-            );
+            );    
         }
     }
-}
 
-/**
- * Sets the scale of the js canvas
- */
-function setCanvasScale() {
-    canvas.style.transform = "scale(" + scale + ")";
+    if (displayGrid) {
+        for (let x = 0 ; x < pixels.length ; x++) {
+            for (let y = 0 ; y < pixels[x].length ; y++) {
+                ctx.lineWidth = 1 / scale;
+                ctx.strokeStyle = "rgba( 128, 128, 128, 0.1)";
+                ctx.strokeRect(
+                    x * pixelWidth, 
+                    y * pixelWidth, 
+                    pixelWidth, 
+                    pixelWidth
+                );
+            }
+        }
+    }
+    canvas.style.border = 2 / scale + "px solid #AAAAAA";
 }
 
 /**
  * Sets the current drawing color
- * @param {Integer} id 
+ * @param {Integer} id
  */
 function setDrawingColor(id) {
+    let currentPicker = document.getElementsByClassName("picker" + (id + 1));
+
     drawingColor = colors[id];
+    
+    for (let i = 0 ; i < pickers.length ; i++) {
+        localPicker = pickers[i];
+
+        for (let j = 0; j < localPicker.length; j++) {
+            localPicker[j].classList.remove("ppp-picker-selected");
+        }
+    }
+    
+    for (let i = 0; i < currentPicker.length; i++) {
+        currentPicker[i].classList.add("ppp-picker-selected");
+    }
+
+    isColoring = true;
 }
 
 /**
@@ -87,95 +158,302 @@ function hexToRgb(hex) {
 }
 
 /**
- * Initialise the paramters of the page
+ * function used to prevent the default action on an event
+ */
+function preventDefault(event) {
+    event.preventDefault();
+}
+
+/**
+ * display new informations about the selected pixels
+ * call without params to clear
+ * @param {String} owner 
+ * @param {String} protected 
+ */
+function displayInfos(owner="", protected="") {
+    for (let i = 0 ; i < pixelInfoDisplay.owner.length ; i++) {
+        pixelInfoDisplay.owner[i].value = owner;
+    }
+    for (let i = 0 ; i < pixelInfoDisplay.protected.length ; i++) {
+        pixelInfoDisplay.protected[i].value = protected;
+    }
+}
+
+/**
+ * code executed when the user moves the mouse above the canvas
+ * @param {MouseEvent} event 
+ */
+function canvasMouseMoveHover(event) {
+    let x = parseInt((event.offsetX) / pixelWidth);
+    let y = parseInt((event.offsetY) / pixelWidth);
+    x < 0 ? x = 0 : "";x > canvasWidth-1 ? x = canvasWidth-1 : "";
+    y < 0 ? y = 0 : "";y > canvasWidth-1 ? y = canvasWidth-1 : "";
+
+    drawPixels();
+    ctx.lineWidth = 1 / scale;
+    let c = hexToRgb(drawingColor);
+    ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
+    ctx.fillRect(
+        x * pixelWidth, 
+        y * pixelWidth, 
+        pixelWidth,
+        pixelWidth
+    );
+    ctx.strokeStyle = "rgba( 128, 128, 128, 0.5)";
+    ctx.strokeRect(
+        x * pixelWidth, 
+        y * pixelWidth, 
+        pixelWidth, 
+        pixelWidth
+    );
+    let ownerName = getOwner(x,y);
+    if (ownerName != null) {
+        displayInfos(ownerName, "False");
+    } else {
+        displayInfos();
+    }
+}
+
+/**
+ * get the OffsetX and offsetY of a click or touch inside an element
+ * @param {Event} evt 
+ * @param {DOMObject} target 
+ */
+function getOffsetPosition(evt, target){
+    let position = {
+        x: (evt.changedTouches) ? evt.changedTouches[0].pageX : evt.pageX,
+        y: (evt.changedTouches) ? evt.changedTouches[0].pageY : evt.pageY
+    };
+    let rect = target.getBoundingClientRect();
+    position.x -= rect.x;
+    position.y -= rect.y;
+
+    position.x /= scale;
+    position.y /= scale;
+
+    return position;
+}
+
+/**
+ * action to fill a pixel (used to respond to events)
+ * @param {Event} event 
+ */
+function fillPixel(event) {
+    let pos = getOffsetPosition(event, canvas);
+    let x = parseInt((pos.x) / pixelWidth);
+    let y = parseInt((pos.y) / pixelWidth);
+    if (x < 0 || y < 0 || x > canvasWidth-1 || y > canvasWidth-1) {
+        return;
+    }
+    $.ajax({
+        type: "POST",
+        url: "/change_pixel_color/",
+        data: {
+            "canvas_id": canvasId,
+            "x": x,
+            "y": y,
+            "hex": drawingColor,
+        },
+        dataType: "json",
+        success: function (data) {
+            if (data.is_valid) {
+                loadPixels();
+            }
+        }
+    });
+}
+
+/**
+ * prevent the context menu from showing when exiting the canvas area with right click pressed
+ */
+function preventContextMenu() {
+    function removeContextMenu(event) {
+        document.removeEventListener("contextmenu", preventDefault, false);
+        document.removeEventListener("contextmenu", removeContextMenu, false);
+    }
+    document.addEventListener("contextmenu", removeContextMenu, false);
+}
+
+function resetTransform() {
+    let rectCanvas = canvas.getBoundingClientRect();
+    let rectContainer = canvasContainer.getBoundingClientRect();
+    
+    scale = 0.1;
+    panZoomInstance.zoomAbs(
+        ((rectContainer.width-280) - rectCanvas.width*scale) / 2 + 280, // initial x position
+        (rectContainer.height - rectCanvas.height*scale) / 2, // initial y position
+        scale  // initial zoom 
+    );
+}
+
+/**
+ * Initialise all the events on the mouse and touch
+ */
+function initEvents() {
+
+    // redraw the canvas when the mouse leaves the area
+    canvas.addEventListener("mouseleave", function() {
+        drawPixels();
+        displayInfos();
+    });
+    
+    // draw a pixel on right click, prevent the context menu 
+    canvasContainer.addEventListener("contextmenu", preventDefault);
+    
+    // redraw the canvas when the mouse hovering, with the pixel below highlighted
+    canvas.addEventListener("mousemove", canvasMouseMoveHover, false);
+    
+    //redraw the pixels when zoomed in or out
+    canvas.addEventListener("wheel", drawPixels, false);
+    
+    // Mouse events
+    canvas.addEventListener("mousedown", function(event){
+        hasMoved = false;
+        canMove = true;
+    });
+    canvas.addEventListener("mouseup", function(event){
+        canMove = false;
+        if (!hasMoved) {
+            fillPixel(event);
+        }
+    });
+    canvasContainer.addEventListener("mousemove", function(event){
+        if (canMove) {
+            hasMoved = true;
+        }
+    });
+
+    // Mobile events
+    canvas.addEventListener("touchstart", function(event){
+        hasMoved = false;
+        canMove = true;
+    });
+    canvas.addEventListener("touchend", function(event){
+        canMove = false;
+        if (!hasMoved) {
+            fillPixel(event);
+        }
+    });
+    canvasContainer.addEventListener("touchmove", function(event){
+        if (canMove) {
+            hasMoved = true;
+        }
+    });
+    document.addEventListener("touchend", function(event){
+        canMove = false;
+    });
+
+    // Calculate the current scale and store it on zoom event
+    panZoomInstance.on('zoom', function(e) {
+        setTimeout(
+            function() {
+                let rectCanvas = canvas.getBoundingClientRect();
+                scale = rectCanvas.width / canvasPixelSize;
+                
+            }, 10
+        );
+    });
+}
+
+/**
+ * Initialise the parameters of the page
  */
 function initParams() {
+    canvas  = document.getElementById("canvas");
+    canvas.width = canvasPixelSize;
+    canvas.height = canvasPixelSize;
+    ctx = canvas.getContext("2d");
+
+    isSidebarHidden = false;
+    sidebarTrigger = document.getElementById("sidebarTrigger");
+
+    canvasContainer = document.getElementById("canvasContainer");
+    pixelInfoDisplay = {
+        owner : document.getElementsByClassName("pixelOwner"),
+        protected : document.getElementsByClassName("pixelProtected"),
+    }
+
     pixels = [];
-    scale = 0.1;
+    pickers = [];
+
+    panZoomInstance = panzoom(canvas, {
+        maxZoom: 10,
+        minZoom: 0.05,
+        smoothScroll: true
+    });
+    
     displayGrid = false;
-    drawingColor = "#FF0000";
+    canMove = false;
+    hasMoved = false;
+    drawingColor = colors[0];
 
-    pickers = [
-        document.getElementById("picker1"),
-        document.getElementById("picker2"),
-        document.getElementById("picker3")
-    ];
-
-    colors = [
-        "#FF0000",
-        "#00FF00",
-        "#0000FF"
-    ];
+    pickers.push(document.getElementsByClassName("picker1"));
+    pickers.push(document.getElementsByClassName("picker2"));
+    pickers.push(document.getElementsByClassName("picker3"));
+    pickers.push(document.getElementsByClassName("picker4"));
 
     for (let i = 0 ; i < pickers.length ; i++) {
-        pickers[i].style.backgroundColor = colors[i];
-        pickers[i].addEventListener('click', function() {
-            setDrawingColor(i);
-        }, false);
+        currentPicker = pickers[i];
+
+        for (let j = 0; j < currentPicker.length; j++) {
+            currentPicker[j].style.backgroundColor = colors[i];
+            currentPicker[j].addEventListener('click', function() {
+                setDrawingColor(i);
+            }, false);
+        }
+    }
+
+    pickerMove = document.getElementsByClassName("pickerMove");
+    for (let i = 0; i < pickerMove.length; i++) {
+        pickerMove[i].addEventListener("click", clickMove, false);
     }
 }
 
 // Execute when the page is fully loaded
 $(document).ready(function(){
-    canvas  = document.getElementById("canvas");
-    ctx = canvas.getContext("2d");
-
-    canvas.addEventListener('click', function(event) {
-        let x = parseInt((event.offsetX) / pixelWidth);
-        let y = parseInt((event.offsetY) / pixelWidth);
     
-        $.ajax({
-            type: 'GET',
-            url: '/change_pixel_color/',
-            data: {
-                'canvas_id': canvasId,
-                'x': x,
-                'y': y,
-                'hex': drawingColor,
-            },
-            dataType: 'json',
-            success: function (data) {
-                if (data.is_valid) {
-                    loadPixels();
-                }
-            }
-        });
-    
-    }, false);
-    
-    canvas.addEventListener("mousemove", function() {
-        let x = parseInt((event.offsetX) / pixelWidth);
-        let y = parseInt((event.offsetY) / pixelWidth);
-        drawPixels();
-        ctx.lineWidth = 1 / scale;
-        let c = hexToRgb(drawingColor);
-        ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
-        ctx.fillRect(
-            x * pixelWidth, 
-            y * pixelWidth, 
-            pixelWidth,
-            pixelWidth
-        );
-        ctx.strokeRect(
-            x * pixelWidth, 
-            y * pixelWidth, 
-            pixelWidth, 
-            pixelWidth
-        );
-    }, false);
-    
-    canvas.addEventListener("mouseleave", function() {
-        drawPixels();
-    }, false);
-    
-    canvas.addEventListener("wheel", function(e) {
-        e.deltaY < 0 ? scale *= 1.2 : scale /= 1.2;
-        setCanvasScale();
-        e.preventDefault();
-    }, false);
-
     initParams();
+    resetTransform();
+    initEvents();
+    
+    // display the grid when the checkbox is checked
+    let showGridCBs = document.getElementsByClassName("showGridCB");
+    for (let index = 0; index < showGridCBs.length; index++) {
+        showGridCBs[index].addEventListener("click", function(event) {
+            displayGrid = this.checked;
+            drawPixels();
+        });
+    }
+
+    sidebarTrigger.addEventListener('click', function() {
+        isSidebarHidden = !isSidebarHidden;
+
+        if(isSidebarHidden) {
+            document.getElementById("sidebarTriggerOpen").hidden = true;
+            document.getElementById("sidebarTriggerClose").hidden = false;
+            document.getElementById("sidebarContainer").classList.add("ppp-sidebar-container-close");
+            document.getElementById("downbarContainer").classList.add("ppp-downbar-container-open");
+        } else {
+            document.getElementById("sidebarTriggerOpen").hidden = false;
+            document.getElementById("sidebarTriggerClose").hidden = true;
+            document.getElementById("sidebarContainer").classList.remove("ppp-sidebar-container-close");
+            document.getElementById("downbarContainer").classList.remove("ppp-downbar-container-open");
+        }
+    });
+
+    // send the csrf token before POST requests
+    // source : https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", window.CSRF_TOKEN);
+            }
+        }
+    });
 
     loadPixels();
-    setCanvasScale();
 });

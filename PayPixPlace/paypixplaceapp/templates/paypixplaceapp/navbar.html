@@ -1,7 +1,8 @@
-<nav class="navbar navbar-expand-md navbar-dark bg-dark navbar-laravel">
+{% load static %}
+<nav class="navbar navbar-expand-md navbar-dark bg-dark ppp-navbar">
     <div class="container">
         <a class="navbar-brand p-0" href="{% url 'paypixplace-home' %}">
-            Pay Pix Place
+            <img class="ppp-logo" src="{% static 'paypixplaceapp/images/logoPPP.png' %}" alt="Pay Pix Place">
         </a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,22 +12,16 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item mr-3 ml-md-3 ml-0">
-                    <a class="nav-link" href="{% url 'canvas-public' %}">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'canvas-official' %}">
                         <i class="fas fa-globe mr-1"></i>
-                        Public
-                    </a>
-                </li>
-                <li class="nav-item mr-3">
-                    <a class="nav-link" href="{% url 'canvas-community' %}">
-                        <i class="fas fa-users mr-1"></i>
-                        Community
+                        Official
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'canvas-private' %}">
-                        <i class="fas fa-lock mr-1"></i>
-                        Private
+                    <a class="nav-link" href="{% url 'canvas-community' %}">
+                        <i class="fas fa-users mr-1"></i>
+                        Community
                     </a>
                 </li>
             </ul>
@@ -36,45 +31,96 @@
                 <!-- Authentication Links -->
                 {% if user.is_authenticated %}
                     <li class="nav-item mr-3">
-                        <a class="nav-link" href="{% url 'purchasepix' %}">
+                        <a class="nav-link d-block d-md-none d-lg-block" href="{% url 'pix-purchase' %}">
                             <span class="mr-1">
                                 <i class="fas fa-arrows-alt mr-1"></i>
-                                {{ user.ammo }}
+                                <span id="userAmmo">{{ user.ammo }}</span>
                             </span>
-                            <span>
-                                <i class="fas fa-dollar-sign mr-1"></i>
-                                {{ user.pix }}
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            {{ user.username }} <span class="caret"></span>
-                            <i class="fas fa-user ml-1"></i>
+                            <div style="display: inline-block;">
+                                <img class="ppp-currency ppp-currency-md" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                                <div id="userPix" style="display: inline-block;">{{ user.pix }}</div>
+                            </div>
                         </a>
 
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{% url 'profile' %}">
-                                <i class="fas fa-bars mr-1" style="width: 20px;"></i>
+                        <div class="d-block d-md-none">
+
+                            <hr style="border-color: white;">
+                            
+                            <div class="font-weight-bold text-white">{{ user.username }}</div>
+
+                            <a class="nav-link" href="{% url 'profile' %}">
+                                <i class="fas fa-user-edit mr-1 ppp-icon"></i>
                                 Profile
                             </a>
 
-                            <a class="dropdown-item" href="{% url 'canvas-create' %}">
-                                <i class="fas fa-plus-circle mr-1" style="width: 20px;"></i>
+                            <a class="nav-link" href="{% url 'canvas-create' %}">
+                                <i class="fas fa-plus-circle mr-1 ppp-icon"></i>
                                 Create a new Canvas
                             </a>
 
-                            <a class="dropdown-item" href="{% url 'purchasepix' %}">
-                                <i class="fas fa-dollar-sign mr-1" style="width: 20px;"></i>
+                            <a class="nav-link" href="{% url 'pix-purchase' %}">
+                                <img class="ppp-currency ppp-currency-md mr-2" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                                 Purchase PIX
                             </a>
 
-                            <a class="dropdown-item" href="{% url 'logout' %}">
-                                <i class="fas fa-sign-out-alt mr-1" style="width: 20px;"></i>
+                            <a class="nav-link" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt mr-1 ppp-icon"></i>
                                 Logout
                             </a>
                         </div>
                     </li>
+                    
+                    <div class="d-none d-md-block">
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                {{ user.username }} <span class="caret"></span>
+                                <i class="fas fa-user ml-1"></i>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                
+                                <div class="d-none d-md-block d-lg-none">
+                                    <a class="dropdown-item" href="{% url 'pix-purchase' %}">
+                                        <span class="mr-1">
+                                            <i class="fas fa-arrows-alt mr-1"></i>
+                                            <span id="userAmmo">{{ user.ammo }}</span>
+                                        </span>
+                                        <div style="display: inline-block;">
+                                            <img class="ppp-currency ppp-currency-md" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                                            <div id="userPix" style="display: inline-block;">{{ user.pix }}</div>
+                                        </div>
+                                    </a> 
+
+                                    <hr>
+                                </div>
+
+                                <a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="fas fa-user-edit mr-1 ppp-icon"></i>
+                                    Profile
+                                </a>
+
+                                <a class="dropdown-item" href="{% url 'canvas-create' %}">
+                                    <i class="fas fa-plus-circle mr-1 ppp-icon"></i>
+                                    Create a new Canvas
+                                </a>
+
+                                <a class="dropdown-item" href="{% url 'canvas-user' %}">
+                                    <i class="fas fa-folder-open mr-1 ppp-icon"></i>
+                                    Created canvas
+                                </a>
+
+                                <a class="dropdown-item" href="{% url 'pix-purchase' %}">
+                                    <img class="ppp-currency ppp-currency-md mr-2" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                                    Purchase PIX
+                                </a>
+
+                                <a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="fas fa-sign-out-alt mr-1 ppp-icon"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+                    </div>
                 {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">
