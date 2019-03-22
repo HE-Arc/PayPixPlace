@@ -33,9 +33,6 @@
                                 <div class="picker4 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
                             </div>
-                            <div class="col-6 col-md-12 col-lg-6 my-3 p-0">
-                                <button class="pickerMove btn btn-sm btn-outline-info">Move</button>
-                            </div>
                         </div>
                     </li>
                     <li class="list-group-item text-white bg-dark">
@@ -99,11 +96,9 @@
     </div>
 
     <div id="canvasContainer" class="ppp-canvas-wrapper">
-        <pinch-zoom class="pinch-zoom">
-            <canvas id="canvas" width="4000" height="4000">
-                    Canvas are not supported
-            </canvas>
-        </pinch-zoom>
+        <canvas id="canvas">
+            Canvas are not supported
+        </canvas>
     </div>
     
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
@@ -153,7 +148,7 @@
             colors.push('{{ slot.color.hex }}')
         {% endfor %}
     </script>
-    <script type="text/javascript" src="{% static 'paypixplaceapp/pinch-zoom-min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/panzoom.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>
     
 {% endblock content %}

@@ -206,7 +206,7 @@ def get_json(request, id):
         canvas = Canvas.objects.get(id=id)
     except ObjectDoesNotExist:
         raise Http404()
-
+    
     pixels = list(Pixel.objects.filter(canvas=id).values('x', 'y', 'hex', 'user__username'))
     pixels2Darray = [list(range(canvas.width)) for p in pixels if p["x"] == 0]
     for pixel in pixels:

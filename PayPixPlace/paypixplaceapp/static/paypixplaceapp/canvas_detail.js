@@ -1,6 +1,7 @@
 let canvas;
 let ctx;
 let pixels;
+let scale;
 let canvasWidth;
 let displayGrid;
 let drawingColor;
@@ -13,7 +14,9 @@ let canvasContainer;
 let pixelInfoDisplay;
 let sidebarTrigger;
 let isSidebarHidden;
-let pinchZoom;
+let panZoomInstance;
+
+const canvasPixelSize = 4000;
 
 /**
  * Change the current slot
@@ -103,7 +106,7 @@ function drawPixels() {
     if (displayGrid) {
         for (let x = 0 ; x < pixels.length ; x++) {
             for (let y = 0 ; y < pixels[x].length ; y++) {
-                ctx.lineWidth = 1 / pinchZoom.scale;
+                ctx.lineWidth = 1 / scale;
                 ctx.strokeStyle = "rgba( 128, 128, 128, 0.1)";
                 ctx.strokeRect(
                     x * pixelWidth, 
@@ -114,24 +117,7 @@ function drawPixels() {
             }
         }
     }
-    canvas.style.border = 2 / pinchZoom.scale + "px solid #AAAAAA";
-}
-
-/**
- * Sets the scale of the js canvas
- * @param {FLoat} x 
- * @param {Float} y 
- */
-function setCanvasTranform(x=0,y=0) {
-    canvas.style.transformOrigin = x + "px " + y + "px";
-    let posCanvas = canvas.getBoundingClientRect()
-    
-    canvas.style.left = 0 + "px";
-    canvas.style.top  = 0 + "px";
-    //canvas.style.transform = "scale("+scale+")";
-
-    canvas.style.left = posCanvas.left + "px";
-    canvas.style.top  = posCanvas.top + "px";
+    canvas.style.border = 2 / scale + "px solid #AAAAAA";
 }
 
 /**
@@ -212,7 +198,7 @@ function canvasMouseMoveHover(event) {
     y < 0 ? y = 0 : "";y > canvasWidth-1 ? y = canvasWidth-1 : "";
 
     drawPixels();
-    ctx.lineWidth = 1 / pinchZoom.scale;
+    ctx.lineWidth = 1 / scale;
     let c = hexToRgb(drawingColor);
     ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
     ctx.fillRect(
@@ -250,8 +236,8 @@ function getOffsetPosition(evt, target){
     position.x -= rect.x;
     position.y -= rect.y;
 
-    position.x /= pinchZoom.scale;
-    position.y /= pinchZoom.scale;
+    position.x /= scale;
+    position.y /= scale;
 
     return position;
 }
@@ -299,12 +285,80 @@ function preventContextMenu() {
 function resetTransform() {
     let rectCanvas = canvas.getBoundingClientRect();
     let rectContainer = canvasContainer.getBoundingClientRect();
-    pinchZoom.setTransform({
-        scale: 0.1,
-        x: (rectContainer.width - rectCanvas.width/10)/2,
-        y: (rectContainer.height - rectCanvas.height/10)/4,
-        // Fire a 'change' event if values are different to current values
-        allowChangeEvent: true,
+    
+    panZoomInstance.zoomAbs(
+        ((rectContainer.width-280) - rectCanvas.width*0.1) / 2 + 280, // initial x position
+        (rectContainer.height - rectCanvas.height*0.1) / 2, // initial y position
+        0.1  // initial zoom 
+      );
+}
+
+/**
+ * Initialise all the events on the mouse and touch
+ */
+function initEvents() {
+
+    // redraw the canvas when the mouse leaves the area
+    canvas.addEventListener("mouseleave", function() {
+        drawPixels();
+        displayInfos();
+    });
+    
+    // draw a pixel on right click, prevent the context menu 
+    canvasContainer.addEventListener("contextmenu", preventDefault);
+    
+    // redraw the canvas when the mouse hovering, with the pixel below highlighted
+    canvas.addEventListener("mousemove", canvasMouseMoveHover, false);
+    
+    //redraw the pixels when zoomed in or out
+    canvas.addEventListener("wheel", drawPixels, false);
+    
+    // Mouse events
+    canvas.addEventListener("mousedown", function(event){
+        hasMoved = false;
+        canMove = true;
+    });
+    canvas.addEventListener("mouseup", function(event){
+        canMove = false;
+        if (!hasMoved) {
+            fillPixel(event);
+        }
+    });
+    canvasContainer.addEventListener("mousemove", function(event){
+        if (canMove) {
+            hasMoved = true;
+        }
+    });
+
+    // Mobile events
+    canvas.addEventListener("touchstart", function(event){
+        hasMoved = false;
+        canMove = true;
+    });
+    canvas.addEventListener("touchend", function(event){
+        canMove = false;
+        if (!hasMoved) {
+            fillPixel(event);
+        }
+    });
+    canvasContainer.addEventListener("touchmove", function(event){
+        if (canMove) {
+            hasMoved = true;
+        }
+    });
+    document.addEventListener("touchend", function(event){
+        canMove = false;
+    });
+
+    // Calculate the current scale and store it on zoom event
+    panZoomInstance.on('zoom', function(e) {
+        setTimeout(
+            function() {
+                let rectCanvas = canvas.getBoundingClientRect();
+                scale = rectCanvas.width / canvasPixelSize;
+                
+            }, 10
+        );
     });
 }
 
@@ -313,6 +367,8 @@ function resetTransform() {
  */
 function initParams() {
     canvas  = document.getElementById("canvas");
+    canvas.width = canvasPixelSize;
+    canvas.height = canvasPixelSize;
     ctx = canvas.getContext("2d");
 
     isSidebarHidden = false;
@@ -326,7 +382,14 @@ function initParams() {
 
     pixels = [];
     pickers = [];
-    pinchZoom = document.querySelector(".pinch-zoom");
+    scale = 1;
+
+    panZoomInstance = panzoom(canvas, {
+        maxZoom: 10,
+        minZoom: 0.05,
+        smoothScroll: true
+    });
+    
     displayGrid = false;
     canMove = false;
     hasMoved = false;
@@ -358,6 +421,8 @@ function initParams() {
 $(document).ready(function(){
     
     initParams();
+    resetTransform();
+    initEvents();
     
     // display the grid when the checkbox is checked
     let showGridCBs = document.getElementsByClassName("showGridCB");
@@ -384,85 +449,6 @@ $(document).ready(function(){
         }
     });
 
-    resetTransform();
-    window.addEventListener('resize', evt => {
-        resetTransform();
-    });
-
-    
-    // mouse left click on the canvas, to draw pixels
-    canvas.addEventListener("mousedown", function(event) {
-        hasMoved = false;
-        canMove = true;
-    }, false);
-    
-    canvas.addEventListener("mouseup", function(event) {
-        canMove = false;
-        if (!hasMoved) {
-            fillPixel(event);
-        }
-    }, false);
-
-    // mouse right click on the canvas container
-    canvasContainer.addEventListener("mousedown", function(event){
-        if (event.buttons == 2 || event.buttons == 3) {
-            document.addEventListener("contextmenu", preventDefault, false);
-        }
-        hasMoved = false;
-        canMove = true;
-    }, false);
-    
-    // moves the canvas when the user is clicking
-    canvasContainer.addEventListener("mousemove", function(event) {
-        if (canMove) {
-            hasMoved = true;
-        }
-    }, false);
-    
-
-    // prevent the opening of the context menu on the canvas container 
-    canvasContainer.addEventListener("contextmenu", preventDefault, false);
-    // mouse right click up on the document
-    document.addEventListener("mouseup", function(event) {
-        canMove = false;
-        preventContextMenu();
-    });
-
-
-    // Mobile part
-    canvas.addEventListener("touchstart", function(event){
-        hasMoved = false;
-        canMove = true;
-    }, false);
-
-    canvas.addEventListener("touchend", function(event){
-        canMove = false;
-        if (!hasMoved) {
-            fillPixel(event);
-        }
-    }, false);
-    
-    canvasContainer.addEventListener("touchmove", function(event){
-        if (canMove) {
-            hasMoved = true;
-        }
-    }, false);
-
-    document.addEventListener("touchend", function(event){
-        canMove = false;
-    }, false);
-
-
-    // redraw the canvas when the mouse hovering, with the pixel below highlighted
-    canvas.addEventListener("mousemove", canvasMouseMoveHover, false);
-    
-    // redraw the canvas when the mouse leaves the area
-    canvas.addEventListener("mouseleave", function() {
-        drawPixels();
-        displayInfos();
-    }, false);
-    
-
     // send the csrf token before POST requests
     // source : https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
     function csrfSafeMethod(method) {
@@ -478,5 +464,4 @@ $(document).ready(function(){
     });
 
     loadPixels();
-    setCanvasTranform();
 });
