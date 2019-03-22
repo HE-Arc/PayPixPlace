@@ -15,8 +15,9 @@ from django.template.defaulttags import register
 from PIL import Image, ImageDraw
 
 from .forms import CreateCanvas
-from .models import Canvas, Pixel, Pixie, User, Slot, Color, PixPrice, Colors_pack
+from .models import Canvas, Pixel, Pixie, User, Slot, Color, PixPrice, Colors_pack, Purchase
 
+from datetime import datetime
 import stripe 
 import random
 
@@ -294,6 +295,9 @@ def buy(request, id):
 
     request.user.pix += totalPix
     request.user.save()
+
+    purchase = Purchase(pixie=pixie, user=request.user, purchase_date=datetime.now())
+    purchase.save()
     
     messages.success(request, f'You received {totalPix} PIX. Thank you for you purchase!')
 
@@ -358,7 +362,7 @@ def buy_color_pack(color_pack, user):
 
     return transaction_success, result_message
 
-def buy(request, id):
+def buy_with_pix(request, id):
     user = request.user
     price = PixPrice.objects.get(num_type=id).price
 
