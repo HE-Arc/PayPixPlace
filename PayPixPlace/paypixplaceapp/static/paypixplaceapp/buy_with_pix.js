@@ -28,3 +28,20 @@ document.getElementById("btnRandomColor").addEventListener("click", function(){
         }
     });
 });
+
+document.getElementsByName("pack_form").forEach(element => element.addEventListener ("submit", function(event){
+    event.preventDefault();
+    $.ajax({
+        type: "POST",
+        url: "/buy/1",
+        data: {
+            csrfmiddlewaretoken: window.CSRF_TOKEN,
+            pack_id: element.getElementsByClassName("pack_id")[0].value,
+        },
+        dataType: "json",
+        success: function (data) {
+            console.log(data);
+            document.getElementById("userPix").innerHTML = data.UserPix;
+        }
+    });
+}))

@@ -27,15 +27,18 @@
     <div>
         {% for color_pack in colors_pack %}
             <div>
-                {{ color_pack.name }}
-                {% for color in color_pack.contains.all %}
-                    <div class="ppp-color-case" style="background-color: {{ color.hex }}; border-style: solid;" ></div>
-                {% endfor %}
-                <button>
-                    {% with color_pack_price=prices|get_item:1 %}
-                    {{ color_pack_price.price }}
-                    {% endwith %} PIX
-                </button>
+                <form action="buy/1" method="post" name="pack_form">
+                    <input type="hidden" name="pack_id" class="pack_id" value="{{ color_pack.id }}" />
+                    {{ color_pack.name }}
+                    {% for color in color_pack.contains.all %}
+                        <div class="ppp-color-case" style="background-color: {{ color.hex }}; border-style: solid;" ></div>
+                    {% endfor %}
+                    <button type="submit">
+                        {% with color_pack_price=prices|get_item:1 %}
+                        {{ color_pack_price.price }}
+                        {% endwith %} PIX
+                    </button>
+                </form>
             </div>
         {% endfor %}
     </div>

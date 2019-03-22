@@ -328,6 +328,17 @@ def buy_random_color(user):
 
     return transaction_success, result_message
 
+def buy_color_pack(color_pack, user):
+    result_message = ""
+    transaction_success = False
+
+    for color in color_pack.contains.all():
+        add_color_to_user(color.hex, user)
+    
+    result_message = "Colors successfuly added!"
+    transaction_success = True
+
+    return transaction_success, result_message
 
 def buy(request, id):
     user = request.user
@@ -340,6 +351,8 @@ def buy(request, id):
     
         if id == int(PixPriceNumType.FIX_COLOR):
             transaction_success, result_message = buy_fix_color(request.POST["hex"], user)
+        elif id == int(PixPriceNumType.COLOR_PACK):
+            transaction_success, result_message = buy_color_pack(Colors_pack.objects.get(id=request.POST["pack_id"]), user)
         elif id == int(PixPriceNumType.RANDOM_COLOR):
             transaction_success, result_message = buy_random_color(user)
 
