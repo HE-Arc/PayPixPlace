@@ -351,14 +351,17 @@ def buy_random_color(user):
     return transaction_success, result_message
 
 def buy_color_pack(color_pack, user):
-    result_message = ""
+    result_message = "You already possess all colors from this pack"
     transaction_success = False
 
     for color in color_pack.contains.all():
-        add_color_to_user(color.hex, user)
-    
-    result_message = "Colors successfuly added!"
-    transaction_success = True
+        try:
+            user.owns.all().get(hex=color.hex)
+            # The user already owns the color
+        except Color.DoesNotExist:
+            add_color_to_user(color.hex, user)
+            transaction_success = True
+            result_message = "Colors successfuly added!"
 
     return transaction_success, result_message
 
