@@ -35,6 +35,47 @@ html, body {
     display: block;
 }
 
+/*START buy color*/
+
+.ppp-buy-color-pack {
+    height: 100%;
+    overflow-y: scroll;
+    border-right: 2px solid #3a3a3a;
+    border-left: 2px solid #3a3a3a;
+}
+
+.ppp-buy-color-case {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    border: 3px solid #3a3a3a;
+}
+
+.buy-color-modal .modal-body > .row {
+    height: 320px;
+}
+
+.ppp-buy-color-title {
+    font-size: 1.6em;
+    font-weight: bold;
+}
+
+.colorpicker-alpha {
+    display:none !important;
+}
+
+.colorpicker {
+    min-width:128px !important;
+}
+
+/*END buy color*/
+
+.ppp-hr {
+    color: #3a3a3a;
+    background-color: #3a3a3a;
+    height: 1px;
+}
+
 .ppp-btn-rounded {
     border-radius: 0.8em;
     border: 0em solid rgb(54, 54, 54);
@@ -43,10 +84,9 @@ html, body {
 }
 
 .ppp-color-case {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     display: inline-block;
-    margin: 10px;
     cursor: pointer;
 }
 
