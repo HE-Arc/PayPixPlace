@@ -19,6 +19,7 @@ let isSidebarHidden;
 let panZoomInstance;
 let ammoInfos;
 let mainLoop;
+let downloadButton;
 
 const canvasPixelSize = 4000;
 
@@ -372,6 +373,13 @@ function initEvents() {
             }, 10
         );
     });
+
+    downloadButton.addEventListener("click", function() {
+        let link = document.createElement("a");
+        link.download = canvasName;
+        link.href = "/canvas/" + canvasId + "/img";
+        link.click();
+    });
 }
 
 /**
@@ -387,6 +395,7 @@ function initParams() {
     ammoProgressbar = document.getElementById("ammoProgressbar");
     isSidebarHidden = false;
     sidebarTrigger = document.getElementById("sidebarTrigger");
+    downloadButton = document.getElementById("downloadButton");
 
     canvasContainer = document.getElementById("canvasContainer");
     pixelInfoDisplay = {

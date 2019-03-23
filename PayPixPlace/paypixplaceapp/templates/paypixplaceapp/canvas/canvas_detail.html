@@ -64,6 +64,9 @@
                         <button class="btn btn-sm btn-outline-info d-inline" data-toggle="modal" data-target=".canvas-control-modal">
                             <i class="fas fa-info-circle ppp-canvas-control"></i>
                         </button>
+                        <button id="downloadButton" class="btn btn-sm btn-outline-info d-inline">
+                            <i class="fas fa-file-download ppp-canvas-control"></i>
+                        </button>                        
                     </li>
                 </ul>
             </div>
@@ -141,6 +144,7 @@
     <script>
         window.CSRF_TOKEN = "{{ csrf_token }}";
         const canvasId = "{{ object.id }}";
+        const canvasName = "{{ object.name }}";
         const userId = "{{ user.id }}";
 
         colors = [];
