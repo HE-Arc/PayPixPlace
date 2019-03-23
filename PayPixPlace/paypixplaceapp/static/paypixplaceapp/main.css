@@ -1,6 +1,15 @@
 #canvas {
     cursor: pointer;
 }
+#ammoProgressbar {
+    position: relative;
+    left : 5px;
+    width: 20px;
+    height: 10px;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+    background-color: #949494;
+}
 
 html, body {
     position: relative;

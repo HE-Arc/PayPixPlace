@@ -1,4 +1,6 @@
 from datetime import datetime
+import pytz
+from django.utils import timezone
 from enum import IntEnum
 
 from django.contrib import messages
@@ -16,7 +18,7 @@ from PIL import Image, ImageDraw
 from .forms import CreateCanvas
 from .models import Canvas, Pixel, Pixie, User, Slot, Color
 
-import stripe 
+import stripe
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
@@ -175,7 +177,7 @@ def change_pixel_color(request):
     hex = request.POST['hex']
     user = request.user
 
-    current_date = datetime.now()
+    current_date = timezone.now()
 
     modification_valid = False
 
@@ -184,13 +186,16 @@ def change_pixel_color(request):
         pixel.hex = hex
         pixel.user = user
         pixel.save()
-        # user.ammo -= 1 TODO remove after enabling ammo recuperation
-        # user.save()
+
+        if user.ammo == user.max_ammo:
+            user.last_ammo_usage = current_date
+        user.ammo -= 1
+        user.save()
         modification_valid = True
 
     # TODO send user confirmation
     data = {
-        'is_valid': modification_valid,
+        'is_valid': modification_valid
     }
     return JsonResponse(data)
 
@@ -222,9 +227,28 @@ def get_json(request, id):
             "hex" : pixel["hex"],
             "username" : pixel["user__username"] 
         }
+    user = request.user
+    
+    timeBeforeReload = (timezone.now() - user.last_ammo_usage).total_seconds()
+    while timeBeforeReload > user.ammo_reloading_seconds:
+        timeBeforeReload -= user.ammo_reloading_seconds
+        if user.ammo < user.max_ammo:
+            user.ammo += 1
+            user.last_ammo_usage = timezone.now()
+    
+    timeBeforeReload = user.ammo_reloading_seconds - abs(int(timeBeforeReload))
+    
+    user.save()
+
     data = {
         'canvas': model_to_dict(canvas),
-        'pixels': pixels2Darray
+        'pixels': pixels2Darray,
+        'ammoInfos' : {
+            'ammo' : user.ammo,
+            'maxAmmo' : user.max_ammo,
+            'reloadTime' : user.ammo_reloading_seconds,
+            'timeBeforeReload' : timeBeforeReload
+        }
     }
     return JsonResponse(data, safe=False)
 
