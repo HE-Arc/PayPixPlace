@@ -35,6 +35,8 @@ html, body {
     display: block;
 }
 
+/*START buy color*/
+
 .ppp-buy-color-pack {
     height: 100%;
     overflow-y: scroll;
@@ -50,13 +52,23 @@ html, body {
 }
 
 .buy-color-modal .modal-body > .row {
-    height: 200px;
+    height: 320px;
 }
 
 .ppp-buy-color-title {
     font-size: 1.6em;
     font-weight: bold;
 }
+
+.colorpicker-alpha {
+    display:none !important;
+}
+
+.colorpicker {
+    min-width:128px !important;
+}
+
+/*END buy color*/
 
 .ppp-hr {
     color: #3a3a3a;

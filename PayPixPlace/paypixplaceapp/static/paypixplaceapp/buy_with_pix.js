@@ -29,4 +29,14 @@ $(document).ready(function() {
             }
         });
     });
+
+    
+    $(function () {
+        $('#fix_color_picker').colorpicker({
+          inline: true,
+          container: true,
+          format: "hex",
+          useAlpha: false
+        });
+    });
 });
