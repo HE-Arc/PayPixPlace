@@ -278,6 +278,20 @@ function fillPixel(event) {
         success: function (data) {
             if (data.is_valid) {
                 loadPixels();
+            } else {
+                $.notify(
+                    "Can't place pixel, no ammunition left", 
+                    {
+                        // whether to hide the notification on click
+                        clickToHide: true,
+                        // whether to auto-hide the notification
+                        autoHide: true,
+                        // if autoHide, hide after milliseconds
+                        autoHideDelay: 4000,
+                        position: "bottom right",
+                        gap: 2
+                    }
+                );
             }
         }
     });

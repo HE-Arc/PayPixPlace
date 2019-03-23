@@ -141,6 +141,19 @@
         </div>
     </div>
 
+    <div id="alert-ammo-modal" class="modal fade alert-ammo-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body" style="display: inline-block;">
+                    No ammo left, can place pixel
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         window.CSRF_TOKEN = "{{ csrf_token }}";
         const canvasId = "{{ object.id }}";
@@ -153,6 +166,7 @@
         {% endfor %}
     </script>
     <script type="text/javascript" src="{% static 'paypixplaceapp/panzoom.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/notify.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>
     
 {% endblock content %}
