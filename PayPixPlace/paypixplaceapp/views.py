@@ -228,16 +228,18 @@ def get_json(request, id):
             "username" : pixel["user__username"] 
         }
     user = request.user
-    
-    timeBeforeReload = (timezone.now() - user.last_ammo_usage).total_seconds()
-    while timeBeforeReload > user.ammo_reloading_seconds:
-        timeBeforeReload -= user.ammo_reloading_seconds
-        if user.ammo < user.max_ammo:
-            user.ammo += 1
-            user.last_ammo_usage = timezone.now()
-    
-    timeBeforeReload = user.ammo_reloading_seconds - abs(int(timeBeforeReload))
-    
+
+    timeBeforeReload = 0
+    if user.last_ammo_usage:
+        timeBeforeReload = (timezone.now() - user.last_ammo_usage).total_seconds()
+        while timeBeforeReload > user.ammo_reloading_seconds:
+            timeBeforeReload -= user.ammo_reloading_seconds
+            if user.ammo < user.max_ammo:
+                user.ammo += 1
+                user.last_ammo_usage = timezone.now()
+        
+        timeBeforeReload = user.ammo_reloading_seconds - abs(int(timeBeforeReload))
+        
     user.save()
 
     data = {
