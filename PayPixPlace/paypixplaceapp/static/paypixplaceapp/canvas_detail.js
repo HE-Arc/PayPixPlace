@@ -12,9 +12,14 @@ let canMove;
 let hasMoved;
 let canvasContainer;
 let pixelInfoDisplay;
+let userAmmoDisplay;
+let ammoProgressbar;
 let sidebarTrigger;
 let isSidebarHidden;
 let panZoomInstance;
+let ammoInfos;
+let mainLoop;
+let downloadButton;
 
 const canvasPixelSize = 4000;
 
@@ -69,6 +74,8 @@ function loadPixels() {
         dataType: "json",
         success: function (data) {
             pixels = data.pixels;
+            ammoInfos = data.ammoInfos;
+            updateAmmo();
             canvasWidth = data.canvas.width;
             pixelWidth = 4000 / canvasWidth;
             drawPixels();
@@ -77,12 +84,25 @@ function loadPixels() {
 }
 
 /**
+ * updates the ammo informations in the navBar
+ * sets the progressBar
+ */
+function updateAmmo() {
+    userAmmoDisplay.innerHTML = ammoInfos.ammo;
+    ammoProgressbar.max = ammoInfos.reloadTime;
+    ammoProgressbar.value = ammoInfos.reloadTime - ammoInfos.timeBeforeReload;
+    if (ammoInfos.ammo == ammoInfos.maxAmmo) {
+        ammoProgressbar.value = 0;
+    }
+}
+
+/**
  * returns the name of the owner of the pixel at the given position
  * @param {Integer} x 
  * @param {Integer} y 
  */
 function getOwner(x,y) {
-    return pixels[x][y].username;
+    return pixels.length > 0 ? pixels[x][y].username : null;
 }
 
 /**
@@ -258,6 +278,20 @@ function fillPixel(event) {
         success: function (data) {
             if (data.is_valid) {
                 loadPixels();
+            } else {
+                $.notify(
+                    "Can't place pixel, no ammunition left", 
+                    {
+                        // whether to hide the notification on click
+                        clickToHide: true,
+                        // whether to auto-hide the notification
+                        autoHide: true,
+                        // if autoHide, hide after milliseconds
+                        autoHideDelay: 4000,
+                        position: "bottom right",
+                        gap: 2
+                    }
+                );
             }
         }
     });
@@ -353,6 +387,13 @@ function initEvents() {
             }, 10
         );
     });
+
+    downloadButton.addEventListener("click", function() {
+        let link = document.createElement("a");
+        link.download = canvasName;
+        link.href = "/canvas/" + canvasId + "/img";
+        link.click();
+    });
 }
 
 /**
@@ -364,22 +405,30 @@ function initParams() {
     canvas.height = canvasPixelSize;
     ctx = canvas.getContext("2d");
 
+    userAmmoDisplay = document.getElementById("userAmmo");
+    ammoProgressbar = document.getElementById("ammoProgressbar");
     isSidebarHidden = false;
     sidebarTrigger = document.getElementById("sidebarTrigger");
+    downloadButton = document.getElementById("downloadButton");
 
     canvasContainer = document.getElementById("canvasContainer");
     pixelInfoDisplay = {
         owner : document.getElementsByClassName("pixelOwner"),
         protected : document.getElementsByClassName("pixelProtected"),
     }
-
+    ammoInfos = {
+        ammo: 3,
+        maxAmmo: 3,
+        reloadTime : 60,
+        timeBeforeReload : 0
+    }
     pixels = [];
     pickers = [];
 
     panZoomInstance = panzoom(canvas, {
         maxZoom: 10,
         minZoom: 0.05,
-        smoothScroll: true
+        smoothScroll: false
     });
     
     displayGrid = false;
@@ -455,5 +504,8 @@ $(document).ready(function(){
         }
     });
 
+    mainLoop = setInterval(function(){
+        loadPixels();
+    }, 5000);
     loadPixels();
 });
