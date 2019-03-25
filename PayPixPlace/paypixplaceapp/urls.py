@@ -16,4 +16,5 @@ urlpatterns = [
     path('pix/purchase/', views.purchase, name='pix-purchase'),
     path('pix/purchase/<int:id>/', views.payment, name='pix-payment'),
     path('buy/<int:id>', views.buy_with_pix, name='buy-element'),
+    path('ammo/', views.get_user_ammo, name="ammo"),
 ]

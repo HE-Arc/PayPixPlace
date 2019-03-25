@@ -12,14 +12,13 @@ let canMove;
 let hasMoved;
 let canvasContainer;
 let pixelInfoDisplay;
-let userAmmoDisplay;
-let ammoProgressbar;
 let sidebarTrigger;
 let isSidebarHidden;
 let panZoomInstance;
-let ammoInfos;
 let mainLoop;
 let downloadButton;
+let userPix;
+let mouseLastPos;
 
 const canvasPixelSize = 4000;
 
@@ -74,26 +73,15 @@ function loadPixels() {
         dataType: "json",
         success: function (data) {
             pixels = data.pixels;
-            ammoInfos = data.ammoInfos;
-            updateAmmo();
             canvasWidth = data.canvas.width;
             pixelWidth = 4000 / canvasWidth;
+            userPix.innerHTML = data.pix;
             drawPixels();
+            if (mouseLastPos) {
+
+            }
         }
     });
-}
-
-/**
- * updates the ammo informations in the navBar
- * sets the progressBar
- */
-function updateAmmo() {
-    userAmmoDisplay.innerHTML = ammoInfos.ammo;
-    ammoProgressbar.max = ammoInfos.reloadTime;
-    ammoProgressbar.value = ammoInfos.reloadTime - ammoInfos.timeBeforeReload;
-    if (ammoInfos.ammo == ammoInfos.maxAmmo) {
-        ammoProgressbar.value = 0;
-    }
 }
 
 /**
@@ -201,36 +189,51 @@ function displayInfos(owner="", protected="") {
 
 /**
  * code executed when the user moves the mouse above the canvas
- * @param {MouseEvent} event 
+ * @param {MouseEvent} event
  */
 function canvasMouseMoveHover(event) {
-    let x = parseInt((event.offsetX) / pixelWidth);
-    let y = parseInt((event.offsetY) / pixelWidth);
-    x < 0 ? x = 0 : "";x > canvasWidth-1 ? x = canvasWidth-1 : "";
-    y < 0 ? y = 0 : "";y > canvasWidth-1 ? y = canvasWidth-1 : "";
+    let x = undefined;
+    let y = undefined;
+    if (event) {
+        x = parseInt((event.offsetX) / pixelWidth);
+        y = parseInt((event.offsetY) / pixelWidth);
+        x < 0 ? x = 0 : "";
+        x > canvasWidth-1 ? x = canvasWidth-1 : "";
+        y < 0 ? y = 0 : "";
+        y > canvasWidth-1 ? y = canvasWidth-1 : "";
+        mouseLastPos = {
+            x : x,
+            y : y
+        }
+    } else if (mouseLastPos){
+        x = mouseLastPos.x;
+        y = mouseLastPos.y;
+    }
 
     drawPixels();
-    ctx.lineWidth = 1 / scale;
-    let c = hexToRgb(drawingColor);
-    ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
-    ctx.fillRect(
-        x * pixelWidth, 
-        y * pixelWidth, 
-        pixelWidth,
-        pixelWidth
-    );
-    ctx.strokeStyle = "rgba( 128, 128, 128, 0.5)";
-    ctx.strokeRect(
-        x * pixelWidth, 
-        y * pixelWidth, 
-        pixelWidth, 
-        pixelWidth
-    );
-    let ownerName = getOwner(x,y);
-    if (ownerName != null) {
-        displayInfos(ownerName, "False");
-    } else {
-        displayInfos();
+    if (x !=undefined && y != undefined) {
+        ctx.lineWidth = 1 / scale;
+        let c = hexToRgb(drawingColor);
+        ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
+        ctx.fillRect(
+            x * pixelWidth, 
+            y * pixelWidth, 
+            pixelWidth,
+            pixelWidth
+        );
+        ctx.strokeStyle = "rgba( 128, 128, 128, 0.5)";
+        ctx.strokeRect(
+            x * pixelWidth, 
+            y * pixelWidth, 
+            pixelWidth, 
+            pixelWidth
+        );
+        let ownerName = getOwner(x,y);
+        if (ownerName != null) {
+            displayInfos(ownerName, "False");
+        } else {
+            displayInfos();
+        }
     }
 }
 
@@ -278,9 +281,24 @@ function fillPixel(event) {
         success: function (data) {
             if (data.is_valid) {
                 loadPixels();
+                updateAmmo();
+                $.notify(
+                    "+1 PIX ! You were rewarded for placing a pixel on this canvas !",
+                    {
+                        className : "success",
+                        // whether to hide the notification on click
+                        clickToHide: true,
+                        // whether to auto-hide the notification
+                        autoHide: true,
+                        // if autoHide, hide after milliseconds
+                        autoHideDelay: 4000,
+                        position: "bottom right",
+                        gap: 2
+                    }
+                )
             } else {
                 $.notify(
-                    "Can't place pixel, no ammunition left", 
+                    "Can't place pixel, next ammo in " + Math.round(timeRemaining) + " seconds", 
                     {
                         // whether to hide the notification on click
                         clickToHide: true,
@@ -329,13 +347,14 @@ function initEvents() {
     canvas.addEventListener("mouseleave", function() {
         drawPixels();
         displayInfos();
+        mouseLastPos = undefined;
     });
     
     // draw a pixel on right click, prevent the context menu 
     canvasContainer.addEventListener("contextmenu", preventDefault);
     
     // redraw the canvas when the mouse hovering, with the pixel below highlighted
-    canvas.addEventListener("mousemove", canvasMouseMoveHover, false);
+    canvas.addEventListener("mousemove", canvasMouseMoveHover);
     
     //redraw the pixels when zoomed in or out
     canvas.addEventListener("wheel", drawPixels, false);
@@ -405,11 +424,10 @@ function initParams() {
     canvas.height = canvasPixelSize;
     ctx = canvas.getContext("2d");
 
-    userAmmoDisplay = document.getElementById("userAmmo");
-    ammoProgressbar = document.getElementById("ammoProgressbar");
     isSidebarHidden = false;
     sidebarTrigger = document.getElementById("sidebarTrigger");
     downloadButton = document.getElementById("downloadButton");
+    userPix = document.getElementById("userPix");
 
     canvasContainer = document.getElementById("canvasContainer");
     pixelInfoDisplay = {
@@ -425,10 +443,13 @@ function initParams() {
     pixels = [];
     pickers = [];
 
+    mouseLastPos = undefined;
+
     panZoomInstance = panzoom(canvas, {
         maxZoom: 10,
         minZoom: 0.05,
-        smoothScroll: false
+        smoothScroll: false, // disable animation when moving
+        zoomDoubleClickSpeed: 1 // disable doubleclick zoom
     });
     
     displayGrid = false;
@@ -504,8 +525,9 @@ $(document).ready(function(){
         }
     });
 
-    mainLoop = setInterval(function(){
-        loadPixels();
-    }, 5000);
+    setInterval(function() {
+        canvasMouseMoveHover();
+    }, 4000)
+
     loadPixels();
 });
