@@ -1,4 +1,6 @@
 from datetime import datetime
+import pytz
+from django.utils import timezone
 from enum import IntEnum
 
 from django.contrib import messages
@@ -11,22 +13,64 @@ from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 from django.core.paginator import Paginator
 from django.db.models import Prefetch
+from django.template.defaulttags import register
 from PIL import Image, ImageDraw
 
 from .forms import CreateCanvas
-from .models import Canvas, Pixel, Pixie, User, Slot, Color
+from .models import Canvas, Pixel, Pixie, User, Slot, Color, PixPrice, Colors_pack, Purchase
 
 import stripe 
+import random
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+
+@register.filter
+def get_enum_value(value):
+    return int(value)
 
 class Place(IntEnum):
     OFFICIAL = 0
     COMMUNITY = 1
 
+class PixPriceNumType(IntEnum):
+    FIX_COLOR = 0
+    COLOR_PACK = 1
+    RANDOM_COLOR = 2
+    UNLOCK_SLOT = 3
+    CANVAS_COLOR_PACK = 4
+
+def get_highest_title(user):
+    purchases = Purchase.objects.filter(user=user)
+    title = "Pixer"
+    max_id = 0
+
+    for purchase in purchases:
+        if purchase.pixie.id > max_id:
+            title = purchase.pixie.title
+            max_id = purchase.pixie.id
+    
+    return title
+
+
+def get_pix_price():
+    pix_prices = PixPrice.objects.all()
+    prices = {}
+    for price in pix_prices:
+        prices[price.num_type] = price
+    return prices
+
+
 def home(request):
     context = {
         'title': 'Home',
+        'prices': get_pix_price,
+        'colors_pack': Colors_pack.objects.all(),
+        'user_title': get_highest_title(request.user)
+
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
@@ -175,27 +219,38 @@ def change_pixel_color(request):
     hex = request.POST['hex']
     user = request.user
 
-    current_date = datetime.now()
+    current_date = timezone.now()
 
     modification_valid = False
 
     pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
-    if can_modify_pixel(pixel, user, current_date):
+    if can_modify_pixel(pixel, hex, user, current_date):
         pixel.hex = hex
         pixel.user = user
         pixel.save()
-        # user.ammo -= 1 TODO remove after enabling ammo recuperation
-        # user.save()
+
+        if user.ammo == user.max_ammo:
+            user.last_ammo_usage = current_date
+        user.ammo -= 1
+        user.save()
         modification_valid = True
 
     # TODO send user confirmation
     data = {
-        'is_valid': modification_valid,
+        'is_valid': modification_valid
     }
     return JsonResponse(data)
 
-def can_modify_pixel(pixel, user, current_date):
-    return (pixel.end_protection_date is None or current_date > pixel.end_protection_date) and (user.ammo > 0)
+def can_modify_pixel(pixel, color, user, current_date):
+    returnBool = True
+    returnBool &= (
+        pixel.end_protection_date is None or
+        current_date > pixel.end_protection_date
+        )
+    returnBool &= user.ammo > 0
+    returnBool &= color in [color.hex for color in user.owns.all()]
+    
+    return returnBool
 
 def get_json(request, id):
     """returns the canvas and all its pixels by its id in a json format"""
@@ -214,9 +269,30 @@ def get_json(request, id):
             "hex" : pixel["hex"],
             "username" : pixel["user__username"] 
         }
+    user = request.user
+
+    timeBeforeReload = 0
+    if user.last_ammo_usage:
+        timeBeforeReload = (timezone.now() - user.last_ammo_usage).total_seconds()
+        while timeBeforeReload > user.ammo_reloading_seconds:
+            timeBeforeReload -= user.ammo_reloading_seconds
+            if user.ammo < user.max_ammo:
+                user.ammo += 1
+                user.last_ammo_usage = timezone.now()
+        
+        timeBeforeReload = user.ammo_reloading_seconds - abs(int(timeBeforeReload))
+        
+    user.save()
+
     data = {
         'canvas': model_to_dict(canvas),
-        'pixels': pixels2Darray
+        'pixels': pixels2Darray,
+        'ammoInfos' : {
+            'ammo' : user.ammo,
+            'maxAmmo' : user.max_ammo,
+            'reloadTime' : user.ammo_reloading_seconds,
+            'timeBeforeReload' : timeBeforeReload
+        }
     }
     return JsonResponse(data, safe=False)
 
@@ -266,9 +342,97 @@ def buy(request, id):
 
     request.user.pix += totalPix
     request.user.save()
+
+    purchase = Purchase(pixie=pixie, user=request.user, purchase_date=datetime.now())
+    purchase.save()
     
     messages.success(request, f'You received {totalPix} PIX. Thank you for you purchase!')
 
 def payment(request, id):
     buy(request, id)
     return JsonResponse("OK", safe=False)
+
+def user_has_enough_pix(user, price):
+    return user.pix >= price
+
+def add_color_to_user(hex, user):
+    try:
+        color = Color.objects.get(hex=hex)
+        user.owns.add(color)
+    except Color.DoesNotExist:
+        user.owns.create(hex=hex)   
+
+def buy_fix_color(hex, user):
+    result_message = ""
+    transaction_success = False
+    
+    try:
+        color = user.owns.all().get(hex=hex)
+        # The user already owns the color
+        result_message = "You already own this color!"
+    except Color.DoesNotExist:
+        # The user does not own the color
+        add_color_to_user(hex, user)
+        result_message = "Color successfuly added!"
+        transaction_success = True
+
+    return transaction_success, result_message
+
+def buy_random_color(user):
+    result_message = ""
+    transaction_success = False
+    
+    while not transaction_success:
+        r = lambda: random.randint(0,255)
+        hex = ('#%02X%02X%02X' % (r(),r(),r()))
+    
+        try:
+            color = user.owns.all().get(hex=hex)
+            # The user already owns the color
+            result_message = "You already own this color!"
+        except Color.DoesNotExist:
+            add_color_to_user(hex, user)
+            result_message = "Color successfuly added! (" + hex + ")"
+            transaction_success = True
+
+    return transaction_success, result_message
+
+def buy_color_pack(color_pack, user):
+    result_message = "You already possess all colors from this pack"
+    transaction_success = False
+
+    for color in color_pack.contains.all():
+        try:
+            user.owns.all().get(hex=color.hex)
+            # The user already owns the color
+        except Color.DoesNotExist:
+            add_color_to_user(color.hex, user)
+            transaction_success = True
+            result_message = "Colors successfuly added!"
+
+    return transaction_success, result_message
+
+def buy_with_pix(request, id):
+    user = request.user
+    price = PixPrice.objects.get(num_type=id).price
+
+    result_message = ""
+    transaction_success = False
+
+    if user_has_enough_pix(user, price):
+    
+        if id == int(PixPriceNumType.FIX_COLOR):
+            transaction_success, result_message = buy_fix_color(request.POST["hex"], user)
+        elif id == int(PixPriceNumType.COLOR_PACK):
+            transaction_success, result_message = buy_color_pack(Colors_pack.objects.get(id=request.POST["pack_id"]), user)
+        elif id == int(PixPriceNumType.RANDOM_COLOR):
+            transaction_success, result_message = buy_random_color(user)
+
+    else:
+        result_message = "You do not have enough pix!"
+
+    if transaction_success:
+        user.pix -= price
+        user.save()
+    
+    return JsonResponse({'Result' : result_message, 'UserPix' : user.pix}, safe=False)

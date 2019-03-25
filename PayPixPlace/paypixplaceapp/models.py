@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+
 class Role(models.Model):
     name = models.CharField(max_length=30, unique=True)
 
@@ -55,4 +56,9 @@ class Slot(models.Model):
     place_num = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
+
+class PixPrice(models.Model):
+    num_type = models.IntegerField(unique=True)
+    name = models.CharField(max_length=30)
+    price = models.IntegerField()
 

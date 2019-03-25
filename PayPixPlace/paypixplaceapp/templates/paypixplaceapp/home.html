@@ -1,6 +1,92 @@
 {% extends "paypixplaceapp/base_standard.html" %}
+{% load staticfiles %}
 {% block content %}
     
     <h1>Home</h1>
+    
+    <div>
+        {{ user_title }}
+    </div>
+
+    <button class="btn btn-sm btn-outline-info" data-toggle="modal" data-target=".buy-color-modal">Buy a color</button>
+
+    <div id="buy-color-modal" class="modal fade buy-color-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body" style="display: inline-block;">
+                    <div class="row text-center align-middle">
+                        <div class="col-4">
+                            <h3 class="ppp-buy-color-title">Any Color</h3>
+
+                            <hr class="ppp-hr">
+
+                            <div id="fix_color_picker" data-color="#305AA2" class="mb-3">
+                                <input id="fix_color" type="text" class="form-control mb-1"/>
+                            </div>
+                            
+                            <button id="btnFixColor" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                                {% with fix_color=prices|get_item:0 %}
+                                {{ fix_color.price }}
+                                {% endwith %}
+                                <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                            </button>
+                        </div>
+
+                        <div class="col-4 ppp-buy-color-pack">
+                            <h3 class="ppp-buy-color-title">Color Pack</h3>
+
+                            <hr class="ppp-hr">
+
+                            {% for color_pack in colors_pack %}
+
+                                <form action="buy/1" method="post" name="pack_form">
+                                    <div class="mb-3">
+                                        <input type="hidden" name="pack_id" class="pack_id" value="{{ color_pack.id }}" />
+                                        <div class="form-group">
+                                            <label class="font-weight-bold d-block">{{ color_pack.name }}</label>
+                                            {% for color in color_pack.contains.all %}
+                                                <div class="ppp-buy-color-case" style="background-color: {{ color.hex }};"></div>
+                                            {% endfor %}
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                                            {% with color_pack_price=prices|get_item:1 %}
+                                            {{ color_pack_price.price }}
+                                            {% endwith %}
+                                            <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                {% if not forloop.last %}
+                                    <hr class="ppp-hr">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-4">
+                            <h3 class="ppp-buy-color-title">Random Color</h3>
+
+                            <hr class="ppp-hr">
+
+                            <button id="btnRandomColor" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                                {% with random_color=prices|get_item:2 %}
+                                {{ random_color.price }}
+                                {% endwith %}
+                                <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+    </script>
     
 {% endblock content %}

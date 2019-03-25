@@ -15,4 +15,5 @@ urlpatterns = [
     path('change_user_slot_color/', views.change_user_slot_color, name='change_user_slot_color'),
     path('pix/purchase/', views.purchase, name='pix-purchase'),
     path('pix/purchase/<int:id>/', views.payment, name='pix-payment'),
+    path('buy/<int:id>', views.buy_with_pix, name='buy-element'),
 ]
