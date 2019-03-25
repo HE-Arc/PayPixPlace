@@ -12,12 +12,9 @@ let canMove;
 let hasMoved;
 let canvasContainer;
 let pixelInfoDisplay;
-let userAmmoDisplay;
-let ammoProgressbar;
 let sidebarTrigger;
 let isSidebarHidden;
 let panZoomInstance;
-let ammoInfos;
 let mainLoop;
 let downloadButton;
 
@@ -74,26 +71,11 @@ function loadPixels() {
         dataType: "json",
         success: function (data) {
             pixels = data.pixels;
-            ammoInfos = data.ammoInfos;
-            updateAmmo();
             canvasWidth = data.canvas.width;
             pixelWidth = 4000 / canvasWidth;
             drawPixels();
         }
     });
-}
-
-/**
- * updates the ammo informations in the navBar
- * sets the progressBar
- */
-function updateAmmo() {
-    userAmmoDisplay.innerHTML = ammoInfos.ammo;
-    ammoProgressbar.max = ammoInfos.reloadTime;
-    ammoProgressbar.value = ammoInfos.reloadTime - ammoInfos.timeBeforeReload;
-    if (ammoInfos.ammo == ammoInfos.maxAmmo) {
-        ammoProgressbar.value = 0;
-    }
 }
 
 /**
@@ -405,8 +387,6 @@ function initParams() {
     canvas.height = canvasPixelSize;
     ctx = canvas.getContext("2d");
 
-    userAmmoDisplay = document.getElementById("userAmmo");
-    ammoProgressbar = document.getElementById("ammoProgressbar");
     isSidebarHidden = false;
     sidebarTrigger = document.getElementById("sidebarTrigger");
     downloadButton = document.getElementById("downloadButton");
@@ -504,8 +484,5 @@ $(document).ready(function(){
         }
     });
 
-    mainLoop = setInterval(function(){
-        loadPixels();
-    }, 5000);
     loadPixels();
 });

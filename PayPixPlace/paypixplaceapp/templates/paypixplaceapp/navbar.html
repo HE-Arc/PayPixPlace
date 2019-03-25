@@ -30,11 +30,12 @@
             <ul class="navbar-nav ml-auto">
                 <!-- Authentication Links -->
                 {% if user.is_authenticated %}
+                    <script src="{% static 'paypixplaceapp/ammo.js' %}"></script>
                     <li class="nav-item mr-3">
                         <a class="nav-link d-block d-md-none d-lg-block" href="{% url 'pix-purchase' %}">
                             <span class="mr-1">
                                 <!--<i class="fas fa-arrows-alt mr-1"></i>-->
-                                <progress class="fas mr-1" id="ammoProgressbar" value="0" max="100"></progress>
+                                <progress class="mr-1" id="ammoProgressbar" value="0" max="100"></progress>
                                 <span id="userAmmo">{{ user.ammo }}</span>
                             </span>
                             <div style="display: inline-block;">
