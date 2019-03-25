@@ -1,5 +1,8 @@
 let userAmmoDisplay;
 let ammoProgressbar;
+let timeRemaining;
+let interval;
+
 
 /**
  * updates the ammo informations in the navBar
@@ -13,9 +16,20 @@ function updateAmmo() {
         success: function (data) {
             userAmmoDisplay.innerHTML = data.ammo;
             ammoProgressbar.max = data.reloadTime;
-            ammoProgressbar.value = data.reloadTime - data.timeBeforeReload;
+            timeRemaining = data.timeBeforeReload;
+            
             if (data.ammo == data.maxAmmo) {
                 ammoProgressbar.value = 0;
+            } else if (interval == undefined){
+                interval = setInterval(function(){
+                    ammoProgressbar.value = data.reloadTime - timeRemaining;
+                    timeRemaining -= 0.2;
+                }, 200);
+                setTimeout(function(){
+                    clearInterval(interval);
+                    interval = undefined;
+                    updateAmmo();
+                }, data.timeBeforeReload*1000);
             }
         }
     });
@@ -24,10 +38,6 @@ function updateAmmo() {
 $(document).ready(function(){
     userAmmoDisplay = document.getElementById("userAmmo");
     ammoProgressbar = document.getElementById("ammoProgressbar");
-
-    mainLoop = setInterval(function(){
-        updateAmmo();
-    }, 200);
-    
+    interval = undefined;
     updateAmmo();
 });

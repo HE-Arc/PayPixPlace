@@ -171,31 +171,35 @@ def change_user_slot_color(request):
             })
 
 def change_pixel_color(request):
-    canvas_id = request.POST['canvas_id']
-    x = request.POST['x']
-    y = request.POST['y']
-    hex = request.POST['hex']
-    user = request.user
-
-    current_date = timezone.now()
-
+    """Changes the color of one pixel of a canvas, if the user have the rights to do so"""
     modification_valid = False
+    if request.is_ajax():
+        if request.method == 'POST':
+            canvas_id = request.POST['canvas_id']
+            x = request.POST['x']
+            y = request.POST['y']
+            hex = request.POST['hex']
+            user = request.user
 
-    pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
-    if can_modify_pixel(pixel, hex, user, current_date):
-        pixel.hex = hex
-        pixel.user = user
-        pixel.save()
+            current_date = timezone.now()
 
-        if user.ammo == user.max_ammo:
-            user.last_ammo_usage = current_date
-        user.ammo -= 1
-        user.pix += 1
-        user.save()
-        modification_valid = True
-        canvas = Canvas.objects.get(id=canvas_id)
-        canvas.is_modified = True
-        canvas.save()
+
+            pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
+            if can_modify_pixel(pixel, hex, user, current_date):
+                pixel.hex = hex
+                pixel.user = user
+                pixel.save()
+
+                if user.ammo == user.max_ammo:
+                    user.last_ammo_usage = current_date
+                user.ammo -= 1
+                user.pix += 1
+                user.save()
+                modification_valid = True
+                canvas = Canvas.objects.get(id=canvas_id)
+                canvas.is_modified = True
+                canvas.interactions += 1
+                canvas.save()
     
     data = {
         'is_valid': modification_valid
@@ -214,31 +218,34 @@ def can_modify_pixel(pixel, color, user, current_date):
     return returnBool
 
 def get_user_ammo(request):
-    user = request.user
+    """Returns informations about the user's ammunitions"""
+    if request.is_ajax():
+        user = request.user
 
-    timeBeforeReload = 0
-    if user.last_ammo_usage:
-        timeBeforeReload = (timezone.now() - user.last_ammo_usage).total_seconds()
-        while timeBeforeReload > user.ammo_reloading_seconds:
-            timeBeforeReload -= user.ammo_reloading_seconds
-            if user.ammo < user.max_ammo:
-                user.ammo += 1
-                user.last_ammo_usage = timezone.now()
-        
-        timeBeforeReload = user.ammo_reloading_seconds - abs(int(timeBeforeReload))
-        
-    user.save()
+        timeBeforeReload = 0
+        if user.last_ammo_usage:
+            timeBeforeReload = (timezone.now() - user.last_ammo_usage).total_seconds()
+            while timeBeforeReload > user.ammo_reloading_seconds:
+                timeBeforeReload -= user.ammo_reloading_seconds
+                if user.ammo < user.max_ammo:
+                    user.ammo += 1
+                    user.last_ammo_usage = timezone.now()
+            
+            timeBeforeReload = user.ammo_reloading_seconds - abs(int(timeBeforeReload))
+        user.save()
 
-    data = {
-        'ammo' : user.ammo,
-        'maxAmmo' : user.max_ammo,
-        'reloadTime' : user.ammo_reloading_seconds,
-        'timeBeforeReload' : timeBeforeReload
-    }
-    return JsonResponse(data, safe=False)
+        data = {
+            'ammo' : user.ammo,
+            'maxAmmo' : user.max_ammo,
+            'reloadTime' : user.ammo_reloading_seconds,
+            'timeBeforeReload' : timeBeforeReload
+        }
+        return JsonResponse(data)
+    else:
+        raise Http404()
 
 def get_json(request, id):
-    """returns the canvas and all its pixels by its id in a json format"""
+    """returns the canvas and all its pixels (and bonus infos) in a json format"""
     if not id:
         raise Http404()
 
@@ -257,9 +264,10 @@ def get_json(request, id):
 
     data = {
         'canvas': model_to_dict(canvas),
-        'pixels': pixels2Darray
+        'pixels': pixels2Darray,
+        'pix' : request.user.pix
     }
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data)
 
 def get_img(request, id):
     """returns the canvas by its id, as a PNG img"""
@@ -272,6 +280,7 @@ def get_img(request, id):
         raise Http404()
     
     img = None
+    # Generate anew image only if the canvas was modified after the last request
     if(canvas.is_modified):
         pixels = [model_to_dict(pixel) for pixel in canvas.pixel_set.all()]
         imgSize = 1000
@@ -289,7 +298,7 @@ def get_img(request, id):
                 ), fill=pixel["hex"]
             )
         del draw
-        get_img.images[id] = img
+        get_img.images[id] = img # Remember the image if a new request come before the canvas is modified
     else:
         img = get_img.images[id]
         canvas.is_modified = False
