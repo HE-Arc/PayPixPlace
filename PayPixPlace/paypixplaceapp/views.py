@@ -213,40 +213,41 @@ def change_user_slot_color(request):
                 'is_valid': True,
             })
 
-@login_required
 def change_pixel_color(request):
     """Changes the color of one pixel of a canvas, if the user have the rights to do so"""
     modification_valid = False
-    if request.is_ajax():
-        if request.method == 'POST':
-            canvas_id = request.POST['canvas_id']
-            x = request.POST['x']
-            y = request.POST['y']
-            hex = request.POST['hex']
-            user = request.user
+    if request.user.is_authenticated:
+        if request.is_ajax():
+            if request.method == 'POST':
+                canvas_id = request.POST['canvas_id']
+                x = request.POST['x']
+                y = request.POST['y']
+                hex = request.POST['hex']
+                user = request.user
 
-            current_date = timezone.now()
+                current_date = timezone.now()
 
 
-            pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
-            if can_modify_pixel(pixel, hex, user, current_date):
-                pixel.hex = hex
-                pixel.user = user
-                pixel.save()
+                pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
+                if can_modify_pixel(pixel, hex, user, current_date):
+                    pixel.hex = hex
+                    pixel.user = user
+                    pixel.save()
 
-                if user.ammo == user.max_ammo:
-                    user.last_ammo_usage = current_date
-                user.ammo -= 1
-                user.pix += 1
-                user.save()
-                modification_valid = True
-                canvas = Canvas.objects.get(id=canvas_id)
-                canvas.is_modified = True
-                canvas.interactions += 1
-                canvas.save()
+                    if user.ammo == user.max_ammo:
+                        user.last_ammo_usage = current_date
+                    user.ammo -= 1
+                    user.pix += 1
+                    user.save()
+                    modification_valid = True
+                    canvas = Canvas.objects.get(id=canvas_id)
+                    canvas.is_modified = True
+                    canvas.interactions += 1
+                    canvas.save()
     
     data = {
-        'is_valid': modification_valid
+        'is_valid' : modification_valid,
+        'user_authenticated' : request.user.is_authenticated
     }
     return JsonResponse(data)
 
