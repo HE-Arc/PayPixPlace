@@ -260,6 +260,7 @@ def can_modify_pixel(pixel, color, user, current_date):
     
     return returnBool
 
+@login_required
 def get_user_ammo(request):
     """Returns informations about the user's ammunitions"""
     if request.is_ajax():

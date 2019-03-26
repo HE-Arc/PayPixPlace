@@ -8,14 +8,16 @@
     <div class="row">
         {% for c in canvas %}
 
-            <div class="text-center col-12 col-sm-6 col-lg-4 mb-5">
+            <div class="text-center col-12 col-sm-6 col-lg-4">
                 <a href="{% url 'canvas-detail' c.id %}">
                     <h2>{{ c.name }}</h2>
-                    <img
-                        class="canvas-img w-100 img-fluid img-thumbnail"
-                        src="{% url 'canvas-img' c.id %}"
-                        alt="canvas named {{c.name}}"
-                    />
+                    <div class="img-container">
+                        <img
+                            class="canvas-img img-fluid img-thumbnail"
+                            src="{% url 'canvas-img' c.id %}"
+                            alt="canvas named {{c.name}}"
+                        />
+                    </div>
                 </a>
             </div>
 
