@@ -247,7 +247,7 @@ html, body {
     -webkit-transition: .4s;
     transition: .4s;
 }
-  
+
 .slider:before {
     position: absolute;
     content: "";
@@ -259,7 +259,14 @@ html, body {
     -webkit-transition: .4s;
     transition: .4s;
 }
-  
+
+.canvas-img {
+    background-image: url("images/loader.gif");
+    background-repeat: no-repeat;
+    background-size: 20%;
+    background-position: center;
+}
+
 input.default:checked + .slider {
     background-color: rgb(104, 104, 104);
 }

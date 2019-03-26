@@ -227,7 +227,6 @@ def change_pixel_color(request):
 
                 current_date = timezone.now()
 
-
                 pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
                 if can_modify_pixel(pixel, hex, user, current_date):
                     pixel.hex = hex
@@ -244,7 +243,6 @@ def change_pixel_color(request):
                     canvas.is_modified = True
                     canvas.interactions += 1
                     canvas.save()
-    
     data = {
         'is_valid' : modification_valid,
         'user_authenticated' : request.user.is_authenticated
@@ -306,6 +304,7 @@ def get_json(request, id):
             "hex" : pixel["hex"],
             "username" : pixel["user__username"] 
         }
+    
     try:
         pix = request.user.pix
     except:
@@ -317,6 +316,7 @@ def get_json(request, id):
     }
     return JsonResponse(data)
 
+
 def get_img(request, id):
     """returns the canvas by its id, as a PNG img"""
     if not id:
@@ -326,31 +326,23 @@ def get_img(request, id):
         canvas = Canvas.objects.get(id=id)
     except ObjectDoesNotExist:
         raise Http404()
-    
-    img = None
-    # Generate anew image only if the canvas was modified after the last request
-    if(canvas.is_modified):
-        pixels = [model_to_dict(pixel) for pixel in canvas.pixel_set.all()]
-        imgSize = 1000
-        img = Image.new('RGB', (imgSize, imgSize))
-        pixelSize = imgSize // model_to_dict(canvas)["width"]
 
-        draw = ImageDraw.Draw(img)
-        for pixel in pixels:
-            draw.rectangle(
-                (
-                    pixel["x"] * pixelSize,
-                    pixel["y"] * pixelSize,
-                    pixel["x"] * pixelSize + pixelSize,
-                    pixel["y"] * pixelSize + pixelSize
-                ), fill=pixel["hex"]
-            )
-        del draw
-        get_img.images[id] = img # Remember the image if a new request come before the canvas is modified
-    else:
-        img = get_img.images[id]
-        canvas.is_modified = False
-        canvas.save()
+    pixels = [model_to_dict(pixel) for pixel in canvas.pixel_set.all()]
+    imgSize = 1000
+    img = Image.new('RGB', (imgSize, imgSize))
+    pixelSize = imgSize // model_to_dict(canvas)["width"]
+
+    draw = ImageDraw.Draw(img)
+    for pixel in pixels:
+        draw.rectangle(
+            (
+                pixel["x"] * pixelSize,
+                pixel["y"] * pixelSize,
+                pixel["x"] * pixelSize + pixelSize,
+                pixel["y"] * pixelSize + pixelSize
+            ), fill=pixel["hex"]
+        )
+    del draw
     
     response = HttpResponse(content_type="image/png")
     img.save(response, "PNG")

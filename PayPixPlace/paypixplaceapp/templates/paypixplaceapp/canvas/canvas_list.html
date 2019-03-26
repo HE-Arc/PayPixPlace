@@ -1,4 +1,5 @@
 {% extends "paypixplaceapp/base_standard.html" %}
+{% load staticfiles %}
 {% block content %}
     {% block title %}
     
@@ -11,10 +12,10 @@
                 <a href="{% url 'canvas-detail' c.id %}">
                     <h2>{{ c.name }}</h2>
                     <img
-                        class="w-100 img-fluid img-thumbnail"
+                        class="canvas-img w-100 h-100 img-fluid img-thumbnail"
                         src="{% url 'canvas-img' c.id %}"
                         alt="canvas named {{c.name}}"
-                    />        
+                    />
                 </a>
             </div>
 
