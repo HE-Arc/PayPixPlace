@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .forms import RegisterForm, UpdateForm, LoginForm
-from paypixplaceapp.models import Color, Slot
+from paypixplaceapp.models import Color, Slot, Colors_pack
+from paypixplaceapp.views import get_pix_price
 
 def register(request):
     if request.method == "POST":
@@ -52,7 +53,9 @@ def profile(request):
 
     context = {
         'title': 'Profile',
-        'form': form
+        'form': form,
+        'prices': get_pix_price(),
+        'colors_pack': Colors_pack.objects.all(),
     }
     return render(request, 'users/profile.html', context)
 

@@ -60,7 +60,6 @@ def get_highest_title(user):
     
     return title
 
-
 def home(request):
     context = {
         'title': 'Home',
@@ -70,7 +69,7 @@ def home(request):
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
-class CanvasView(ListView):
+class CommunityCanvasView(ListView):
     model = Canvas
     template_name = 'paypixplaceapp/canvas/community_canvas.html'
 
@@ -79,7 +78,23 @@ class CanvasView(ListView):
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context['title'] = 'Community Canvas'
+        context['prices'] = get_pix_price()
+        context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
+        return context
+
+class OfficialCanvasView(ListView):
+    model = Canvas
+    template_name = 'paypixplaceapp/canvas/official_canvas.html'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['title'] = 'Official Canvas'
+        context['prices'] = get_pix_price()
+        context['colors_pack'] = Colors_pack.objects.all()
+        context['canvas'] = getCanvas(self.request.GET.get('page'), Place.OFFICIAL)
         return context
 
 class CanvasDetailsView(DetailView):
@@ -99,6 +114,8 @@ class CanvasDetailsView(DetailView):
             place_text = "Community"
 
         context['place_text'] = place_text
+        context['prices'] = get_pix_price()
+        context['colors_pack'] = Colors_pack.objects.all()
         return context
 
 def getCanvas(page, place):
@@ -141,17 +158,12 @@ def createCanvas(request):
 
     context = {
         'title': 'Create Canvas',
-        'form': form
+        'form': form,
+        'prices': get_pix_price(),
+        'colors_pack': Colors_pack.objects.all(),
     }
 
     return render(request, 'paypixplaceapp/canvas/create_canvas.html', context)
-
-def officialCanvas(request):
-    context = {
-        'title': 'Official Canvas',
-        'canvas': getCanvas(request.GET.get('page'), Place.OFFICIAL)
-    }
-    return render(request, 'paypixplaceapp/canvas/official_canvas.html', context)
 
 def userCanvas(request):
     canvas_list = Canvas.objects.filter(user=request.user)
@@ -160,7 +172,9 @@ def userCanvas(request):
 
     context = {
         'title': 'User\'s Canvas',
-        'canvas': canvas
+        'canvas': canvas,
+        'prices': get_pix_price(),
+        'colors_pack': Colors_pack.objects.all(),
     }
     return render(request, 'paypixplaceapp/canvas/user_canvas.html', context)
 
@@ -171,7 +185,9 @@ def get_pixies_info():
 def purchase(request):
     context = {
         'title': 'Purchase PIX',
-        'pixies': get_pixies_info()
+        'pixies': get_pixies_info(),
+        'prices': get_pix_price(),
+        'colors_pack': Colors_pack.objects.all(),
     }
     return render(request, 'paypixplaceapp/purchase_pix.html', context)
       
