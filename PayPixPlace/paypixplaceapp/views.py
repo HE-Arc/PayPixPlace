@@ -30,8 +30,12 @@ def get_item(dictionary, key):
     return dictionary.get(key)
 
 @register.filter
-def get_enum_value(value):
-    return int(value)
+def get_pix_price():
+    pix_prices = PixPrice.objects.all()
+    prices = {}
+    for price in pix_prices:
+        prices[price.num_type] = price
+    return prices
 
 class Place(IntEnum):
     OFFICIAL = 0
@@ -57,21 +61,12 @@ def get_highest_title(user):
     return title
 
 
-def get_pix_price():
-    pix_prices = PixPrice.objects.all()
-    prices = {}
-    for price in pix_prices:
-        prices[price.num_type] = price
-    return prices
-
-
 def home(request):
     context = {
         'title': 'Home',
-        'prices': get_pix_price,
+        'prices': get_pix_price(),
         'colors_pack': Colors_pack.objects.all(),
         'user_title': get_highest_title(request.user)
-
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
