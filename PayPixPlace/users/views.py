@@ -4,20 +4,25 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .forms import RegisterForm, UpdateForm, LoginForm
-from paypixplaceapp.models import Color
+from paypixplaceapp.models import Color, Slot
 
 def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
             new_user = form.save()
+            first_color = Color.objects.get(hex="#fbae00")
+            second_color = Color.objects.get(hex="#da5353")
             new_user.owns.add(
-                Color.objects.get(hex="#fbae00"),
-                Color.objects.get(hex="#da5353"),
+                first_color,
+                second_color,
                 Color.objects.get(hex="#693f7b"),
                 Color.objects.get(hex="#39589a"),
                 Color.objects.get(hex="#338984")
             )
+            
+            Slot.objects.create(place_num=1, user=new_user, color=first_color)
+            Slot.objects.create(place_num=2, user=new_user, color=second_color)
 
             new_user = authenticate(
                 username=form.cleaned_data['username'],
