@@ -4,6 +4,7 @@ from django.utils import timezone
 from enum import IntEnum
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
@@ -212,6 +213,7 @@ def change_user_slot_color(request):
                 'is_valid': True,
             })
 
+@login_required
 def change_pixel_color(request):
     """Changes the color of one pixel of a canvas, if the user have the rights to do so"""
     modification_valid = False
@@ -303,11 +305,14 @@ def get_json(request, id):
             "hex" : pixel["hex"],
             "username" : pixel["user__username"] 
         }
-
+    try:
+        pix = request.user.pix
+    except:
+        pix = -1
     data = {
         'canvas': model_to_dict(canvas),
         'pixels': pixels2Darray,
-        'pix' : request.user.pix
+        'pix' : pix
     }
     return JsonResponse(data)
 

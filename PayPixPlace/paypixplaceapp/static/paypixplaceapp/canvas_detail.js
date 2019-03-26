@@ -17,7 +17,6 @@ let isSidebarHidden;
 let panZoomInstance;
 let mainLoop;
 let downloadButton;
-let userPix;
 let mouseLastPos;
 
 const canvasPixelSize = 4000;
@@ -75,7 +74,9 @@ function loadPixels() {
             pixels = data.pixels;
             canvasWidth = data.canvas.width;
             pixelWidth = 4000 / canvasWidth;
-            userPix.innerHTML = data.pix;
+            if (data.pix != -1) {
+                document.getElementById("userPix").innerHTML = data.pix;
+            }
             drawPixels();
             if (mouseLastPos) {
 
@@ -214,7 +215,11 @@ function canvasMouseMoveHover(event) {
     if (x !=undefined && y != undefined) {
         ctx.lineWidth = 1 / scale;
         let c = hexToRgb(drawingColor);
-        ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
+        if (!c) {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+        } else {
+            ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
+        }
         ctx.fillRect(
             x * pixelWidth, 
             y * pixelWidth, 
@@ -427,8 +432,7 @@ function initParams() {
     isSidebarHidden = false;
     sidebarTrigger = document.getElementById("sidebarTrigger");
     downloadButton = document.getElementById("downloadButton");
-    userPix = document.getElementById("userPix");
-
+    
     canvasContainer = document.getElementById("canvasContainer");
     pixelInfoDisplay = {
         owner : document.getElementsByClassName("pixelOwner"),
