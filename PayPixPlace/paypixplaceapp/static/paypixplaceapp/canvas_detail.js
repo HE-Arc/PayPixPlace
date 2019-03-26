@@ -36,7 +36,7 @@ function loadPixels() {
             if (data.pix != -1) {
                 document.getElementById("userPix").innerHTML = data.pix;
             }
-            drawPixels();
+            canvasMouseMoveHover();
         }
     });
 }
@@ -206,6 +206,10 @@ function fillPixel(event) {
     if (x < 0 || y < 0 || x > canvasWidth-1 || y > canvasWidth-1) {
         return;
     }
+    if (drawingColor) {
+        pixels[x][y].hex = drawingColor;
+    }
+    canvasMouseMoveHover();
     $.ajax({
         type: "POST",
         url: "/change_pixel_color/",
@@ -217,8 +221,8 @@ function fillPixel(event) {
         },
         dataType: "json",
         success: function (data) {
+            loadPixels();
             if (data.is_valid) {
-                loadPixels();
                 updateAmmo();
                 $.notify(
                     "+1 PIX ! You were rewarded for placing a pixel on this canvas !",
@@ -459,8 +463,8 @@ $(document).ready(function(){
     });
 
     setInterval(function() {
-        canvasMouseMoveHover();
+        loadPixels();
     }, 4000)
-
+    
     loadPixels();
 });
