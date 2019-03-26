@@ -22,6 +22,7 @@ class User(AbstractUser):
 
 class Pixie(models.Model):
     title = models.CharField(max_length=30)
+    num_type = models.IntegerField(unique=True)
     price = models.IntegerField()
     number = models.IntegerField()
     bonus = models.IntegerField()
