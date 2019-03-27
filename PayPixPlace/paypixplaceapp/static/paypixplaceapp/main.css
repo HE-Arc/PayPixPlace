@@ -1,3 +1,6 @@
+#canvas {
+    cursor: pointer;
+}
 #ammoProgressbar {
     position: relative;
     left : 5px;
@@ -226,7 +229,7 @@ html, body {
     display: inline-block;
     width: 60px;
     height: 34px;
-    float:right;
+    float: right;
 }
   
 /* Hide default HTML checkbox */

@@ -315,6 +315,7 @@ def get_user_ammo(request):
     else:
         raise Http404()
 
+
 def get_cursor(request, hex):
     img = Image.new('RGBA', (32, 32))
     draw = ImageDraw.Draw(img)

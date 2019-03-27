@@ -6,7 +6,7 @@ let canvasWidth;
 let displayGrid;
 let pixelWidth;
 let canMove;
-let hasMoved;
+let countMove;
 let canvasContainer;
 let pixelInfoDisplay;
 let sidebarTrigger;
@@ -281,7 +281,7 @@ function fillPixel(event=undefined) {
  */
 function setCursor() {
     if (drawingColor) {
-        canvas.style.cursor = "url(/cursor/"+drawingColor.replace("#","")+"/), pointer, auto";
+        canvas.style.cursor = "url(/cursor/"+drawingColor.replace("#","")+"), auto";
     } else {
         canvas.style.cursor = "pointer";
     }
@@ -330,38 +330,39 @@ function initEvents() {
     
     //redraw the pixels when zoomed in or out
     canvas.addEventListener("wheel", drawPixels);
+
     
     // Mouse events
     canvas.addEventListener("mousedown", function(event){
-        hasMoved = false;
+        countMove = 0;
         canMove = true;
     });
     canvas.addEventListener("mouseup", function(event){
         canMove = false;
-        if (!hasMoved) {
+        if (countMove <= 1) {
             fillPixel(event);
         }
     });
     canvasContainer.addEventListener("mousemove", function(event){
         if (canMove) {
-            hasMoved = true;
+            countMove++;
         }
     });
 
     // Mobile events
     canvas.addEventListener("touchstart", function(event){
-        hasMoved = false;
+        countMove = 0;
         canMove = true;
     });
     canvas.addEventListener("touchend", function(event){
         canMove = false;
-        if (!hasMoved) {
+        if (countMove <= 1) {
             fillPixel(event);
         }
     });
     canvasContainer.addEventListener("touchmove", function(event){
         if (canMove) {
-            hasMoved = true;
+            countMove++;
         }
     });
     document.addEventListener("touchend", function(event){
@@ -430,7 +431,7 @@ function initParams() {
     
     displayGrid = false;
     canMove = false;
-    hasMoved = false;
+    countMove = 0;
 }
 
 // Execute when the page is fully loaded
