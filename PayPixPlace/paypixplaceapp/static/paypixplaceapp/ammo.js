@@ -18,7 +18,7 @@ function updateAmmo() {
             ammoProgressbar.max = data.reloadTime;
             timeRemaining = data.timeBeforeReload;
             
-            if (data.ammo == data.maxAmmo) {
+            if (data.ammo >= data.maxAmmo) {
                 ammoProgressbar.value = 0;
             } else if (interval == undefined){
                 interval = setInterval(function(){
