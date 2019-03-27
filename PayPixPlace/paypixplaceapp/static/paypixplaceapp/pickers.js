@@ -20,10 +20,9 @@ function changeSlotColor(newColor) {
         currentPicker[i].style.backgroundColor = newColor;
         currentPicker[i].addEventListener("click", function() {
             drawingColor = newColor;
+            setCursor();
         }, false);
     }
-    
-    drawingColor = newColor;
 
     $.ajax({
         type: "POST",
@@ -35,7 +34,8 @@ function changeSlotColor(newColor) {
         },
         dataType: "json",
         success: function(data) {
-
+            drawingColor = newColor;
+            setCursor();
         }
     });
 }
@@ -62,6 +62,7 @@ function setDrawingColor(id) {
     }
 
     isColoring = true;
+    setCursor();
 }
 
 
@@ -69,7 +70,7 @@ function setDrawingColor(id) {
 $(document).ready(function(){
     
     drawingColor = colors[0];
-
+    setCursor();
     pickers = []
 
     pickers.push(document.getElementsByClassName("picker1"));

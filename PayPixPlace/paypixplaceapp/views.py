@@ -312,6 +312,46 @@ def get_user_ammo(request):
     else:
         raise Http404()
 
+def get_cursor(request, hex):
+    img = Image.new('RGBA', (32, 32))
+    draw = ImageDraw.Draw(img)
+    draw.line(
+        [(20,20),(10,10)],
+        width=7,
+        fill="#AAAAAA",
+    )
+    draw.ellipse(
+        [(18,18),(24,24)],
+        fill="#AAAAAA"
+    )
+    draw.line(
+        [(20,20),(10,10)],
+        width=6,
+        fill="#000000",
+    )
+    draw.ellipse(
+        [(18,18),(22,22)],
+        fill="#000000"
+    )
+
+    draw.rectangle(
+        [(0,0),(8,8)],
+        fill= "#" + hex
+    )
+    draw.ellipse(
+        [(3,3),(14,14)],
+        fill= "#" + hex
+    )
+    draw.ellipse(
+        [(1,1),(12,12)],
+        fill= "#" + hex
+    )
+    del draw
+
+    response = HttpResponse(content_type="image/png")
+    img.save(response, "png")
+    return response
+
 def get_json(request, id):
     """returns the canvas and all its pixels (and bonus infos) in a json format"""
     if not id:

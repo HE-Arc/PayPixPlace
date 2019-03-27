@@ -15,7 +15,8 @@ let panZoomInstance;
 let mainLoop;
 let downloadButton;
 let mouseLastPos;
-let drawingColor = undefined;
+let drawingColor;
+let selecting;
 
 const canvasPixelSize = 4000;
 
@@ -166,11 +167,13 @@ function canvasMouseMoveHover(event) {
             pixelWidth, 
             pixelWidth
         );
-        let ownerName = getOwner(x,y);
-        if (ownerName != null) {
-            displayInfos(ownerName, "False");
-        } else {
-            displayInfos();
+        if (event) {
+            let ownerName = getOwner(x,y);
+            if (ownerName != null) {
+                displayInfos(ownerName, "False");
+            } else {
+                displayInfos();
+            }
         }
     }
 }
@@ -199,7 +202,7 @@ function getOffsetPosition(evt, target){
  * action to fill a pixel (used to respond to events)
  * @param {Event} event 
  */
-function fillPixel(event) {
+function fillPixel(event=undefined) {
     let pos = getOffsetPosition(event, canvas);
     let x = parseInt((pos.x) / pixelWidth);
     let y = parseInt((pos.y) / pixelWidth);
@@ -274,6 +277,17 @@ function fillPixel(event) {
 }
 
 /**
+ * Sets the cursor to be a paintbrush of the same color as the drawing color 
+ */
+function setCursor() {
+    if (drawingColor) {
+        canvas.style.cursor = "url(/cursor/"+drawingColor.replace("#","")+"/), auto";
+    } else {
+        canvas.style.cursor = "pointer";
+    }
+}
+
+/**
  * prevent the context menu from showing when exiting the canvas area with right click pressed
  */
 function preventContextMenu() {
@@ -315,7 +329,7 @@ function initEvents() {
     canvas.addEventListener("mousemove", canvasMouseMoveHover);
     
     //redraw the pixels when zoomed in or out
-    canvas.addEventListener("wheel", drawPixels, false);
+    canvas.addEventListener("wheel", drawPixels);
     
     // Mouse events
     canvas.addEventListener("mousedown", function(event){
@@ -380,6 +394,7 @@ function initParams() {
     canvas  = document.getElementById("canvas");
     canvas.width = canvasPixelSize;
     canvas.height = canvasPixelSize;
+
     ctx = canvas.getContext("2d");
 
     isSidebarHidden = false;
@@ -403,6 +418,8 @@ function initParams() {
     pixels = [];
 
     mouseLastPos = undefined;
+    drawingColor = undefined;
+    selecting = false;
 
     panZoomInstance = panzoom(canvas, {
         maxZoom: 10,
@@ -422,7 +439,8 @@ $(document).ready(function(){
     initParams();
     resetTransform();
     initEvents();
-    
+    setCursor();
+
     // display the grid when the checkbox is checked
     let showGridCBs = document.getElementsByClassName("showGridCB");
     for (let index = 0; index < showGridCBs.length; index++) {
