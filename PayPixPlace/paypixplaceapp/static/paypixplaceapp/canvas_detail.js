@@ -281,7 +281,7 @@ function fillPixel(event=undefined) {
  */
 function setCursor() {
     if (drawingColor) {
-        canvas.style.cursor = "url(/cursor/"+drawingColor.replace("#","")+"/), auto";
+        canvas.style.cursor = "url(/cursor/"+drawingColor.replace("#","")+"/), pointer, auto";
     } else {
         canvas.style.cursor = "pointer";
     }
