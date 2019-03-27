@@ -1,15 +1,13 @@
-function display_informations(data)
-{
+function display_informations(data) {
     transactionState = data.TransactionSuccess ? "success" : "error";
     console.log(data);
-    message = "";
-    if (Array.isArray(data.Result))
-    {
-        message = data.Result;
-    }
-    else
-    {
-        message = data.Result;
+    message = data.Result[1];
+    if (data.TransactionSuccess) {
+        $("#unlock-item-modal").modal();
+
+        if (data.Result[0] == 0 || data.Result[0] == 2) {
+            document.getElementById("unlockItem").style.backgroundColor = data.Result[2];
+        }
     }
 
     $.notify(

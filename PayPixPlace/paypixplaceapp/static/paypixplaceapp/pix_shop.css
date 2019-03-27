@@ -37,3 +37,11 @@
 .colorpicker {
     min-width:128px !important;
 }
+
+.ppp-unlock-item {
+    position: relative;
+    left: calc(50% - 50px);
+    width: 100px;
+    height: 100px;
+    background-color: black;
+}

@@ -435,7 +435,7 @@ def buy_fix_color(hex, user):
     except Color.DoesNotExist:
         # The user does not own the color
         add_color_to_user(hex, user)
-        result_message = "Color successfuly added!"
+        result_message = ["Color successfuly added!", hex]
         transaction_success = True
 
     return transaction_success, result_message
@@ -544,6 +544,14 @@ def buy_with_pix(request, id):
             transaction_success, result_message = reduce_refill_time(user)
         elif id == int(PixPriceNumType.INSTANT_AMMO):
             transaction_success, result_message = get_instant_ammo(user)
+
+        res = [id]
+        if isinstance(result_message, (list,) ):
+            res.extend(result_message)
+        else:
+            res.append(result_message)
+
+        result_message = res
 
     else:
         result_message = "You do not have enough pix!"

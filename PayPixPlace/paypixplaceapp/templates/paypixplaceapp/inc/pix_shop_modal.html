@@ -130,10 +130,24 @@
     </div>
 </div>
 
+<div id="unlock-item-modal" class="modal fade unlock-item-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content text-center">
+            <div class="modal-body">
+                <h2 class="mb-3">Unlocked</h2>
+                <div id="unlockItem" class="ppp-unlock-item mb-3">
+            
+                </div>
+                <button type="button" class="btn btn-outline-info" data-dismiss="modal">Accept</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     window.CSRF_TOKEN = "{{ csrf_token }}";
 </script>
 
-<script type="text/javascript" src="{% static 'paypixplaceapp/buy_with_pix.js' %}"></script>
+<script type="text/javascript" src="{% static 'paypixplaceapp/pix_shop.js' %}"></script>
 
 {% endif %}
