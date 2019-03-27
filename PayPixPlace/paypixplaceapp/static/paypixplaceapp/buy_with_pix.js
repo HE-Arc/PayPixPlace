@@ -30,6 +30,21 @@ $(document).ready(function() {
         });
     });
 
+    document.getElementById("btnBuySlot").addEventListener("click", function(){
+        $.ajax({
+            type: "POST",
+            url: "/buy/3",
+            data: {
+                csrfmiddlewaretoken: window.CSRF_TOKEN,
+            },
+            dataType: "json",
+            success: function (data) {
+                console.log(data);
+                document.getElementById("userPix").innerHTML = data.UserPix;
+            }
+        });
+    });
+
     document.getElementsByName("pack_form").forEach(element => element.addEventListener ("submit", function(event){
         event.preventDefault();
         $.ajax({

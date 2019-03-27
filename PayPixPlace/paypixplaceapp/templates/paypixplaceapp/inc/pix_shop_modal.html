@@ -66,6 +66,19 @@
                             {% endwith %}
                             <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                         </button>
+
+                        <hr class="ppp-hr">
+
+                        <h3 class="ppp-buy-color-title">Color Slot</h3>
+
+                        <hr class="ppp-hr">
+
+                        <button id="btnBuySlot" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                            {% with unlock_slot=prices|get_item:3 %}
+                            {{ unlock_slot.price }}
+                            {% endwith %}
+                            <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                        </button>
                     </div>
                 </div>
             </div>

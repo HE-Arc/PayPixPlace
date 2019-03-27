@@ -24,6 +24,7 @@ import stripe
 import random
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+MAX_PLAYER_SLOT = 4
 
 @register.filter
 def get_item(dictionary, key):
@@ -450,6 +451,23 @@ def buy_random_color(user):
 
     return transaction_success, result_message
 
+def buy_slot(user):
+    result_message = ""
+    transaction_success = False
+
+    player_slots = Slot.objects.filter(user=user).order_by('-place_num')
+    
+    if player_slots.count() < MAX_PLAYER_SLOT:
+        last_slot_number = player_slots.first().place_num
+        Slot.objects.create(place_num= last_slot_number + 1, user=user, color=user.owns.first())
+        result_message = "Slot successfuly added"
+        transaction_success = True
+
+    else:
+         result_message = "You can't buy anymore slots!"
+
+    return transaction_success, result_message
+
 def buy_color_pack(color_pack, user):
     result_message = "You already possess all colors from this pack"
     transaction_success = False
@@ -480,6 +498,8 @@ def buy_with_pix(request, id):
             transaction_success, result_message = buy_color_pack(Colors_pack.objects.get(id=request.POST["pack_id"]), user)
         elif id == int(PixPriceNumType.RANDOM_COLOR):
             transaction_success, result_message = buy_random_color(user)
+        elif id == int(PixPriceNumType.UNLOCK_SLOT):
+            transaction_success, result_message = buy_slot(user)
 
     else:
         result_message = "You do not have enough pix!"
