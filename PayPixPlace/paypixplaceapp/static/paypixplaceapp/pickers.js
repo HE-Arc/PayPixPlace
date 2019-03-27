@@ -1,5 +1,7 @@
 let pickers;
 let currentSlot;
+let selectCB;
+let selectedPixel;
 
 /**
  * Change the current slot
@@ -102,4 +104,14 @@ $(document).ready(function(){
     for (let i = 0; i < pickerMove.length; i++) {
         pickerMove[i].addEventListener("click", clickMove, false);
     }
+
+    selectCB = document.getElementById("selectCB");
+    selectCB.addEventListener("click", function() {
+        isColoring = !this.checked;
+        setCursor();
+        $("#selectionToolbox").slideToggle();
+        selectedPixel = null;
+        drawPixels();
+    });
+    selectedPixel = null;
 });
