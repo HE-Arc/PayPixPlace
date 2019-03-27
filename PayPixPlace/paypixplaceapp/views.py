@@ -54,6 +54,8 @@ class PixPriceNumType(IntEnum):
     MAX_AMMO = 5
     REFILL_TIME = 6
     INSTANT_AMMO = 7
+    CANVAS_PROFIT_CREATION = 8
+    CANVAS_PROFIT_ACTIVATION = 9
 
 def get_highest_title_num(user):
     purchases = Purchase.objects.filter(user=user)
@@ -164,6 +166,10 @@ def createCanvas(request):
 
                     instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
                     Pixel.objects.bulk_create(instances)  
+
+                    if canvas.is_profit_on:
+                        # user.pix -=
+                        pass
 
                     messages.success(request, f'You created a new canvas successfully!')
 
