@@ -81,6 +81,48 @@
                             <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                         </button>
                     </div>
+                    <!-- Start Farid -->
+                    <div class="row text-center align-middle">
+                        <div class="col-4">
+                            <h3 class="ppp-buy-color-title">Increase Max Ammo</h3>
+    
+                            <hr class="ppp-hr">
+                            
+                            <button id="btnIncreaseMaxAmmo" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                                {% with max_ammo=prices|get_item:5 %}
+                                {{ max_ammo.price }}
+                                {% endwith %}
+                                <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                            </button>
+                        </div>
+
+                        <div class="col-4">
+                            <h3 class="ppp-buy-color-title">Reduce Refill Time</h3>
+    
+                            <hr class="ppp-hr">
+                            
+                            <button id="btnReduceRefillTime" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                                {% with refill_time=prices|get_item:6 %}
+                                {{ refill_time.price }}
+                                {% endwith %}
+                                <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                            </button>
+                        </div>
+
+                        <div class="col-4">
+                            <h3 class="ppp-buy-color-title">Instant Ammo</h3>
+    
+                            <hr class="ppp-hr">
+                            
+                            <button id="btnInstantAmmo" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                                {% with instant_ammo=prices|get_item:7 %}
+                                {{ instant_ammo.price }}
+                                {% endwith %}
+                                <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                            </button>
+                        </div>
+                    </div>
+                    <!-- End Farid -->
                 </div>
             </div>
             <div class="modal-footer">

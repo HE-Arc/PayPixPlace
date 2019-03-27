@@ -22,7 +22,7 @@ function display_informations(data)
             autoHide: true,
             // if autoHide, hide after milliseconds
             autoHideDelay: 4000,
-            position: "top center",
+            position: "top right",
             gap: 2
         }
     )
@@ -64,6 +64,48 @@ $(document).ready(function() {
         $.ajax({
             type: "POST",
             url: "/buy/3",
+            data: {
+                csrfmiddlewaretoken: window.CSRF_TOKEN,
+            },
+            dataType: "json",
+            success: function (data) {
+                display_informations(data);
+            }
+        });
+    });
+
+    document.getElementById("btnIncreaseMaxAmmo").addEventListener("click", function(){
+        $.ajax({
+            type: "POST",
+            url: "/buy/5",
+            data: {
+                csrfmiddlewaretoken: window.CSRF_TOKEN,
+            },
+            dataType: "json",
+            success: function (data) {
+                display_informations(data);
+            }
+        });
+    });
+
+    document.getElementById("btnReduceRefillTime").addEventListener("click", function(){
+        $.ajax({
+            type: "POST",
+            url: "/buy/6",
+            data: {
+                csrfmiddlewaretoken: window.CSRF_TOKEN,
+            },
+            dataType: "json",
+            success: function (data) {
+                display_informations(data);
+            }
+        });
+    });
+
+    document.getElementById("btnInstantAmmo").addEventListener("click", function(){
+        $.ajax({
+            type: "POST",
+            url: "/buy/7",
             data: {
                 csrfmiddlewaretoken: window.CSRF_TOKEN,
             },
