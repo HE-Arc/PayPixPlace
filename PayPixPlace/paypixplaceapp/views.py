@@ -165,11 +165,15 @@ def createCanvas(request):
                     canvas.save()
 
                     instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
-                    Pixel.objects.bulk_create(instances)  
+                    Pixel.objects.bulk_create(instances)
 
                     if canvas.is_profit_on:
-                        # user.pix -=
-                        pass
+                        price = PixPrice.objects.get(num_type=int(PixPriceNumType.CANVAS_PROFIT_CREATION)).price
+                        if canvas.user.pix >= price:
+                            canvas.user.pix -= price
+                            canvas.user.save()
+                        else:
+                            messages.error(request, f"You don't have enough pix to enable the profit!")
 
                     messages.success(request, f'You created a new canvas successfully!')
 
