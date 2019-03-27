@@ -15,9 +15,18 @@ function changeCurrentSlot(id) {
  */
 function changeSlotColor(newColor) {
     let currentPicker = document.getElementsByClassName("picker" + currentSlot);
+    
+    for (let i = 0 ; i < pickers.length ; i++) {
+        localPicker = pickers[i];
+
+        for (let j = 0; j < localPicker.length; j++) {
+            localPicker[j].classList.remove("ppp-picker-selected");
+        }
+    }
 
     for (let i = 0; i < currentPicker.length; i++) {
         currentPicker[i].style.backgroundColor = newColor;
+        currentPicker[i].classList.add("ppp-picker-selected");
         currentPicker[i].addEventListener("click", function() {
             drawingColor = newColor;
             setCursor();

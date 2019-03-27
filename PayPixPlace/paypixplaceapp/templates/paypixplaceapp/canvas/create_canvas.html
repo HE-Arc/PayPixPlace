@@ -1,4 +1,5 @@
 {% extends "paypixplaceapp/base_standard.html" %}
+{% load staticfiles %}
 {% load crispy_forms_tags %}
 {% block content %}
 
@@ -8,5 +9,11 @@
 		{% crispy form %}
 	</fieldset>
 </div>
+
+<script>
+	userRole = "{{ user.role.name }}"
+</script>
+
+<script src="{% static 'paypixplaceapp/canvas_create.js' %}"></script>
 
 {% endblock content %}

@@ -24,6 +24,7 @@ import stripe
 import random
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+MAX_PLAYER_SLOT = 4
 
 @register.filter
 def get_item(dictionary, key):
@@ -121,9 +122,9 @@ class CanvasDetailsView(DetailView):
         context['slots'] = Slot.objects.filter(user=self.request.user.id)
 
         place_text = "Invalid"
-        if self.object.place == 0:
+        if self.object.place == Place.OFFICIAL:
             place_text = "Official"
-        elif self.object.place == 1:
+        elif self.object.place == Place.COMMUNITY:
             place_text = "Community"
 
         context['place_text'] = place_text
@@ -150,20 +151,22 @@ def createCanvas(request):
             canvas.user = request.user
 
             # Check if the given place is a valid one
-            if canvas.place >= 0 and canvas.place <= 1:
-                canvas.save()
+            if canvas.place >= Place.OFFICIAL and canvas.place <= Place.COMMUNITY:
 
-                instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
-                Pixel.objects.bulk_create(instances)  
+                if request.user.role.name == "admin" or (request.user.role.name == "user" and canvas.place == Place.COMMUNITY):
+                    canvas.save()
 
-                messages.success(request, f'You create a new canvas successfully!')
+                    instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
+                    Pixel.objects.bulk_create(instances)  
 
-                if canvas.place == int(Place.COMMUNITY):
-                    return redirect('canvas-community')
-                else:
-                    return redirect('canvas-official')
-            else:
-                messages.error(request, f'The place is invalid!')
+                    messages.success(request, f'You create a new canvas successfully!')
+
+                    if canvas.place == int(Place.COMMUNITY):
+                        return redirect('canvas-community')
+                    else:
+                        return redirect('canvas-official')
+
+            messages.error(request, f'The place is invalid!')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -487,6 +490,23 @@ def buy_random_color(user):
 
     return transaction_success, result_message
 
+def buy_slot(user):
+    result_message = ""
+    transaction_success = False
+
+    player_slots = Slot.objects.filter(user=user).order_by('-place_num')
+    
+    if player_slots.count() < MAX_PLAYER_SLOT:
+        last_slot_number = player_slots.first().place_num
+        Slot.objects.create(place_num= last_slot_number + 1, user=user, color=user.owns.first())
+        result_message = "Slot successfuly added"
+        transaction_success = True
+
+    else:
+         result_message = "You can't buy anymore slots!"
+
+    return transaction_success, result_message
+
 def buy_color_pack(color_pack, user):
     result_message = "You already possess all colors from this pack"
     transaction_success = False
@@ -517,6 +537,8 @@ def buy_with_pix(request, id):
             transaction_success, result_message = buy_color_pack(Colors_pack.objects.get(id=request.POST["pack_id"]), user)
         elif id == int(PixPriceNumType.RANDOM_COLOR):
             transaction_success, result_message = buy_random_color(user)
+        elif id == int(PixPriceNumType.UNLOCK_SLOT):
+            transaction_success, result_message = buy_slot(user)
 
     else:
         result_message = "You do not have enough pix!"

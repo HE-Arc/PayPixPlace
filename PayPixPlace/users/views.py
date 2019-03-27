@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .forms import RegisterForm, UpdateForm, LoginForm
-from paypixplaceapp.models import Color, Slot, Colors_pack
+from paypixplaceapp.models import Color, Slot, Colors_pack, Role
 from paypixplaceapp.views import get_pix_price
 
 def register(request):
@@ -21,6 +21,7 @@ def register(request):
                 Color.objects.get(hex="#39589a"),
                 Color.objects.get(hex="#338984")
             )
+            new_user.role = Role.objects.get(name="user")
             
             Slot.objects.create(place_num=1, user=new_user, color=first_color)
             Slot.objects.create(place_num=2, user=new_user, color=second_color)

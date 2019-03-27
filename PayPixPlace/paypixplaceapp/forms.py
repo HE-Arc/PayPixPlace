@@ -27,6 +27,6 @@ class CreateCanvas(forms.ModelForm):
             PrependedText('theme', '<i class="fas fa-book"></i>'),
             PrependedText('width', '<i class="fas fa-arrows-alt-h"></i>'),
             'is_profit_on',
-            InlineRadios('place', css_class='p-0'),
+            InlineRadios('place', css_class='p-0', id="place"),
             StrictButton('Create Canvas', type='submit', css_class='btn-outline-info'),
         )
