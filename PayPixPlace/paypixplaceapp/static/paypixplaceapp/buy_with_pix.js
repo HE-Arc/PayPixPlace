@@ -1,3 +1,34 @@
+function display_informations(data)
+{
+    transactionState = data.TransactionSuccess ? "success" : "error";
+    console.log(data);
+    message = "";
+    if (Array.isArray(data.Result))
+    {
+        message = data.Result;
+    }
+    else
+    {
+        message = data.Result;
+    }
+
+    $.notify(
+        message,
+        {
+            className : transactionState,
+            // whether to hide the notification on click
+            clickToHide: true,
+            // whether to auto-hide the notification
+            autoHide: true,
+            // if autoHide, hide after milliseconds
+            autoHideDelay: 4000,
+            position: "top center",
+            gap: 2
+        }
+    )
+    document.getElementById("userPix").innerHTML = data.UserPix;
+}
+
 $(document).ready(function() {
     document.getElementById("btnFixColor").addEventListener("click", function(){
         $.ajax({
@@ -9,8 +40,7 @@ $(document).ready(function() {
             },
             dataType: "json",
             success: function (data) {
-                console.log(data);
-                document.getElementById("userPix").innerHTML = data.UserPix;
+                display_informations(data);
             }
         });
     });
@@ -24,8 +54,7 @@ $(document).ready(function() {
             },
             dataType: "json",
             success: function (data) {
-                console.log(data);
-                document.getElementById("userPix").innerHTML = data.UserPix;
+                display_informations(data);
             }
         });
     });
@@ -39,8 +68,7 @@ $(document).ready(function() {
             },
             dataType: "json",
             success: function (data) {
-                console.log(data);
-                document.getElementById("userPix").innerHTML = data.UserPix;
+                display_informations(data);
             }
         });
     });
@@ -56,8 +84,7 @@ $(document).ready(function() {
             },
             dataType: "json",
             success: function (data) {
-                console.log(data);
-                document.getElementById("userPix").innerHTML = data.UserPix;
+                display_informations(data);
             }
         });
     }));

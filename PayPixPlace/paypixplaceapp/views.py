@@ -443,7 +443,7 @@ def buy_random_color(user):
             result_message = "You already own this color!"
         except Color.DoesNotExist:
             add_color_to_user(hex, user)
-            result_message = "Color successfuly added! (" + hex + ")"
+            result_message = ["Color successfuly added!", hex]
             transaction_success = True
 
     return transaction_success, result_message
@@ -505,4 +505,4 @@ def buy_with_pix(request, id):
         user.pix -= price
         user.save()
     
-    return JsonResponse({'Result' : result_message, 'UserPix' : user.pix}, safe=False)
+    return JsonResponse({'Result' : result_message, "TransactionSuccess" : transaction_success, 'UserPix' : user.pix}, safe=False)
