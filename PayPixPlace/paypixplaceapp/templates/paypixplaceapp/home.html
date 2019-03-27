@@ -2,8 +2,6 @@
 {% load staticfiles %}
 {% block content %}
     
-    {% if user.is_authenticated %}
-    
     <div class="col-12 text-center">
         {% if user_title_num == 4 %}
             <img class="img-fluid w-75" src="{% static 'paypixplaceapp/images/pixelLegendPPP.png' %}" alt="Pixel Legend">
@@ -11,10 +9,13 @@
             <img class="img-fluid w-50" src="{% static 'paypixplaceapp/images/pixelLordPPP.png' %}" alt="Pixel Lord">
         {% elif user_title_num == 0 %}
             <h2>{{ user_title }}</h2>
-            <a href="{% url 'pix-purchase' %}">You want to upgrade and get bonus ?</a>
+            <a href="{% url 'pix-purchase' %}">Upgrade and get bonus ?</a>
         {% else %}
             <h2>{{ user_title }}</h2>
+            <a href="{% url 'register' %}">Create an account ?</a>
+            <br>
+            <a href="{% url 'login' %}">Already have an account ?</a>
         {% endif %}
-    {% endif %}
+    </div>
     
 {% endblock content %}
