@@ -21,7 +21,6 @@ class CreateCanvas(forms.ModelForm):
         super(CreateCanvas, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'POST'
-        self.helper.form_action = './'
         self.helper.layout = Layout(
             PrependedText('name', '<i class="fas fa-user"></i>'),
             PrependedText('theme', '<i class="fas fa-book"></i>'),

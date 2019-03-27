@@ -140,6 +140,7 @@ def getCanvas(page, place):
         c.pixels = Pixel.objects.filter(canvas=c.id)
     return canvas
 
+@login_required
 def createCanvas(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -181,6 +182,7 @@ def createCanvas(request):
 
     return render(request, 'paypixplaceapp/canvas/create_canvas.html', context)
 
+@login_required
 def userCanvas(request):
     canvas_list = Canvas.objects.filter(user=request.user)
     paginator = Paginator(canvas_list, 6)
@@ -198,6 +200,7 @@ def get_pixies_info():
     pixies = Pixie.objects.all()
     return pixies
 
+@login_required
 def purchase(request):
     context = {
         'title': 'Purchase PIX',

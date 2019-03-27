@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as django_login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils.http import is_safe_url
 
 from .forms import RegisterForm, UpdateForm, LoginForm
 from paypixplaceapp.models import Color, Slot, Colors_pack, Role
@@ -65,12 +66,21 @@ def login(request):
         form = LoginForm(data=request.POST)
 
         if form.is_valid():
-            messages.success(request, "You are now logged in!")
             user = authenticate(
                 username=form.cleaned_data['username'],
                 password=form.cleaned_data['password'],
             )
             django_login(request, user)
+
+            # get the redirect location
+            redirect_to = request.GET.get('next', '')
+            url_is_safe = is_safe_url(redirect_to, request.get_host())
+
+            if redirect_to and url_is_safe:
+                messages.success(request, "You are now logged in! You have been redirected!")
+                return redirect(redirect_to)
+
+            messages.success(request, "You are now logged in!")
             return redirect('paypixplace-home')
     else:
         form = LoginForm()
