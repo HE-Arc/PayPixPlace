@@ -7,6 +7,8 @@
             <img class="img-fluid w-75" src="{% static 'paypixplaceapp/images/pixelLegendPPP.png' %}" alt="Pixel Legend">
         {% elif user_title_num == 3 %}
             <img class="img-fluid w-50" src="{% static 'paypixplaceapp/images/pixelLordPPP.png' %}" alt="Pixel Lord">
+        {% elif user_title_num < 3 and user_title_num > 0 %}
+            <h2>{{ user_title }}</h2>
         {% elif user_title_num == 0 %}
             <h2>{{ user_title }}</h2>
             <a href="{% url 'pix-purchase' %}">Upgrade and get bonus ?</a>
