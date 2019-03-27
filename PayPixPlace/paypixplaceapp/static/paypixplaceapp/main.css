@@ -44,41 +44,6 @@ html, body {
     display: block;
 }
 
-/*START buy color*/
-
-.ppp-buy-color-pack {
-    height: 100%;
-    overflow-y: scroll;
-    border-right: 2px solid #3a3a3a;
-    border-left: 2px solid #3a3a3a;
-}
-
-.ppp-buy-color-case {
-    width: 40px;
-    height: 40px;
-    display: inline-block;
-    border: 3px solid #3a3a3a;
-}
-
-.buy-color-modal .modal-body > .row {
-    height: 320px;
-}
-
-.ppp-buy-color-title {
-    font-size: 1.6em;
-    font-weight: bold;
-}
-
-.colorpicker-alpha {
-    display:none !important;
-}
-
-.colorpicker {
-    min-width:128px !important;
-}
-
-/*END buy color*/
-
 .ppp-hr {
     color: #3a3a3a;
     background-color: #3a3a3a;

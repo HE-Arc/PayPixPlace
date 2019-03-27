@@ -25,6 +25,9 @@ import random
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 MAX_PLAYER_SLOT = 4
+MAX_PLAYER_AMMO = 20
+MIN_REFILL_TIME = 10
+REDUCE_REFILL_TIME = 5
 
 @register.filter
 def get_item(dictionary, key):
@@ -48,6 +51,9 @@ class PixPriceNumType(IntEnum):
     RANDOM_COLOR = 2
     UNLOCK_SLOT = 3
     CANVAS_COLOR_PACK = 4
+    MAX_AMMO = 5
+    REFILL_TIME = 6
+    INSTANT_AMMO = 7
 
 def get_highest_title_num(user):
     purchases = Purchase.objects.filter(user=user)
@@ -140,6 +146,7 @@ def getCanvas(page, place):
         c.pixels = Pixel.objects.filter(canvas=c.id)
     return canvas
 
+@login_required
 def createCanvas(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -159,7 +166,7 @@ def createCanvas(request):
                     instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
                     Pixel.objects.bulk_create(instances)  
 
-                    messages.success(request, f'You create a new canvas successfully!')
+                    messages.success(request, f'You created a new canvas successfully!')
 
                     if canvas.place == int(Place.COMMUNITY):
                         return redirect('canvas-community')
@@ -181,6 +188,7 @@ def createCanvas(request):
 
     return render(request, 'paypixplaceapp/canvas/create_canvas.html', context)
 
+@login_required
 def userCanvas(request):
     canvas_list = Canvas.objects.filter(user=request.user)
     paginator = Paginator(canvas_list, 6)
@@ -198,6 +206,7 @@ def get_pixies_info():
     pixies = Pixie.objects.all()
     return pixies
 
+@login_required
 def purchase(request):
     context = {
         'title': 'Purchase PIX',
@@ -474,7 +483,7 @@ def buy_fix_color(hex, user):
     except Color.DoesNotExist:
         # The user does not own the color
         add_color_to_user(hex, user)
-        result_message = "Color successfuly added!"
+        result_message = ["Color successfuly added!", hex]
         transaction_success = True
 
     return transaction_success, result_message
@@ -493,7 +502,7 @@ def buy_random_color(user):
             result_message = "You already own this color!"
         except Color.DoesNotExist:
             add_color_to_user(hex, user)
-            result_message = "Color successfuly added! (" + hex + ")"
+            result_message = ["Color successfuly added!", hex]
             transaction_success = True
 
     return transaction_success, result_message
@@ -530,6 +539,36 @@ def buy_color_pack(color_pack, user):
 
     return transaction_success, result_message
 
+def increase_max_ammo(user):
+    result_message = "You already have the max ammo possible!"
+    transaction_success = False
+
+    if user.max_ammo < MAX_PLAYER_AMMO:
+        user.max_ammo += 1
+        user.ammo += 1
+        transaction_success = True
+        result_message = "Max ammo increased!"
+
+    return transaction_success, result_message
+
+def reduce_refill_time(user):
+    result_message = "You already have the lowest refill time possible!"
+    transaction_success = False
+
+    if user.ammo_reloading_seconds > MIN_REFILL_TIME:
+        user.ammo_reloading_seconds -= REDUCE_REFILL_TIME
+        transaction_success = True
+        result_message = "Refill time decreased!"
+
+    return transaction_success, result_message
+
+def get_instant_ammo(user):
+    user.ammo += 1
+    transaction_success = True
+    result_message = "Received an ammo!"
+
+    return transaction_success, result_message
+
 def buy_with_pix(request, id):
     user = request.user
     price = PixPrice.objects.get(num_type=id).price
@@ -547,6 +586,20 @@ def buy_with_pix(request, id):
             transaction_success, result_message = buy_random_color(user)
         elif id == int(PixPriceNumType.UNLOCK_SLOT):
             transaction_success, result_message = buy_slot(user)
+        elif id == int(PixPriceNumType.MAX_AMMO):
+            transaction_success, result_message = increase_max_ammo(user)
+        elif id == int(PixPriceNumType.REFILL_TIME):
+            transaction_success, result_message = reduce_refill_time(user)
+        elif id == int(PixPriceNumType.INSTANT_AMMO):
+            transaction_success, result_message = get_instant_ammo(user)
+
+        res = [id]
+        if isinstance(result_message, (list,) ):
+            res.extend(result_message)
+        else:
+            res.append(result_message)
+
+        result_message = res
 
     else:
         result_message = "You do not have enough pix!"
@@ -555,4 +608,4 @@ def buy_with_pix(request, id):
         user.pix -= price
         user.save()
     
-    return JsonResponse({'Result' : result_message, 'UserPix' : user.pix}, safe=False)
+    return JsonResponse({'Result' : result_message, "TransactionSuccess" : transaction_success, 'UserPix' : user.pix}, safe=False)
