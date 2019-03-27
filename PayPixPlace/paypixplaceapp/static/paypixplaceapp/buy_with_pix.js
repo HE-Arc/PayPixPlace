@@ -1,5 +1,10 @@
 $(document).ready(function() {
-    document.getElementById("btnFixColor").addEventListener("click", function(){
+    
+    let btnFixColor = document.getElementById("btnFixColor");
+    let btnRandomColor = document.getElementById("btnRandomColor");
+    let packForm = document.getElementsByName("pack_form");
+    
+    btnFixColor.addEventListener("click", function(){
         $.ajax({
             type: "POST",
             url: "/buy/0",
@@ -15,7 +20,7 @@ $(document).ready(function() {
         });
     });
 
-    document.getElementById("btnRandomColor").addEventListener("click", function(){
+    btnRandomColor.addEventListener("click", function(){
         $.ajax({
             type: "POST",
             url: "/buy/2",
@@ -30,7 +35,7 @@ $(document).ready(function() {
         });
     });
 
-    document.getElementsByName("pack_form").forEach(element => element.addEventListener ("submit", function(event){
+    packForm.forEach(element => element.addEventListener ("submit", function(event){
         event.preventDefault();
         $.ajax({
             type: "POST",
@@ -49,10 +54,10 @@ $(document).ready(function() {
     
     $(function () {
         $('#fix_color_picker').colorpicker({
-          inline: true,
-          container: true,
-          format: "hex",
-          useAlpha: false
+            inline: true,
+            container: true,
+            format: "hex",
+            useAlpha: false
         });
     });
 });

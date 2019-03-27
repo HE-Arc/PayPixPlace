@@ -121,9 +121,9 @@ class CanvasDetailsView(DetailView):
         context['slots'] = Slot.objects.filter(user=self.request.user.id)
 
         place_text = "Invalid"
-        if self.object.place == 0:
+        if self.object.place == Place.OFFICIAL:
             place_text = "Official"
-        elif self.object.place == 1:
+        elif self.object.place == Place.COMMUNITY:
             place_text = "Community"
 
         context['place_text'] = place_text
@@ -150,20 +150,22 @@ def createCanvas(request):
             canvas.user = request.user
 
             # Check if the given place is a valid one
-            if canvas.place >= 0 and canvas.place <= 1:
-                canvas.save()
+            if canvas.place >= Place.OFFICIAL and canvas.place <= Place.COMMUNITY:
 
-                instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
-                Pixel.objects.bulk_create(instances)  
+                if request.user.role.name == "admin" or (request.user.role.name == "user" and canvas.place == Place.COMMUNITY):
+                    canvas.save()
 
-                messages.success(request, f'You create a new canvas successfully!')
+                    instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
+                    Pixel.objects.bulk_create(instances)  
 
-                if canvas.place == int(Place.COMMUNITY):
-                    return redirect('canvas-community')
-                else:
-                    return redirect('canvas-official')
-            else:
-                messages.error(request, f'The place is invalid!')
+                    messages.success(request, f'You create a new canvas successfully!')
+
+                    if canvas.place == int(Place.COMMUNITY):
+                        return redirect('canvas-community')
+                    else:
+                        return redirect('canvas-official')
+
+            messages.error(request, f'The place is invalid!')
 
     # if a GET (or any other method) we'll create a blank form
     else:

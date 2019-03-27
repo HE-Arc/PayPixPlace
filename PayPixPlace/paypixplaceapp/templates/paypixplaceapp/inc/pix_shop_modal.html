@@ -1,6 +1,7 @@
 {% load static %}
 
 {% if prices != Undefined and colors_pack != Undefined and user.is_authenticated %}
+
 <div id="buy-color-modal" class="modal fade buy-color-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -79,4 +80,7 @@
 <script>
     window.CSRF_TOKEN = "{{ csrf_token }}";
 </script>
+
+<script type="text/javascript" src="{% static 'paypixplaceapp/buy_with_pix.js' %}"></script>
+
 {% endif %}
