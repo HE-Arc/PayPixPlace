@@ -5,15 +5,20 @@
 <div id="buy-color-modal" class="modal fade buy-color-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-body" style="display: inline-block;">
-                <div class="row text-center align-middle">
-                    <div class="col-4">
-                        <h3 class="ppp-buy-color-title">Any Color</h3>
+            <div class="modal-body text-center">
+                <img class="img-fluid w-75 mb-3" src="{% static 'paypixplaceapp/images/pixShopPPP.png' %}" alt="PIX Shop">
+                <p class="font-weight-bold">
+                    Here you can spend the PIX that you earned or <a href="{% url 'pix-purchase' %}">bought</a>
+                </p>
 
-                        <hr class="ppp-hr">
+                <hr class="ppp-hr w-100">
+
+                <div class="row text-center align-middle ppp-color-pack-row">
+                    <div class="col-6 ppp-border-right">
+                        <h3 class="ppp-pix-shop-title mb-3">Any Color</h3>
 
                         <div id="fix_color_picker" data-color="#305AA2" class="mb-3">
-                            <input id="fix_color" type="text" class="form-control mb-1"/>
+                            <input id="fix_color" type="text" class="form-control mb-1 col-8 offset-2"/>
                         </div>
                         
                         <button id="btnFixColor" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
@@ -24,10 +29,8 @@
                         </button>
                     </div>
 
-                    <div class="col-4 ppp-buy-color-pack">
-                        <h3 class="ppp-buy-color-title">Color Pack</h3>
-
-                        <hr class="ppp-hr">
+                    <div class="col-6 ppp-buy-color-pack">
+                        <h3 class="ppp-pix-shop-title mb-3">Color Pack</h3>
 
                         {% for color_pack in colors_pack %}
 
@@ -55,11 +58,13 @@
                             {% endif %}
                         {% endfor %}
                     </div>
+                </div>
 
-                    <div class="col-4">
-                        <h3 class="ppp-buy-color-title">Random Color</h3>
+                <hr class="ppp-hr w-100">
 
-                        <hr class="ppp-hr">
+                <div class="row text-center align-middle mb-5">
+                    <div class="col-6">
+                        <h3 class="ppp-pix-shop-title mb-3">Random Color</h3>
 
                         <button id="btnRandomColor" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
                             {% with random_color=prices|get_item:2 %}
@@ -67,13 +72,11 @@
                             {% endwith %}
                             <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                         </button>
+                    </div>
 
-                        <hr class="ppp-hr">
-
-                        <h3 class="ppp-buy-color-title">Color Slot</h3>
-
-                        <hr class="ppp-hr">
-
+                    <div class="col-6">
+                        <h3 class="ppp-pix-shop-title mb-3">Color Slot</h3>
+                        
                         <button id="btnBuySlot" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
                             {% with unlock_slot=prices|get_item:3 %}
                             {{ unlock_slot.price }}
@@ -81,48 +84,43 @@
                             <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                         </button>
                     </div>
-                    <!-- Start Farid -->
-                    <div class="row text-center align-middle">
-                        <div class="col-4">
-                            <h3 class="ppp-buy-color-title">Increase Max Ammo</h3>
-    
-                            <hr class="ppp-hr">
-                            
-                            <button id="btnIncreaseMaxAmmo" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
-                                {% with max_ammo=prices|get_item:5 %}
-                                {{ max_ammo.price }}
-                                {% endwith %}
-                                <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
-                            </button>
-                        </div>
+                </div>
 
-                        <div class="col-4">
-                            <h3 class="ppp-buy-color-title">Reduce Refill Time</h3>
-    
-                            <hr class="ppp-hr">
-                            
-                            <button id="btnReduceRefillTime" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
-                                {% with refill_time=prices|get_item:6 %}
-                                {{ refill_time.price }}
-                                {% endwith %}
-                                <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
-                            </button>
-                        </div>
-
-                        <div class="col-4">
-                            <h3 class="ppp-buy-color-title">Instant Ammo</h3>
-    
-                            <hr class="ppp-hr">
-                            
-                            <button id="btnInstantAmmo" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
-                                {% with instant_ammo=prices|get_item:7 %}
-                                {{ instant_ammo.price }}
-                                {% endwith %}
-                                <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
-                            </button>
-                        </div>
+                <div class="row text-center align-middle mb-5">
+                    <div class="col-6">
+                        <h3 class="ppp-pix-shop-title mb-3">Increase Max Ammo</h3>
+                        
+                        <button id="btnIncreaseMaxAmmo" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                            {% with max_ammo=prices|get_item:5 %}
+                            {{ max_ammo.price }}
+                            {% endwith %}
+                            <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                        </button>
                     </div>
-                    <!-- End Farid -->
+
+                    <div class="col-6">
+                        <h3 class="ppp-pix-shop-title mb-3">Reduce Refill Time</h3>
+                        
+                        <button id="btnReduceRefillTime" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                            {% with refill_time=prices|get_item:6 %}
+                            {{ refill_time.price }}
+                            {% endwith %}
+                            <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row text-center align-middle mb-5">
+                    <div class="col-6">
+                        <h3 class="ppp-pix-shop-title mb-3">Instant Ammo</h3>
+                        
+                        <button id="btnInstantAmmo" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                            {% with instant_ammo=prices|get_item:7 %}
+                            {{ instant_ammo.price }}
+                            {% endwith %}
+                            <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
