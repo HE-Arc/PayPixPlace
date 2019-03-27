@@ -317,6 +317,7 @@ def get_user_ammo(request):
 
 
 def get_cursor(request, hex):
+    """Returns a img a a paintBrush with the given hex color"""
     img = Image.new('RGBA', (32, 32))
     draw = ImageDraw.Draw(img)
     draw.line(
@@ -369,9 +370,15 @@ def get_json(request, id):
     pixels = list(Pixel.objects.filter(canvas=id).values('x', 'y', 'hex', 'user__username'))
     pixels2Darray = [list(range(canvas.width)) for p in pixels if p["x"] == 0]
     for pixel in pixels:
+        try:
+            timeLeft = int((timezone.now() - pixel.end_protection_date).total_seconds())
+        except:
+            timeLeft = 0
+        
         pixels2Darray[pixel["x"]][pixel["y"]] = {
             "hex" : pixel["hex"],
-            "username" : pixel["user__username"] 
+            "username" : pixel["user__username"],
+            "timeLeft" : timeLeft
         }
     
     try:

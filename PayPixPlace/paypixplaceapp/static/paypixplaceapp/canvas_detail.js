@@ -43,12 +43,12 @@ function loadPixels() {
 }
 
 /**
- * returns the name of the owner of the pixel at the given position
+ * returns the pixel at the given position
  * @param {Integer} x 
  * @param {Integer} y 
  */
-function getOwner(x,y) {
-    return pixels.length > 0 ? pixels[x][y].username : null;
+function getPixel(x,y) {
+    return pixels.length > 0 ? pixels[x][y] : null;
 }
 
 /**
@@ -320,9 +320,9 @@ function selectPixel(event) {
         return;
     }
     
-    let ownerName = getOwner(x,y);
-    if (ownerName != null) {
-        displayInfos(ownerName, "False");
+    let pixel = getPixel(x,y);
+    if (pixel != null) {
+        displayInfos(pixel.username, pixel.timeLeft);
     } else {
         displayInfos();
     }
