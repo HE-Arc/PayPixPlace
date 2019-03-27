@@ -61,13 +61,17 @@ def get_highest_title_num(user):
     return num
 
 def home(request):
-    pixie_num = get_highest_title_num(request.user)
-    user_title = Pixie.objects.filter(num_type=pixie_num).first()
+    try:
+        pixie_num = get_highest_title_num(request.user)
+        user_title = Pixie.objects.filter(num_type=pixie_num).first()
 
-    if(user_title == None):
-        user_title = "Pixer"
-    else:
-        user_title = user_title.title
+        if(user_title == None):
+            user_title = "Pixer"
+        else:
+            user_title = user_title.title
+    except:
+        pixie_num = -1
+        user_title = "Anonymous"
 
     context = {
         'title': 'Home',
