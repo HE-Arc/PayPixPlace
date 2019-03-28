@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from django.utils import timezone
 from enum import IntEnum
@@ -267,6 +267,28 @@ def change_user_slot_color(request):
                 'is_valid': True,
             })
 
+def lock_pixel(request):
+    """Locks a pixel for a given time, becoming only modifiable by the owner"""
+    modification_valid = False
+    if request.user.is_authenticated:
+        if request.is_ajax():
+            if request.method == 'POST':
+                canvas_id = request.POST['canvas_id']
+                x = request.POST['x']
+                y = request.POST['y']
+                user = request.user
+                #TODO make the user pay the price
+
+                pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
+                pixel.user = user
+                pixel.end_protection_date = timezone.now() + timedelta(hours=1)
+                pixel.save()
+                modification_valid = True
+    data = {
+        'is_valid' : modification_valid
+    }
+    return JsonResponse(data)
+
 def change_pixel_color(request):
     """Changes the color of one pixel of a canvas, if the user have the rights to do so"""
     modification_valid = False
@@ -297,18 +319,25 @@ def change_pixel_color(request):
                     canvas.is_modified = True
                     canvas.interactions += 1
                     canvas.save()
+                
+                pixel_locked = (
+                    pixel.end_protection_date is not None and 
+                    current_date < pixel.end_protection_date
+                    ) and (pixel.user != user)
     data = {
         'is_valid' : modification_valid,
-        'user_authenticated' : request.user.is_authenticated
+        'user_authenticated' : request.user.is_authenticated,
+        'pixel_locked' : pixel_locked
     }
     return JsonResponse(data)
 
 def can_modify_pixel(pixel, color, user, current_date):
+    """Test if the user can modify a pixel"""
     returnBool = True
     returnBool &= (
         pixel.end_protection_date is None or
         current_date > pixel.end_protection_date
-        )
+        ) or (pixel.user == user)
     returnBool &= user.ammo > 0
     returnBool &= color in [color.hex for color in user.owns.all()]
     
@@ -394,14 +423,16 @@ def get_json(request, id):
     except ObjectDoesNotExist:
         raise Http404()
     
-    pixels = list(Pixel.objects.filter(canvas=id).values('x', 'y', 'hex', 'user__username'))
+    pixels = list(Pixel.objects.filter(canvas=id).values('x', 'y', 'hex', 'user__username', 'end_protection_date'))
     pixels2Darray = [list(range(canvas.width)) for p in pixels if p["x"] == 0]
     for pixel in pixels:
         try:
-            timeLeft = int((timezone.now() - pixel.end_protection_date).total_seconds())
+            timeLeft = int((pixel['end_protection_date'] - timezone.now()).total_seconds())
+            if timeLeft < 0:
+                timeLeft = 0
         except:
             timeLeft = 0
-        
+
         pixels2Darray[pixel["x"]][pixel["y"]] = {
             "hex" : pixel["hex"],
             "username" : pixel["user__username"],
