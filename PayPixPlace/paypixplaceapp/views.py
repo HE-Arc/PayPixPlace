@@ -54,6 +54,8 @@ class PixPriceNumType(IntEnum):
     MAX_AMMO = 5
     REFILL_TIME = 6
     INSTANT_AMMO = 7
+    CANVAS_PROFIT_CREATION = 8
+    CANVAS_PROFIT_ACTIVATION = 9
 
 def get_highest_title_num(user):
     purchases = Purchase.objects.filter(user=user)
@@ -164,7 +166,15 @@ def createCanvas(request):
                     canvas.save()
 
                     instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
-                    Pixel.objects.bulk_create(instances)  
+                    Pixel.objects.bulk_create(instances)
+
+                    if canvas.is_profit_on:
+                        price = PixPrice.objects.get(num_type=int(PixPriceNumType.CANVAS_PROFIT_CREATION)).price
+                        if canvas.user.pix >= price:
+                            canvas.user.pix -= price
+                            canvas.user.save()
+                        else:
+                            messages.error(request, f"You don't have enough pix to enable the profit!")
 
                     messages.success(request, f'You created a new canvas successfully!')
 
@@ -454,7 +464,7 @@ def buy_random_color(user):
             result_message = "You already own this color!"
         except Color.DoesNotExist:
             add_color_to_user(hex, user)
-            result_message = ["Color successfuly added!", hex]
+            result_message = ["Color successfully added!", hex]
             transaction_success = True
 
     return transaction_success, result_message
@@ -468,7 +478,7 @@ def buy_slot(user):
     if player_slots.count() < MAX_PLAYER_SLOT:
         last_slot_number = player_slots.first().place_num
         Slot.objects.create(place_num= last_slot_number + 1, user=user, color=user.owns.first())
-        result_message = "Slot successfuly added"
+        result_message = "Slot successfully added"
         transaction_success = True
 
     else:
@@ -487,7 +497,7 @@ def buy_color_pack(color_pack, user):
         except Color.DoesNotExist:
             add_color_to_user(color.hex, user)
             transaction_success = True
-            result_message = "Colors successfuly added!"
+            result_message = "Colors successfully added!"
 
     return transaction_success, result_message
 
@@ -521,6 +531,25 @@ def get_instant_ammo(user):
 
     return transaction_success, result_message
 
+def activate_profit(canvas_id):
+    transaction_success = False
+    result_message = ""
+    try:
+        canvas = Canvas.objects.get(id=canvas_id)
+        if not canvas.is_profit_on:
+            canvas.is_profit_on = True
+            canvas.save()
+            transaction_success = True
+            result_message = "Profit successfully enabled!"
+        else:
+            transaction_success = False
+            result_message = "The profit is already enabled"
+    except:
+        result_message = "Don't try to modify the html, you little b*stard"
+        transaction_success = False
+
+    return transaction_success, result_message
+
 def buy_with_pix(request, id):
     user = request.user
     price = PixPrice.objects.get(num_type=id).price
@@ -544,6 +573,8 @@ def buy_with_pix(request, id):
             transaction_success, result_message = reduce_refill_time(user)
         elif id == int(PixPriceNumType.INSTANT_AMMO):
             transaction_success, result_message = get_instant_ammo(user)
+        elif id == int(PixPriceNumType.CANVAS_PROFIT_ACTIVATION):
+            transaction_success, result_message = activate_profit(request.POST["canvas_id"])
 
         res = [id]
         if isinstance(result_message, (list,) ):
@@ -560,4 +591,4 @@ def buy_with_pix(request, id):
         user.pix -= price
         user.save()
     
-    return JsonResponse({'Result' : result_message, "TransactionSuccess" : transaction_success, 'UserPix' : user.pix}, safe=False)
+    return JsonResponse({'Result' : result_message, "TransactionSuccess" : transaction_success, 'UserPix' : user.pix, "Ammo" : user.ammo}, safe=False)

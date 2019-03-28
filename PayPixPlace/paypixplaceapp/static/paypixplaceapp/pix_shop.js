@@ -25,6 +25,7 @@ function display_informations(data) {
         }
     )
     document.getElementById("userPix").innerHTML = data.UserPix;
+    document.getElementById("userAmmo").innerHTML = data.Ammo;
 }
 
 $(document).ready(function() {
