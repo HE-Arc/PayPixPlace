@@ -11,7 +11,7 @@ namespace :uwsgi do
   desc 'Restart application'
   task :restart do
     on roles(:web) do |h|
-      execute :sudo, 'sv restart uwsgi'
+      execute :sudo, 'sv reload uwsgi'
     end
   end
 end
@@ -20,7 +20,7 @@ namespace :nginx do
   desc 'Restart nginx'
   task :restart do
     on roles(:web) do |h|
-      execute :sudo, 'sv restart nginx'
+      execute :sudo, 'sv reload nginx'
     end
   end
 end

@@ -23,7 +23,8 @@ def register(request):
                 Color.objects.get(hex="#338984")
             )
             new_user.role = Role.objects.get(name="user")
-            
+            new_user.save()
+
             Slot.objects.create(place_num=1, user=new_user, color=first_color)
             Slot.objects.create(place_num=2, user=new_user, color=second_color)
 
