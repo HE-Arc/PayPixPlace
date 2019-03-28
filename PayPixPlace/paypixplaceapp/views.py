@@ -50,7 +50,6 @@ class PixPriceNumType(IntEnum):
     COLOR_PACK = 1
     RANDOM_COLOR = 2
     UNLOCK_SLOT = 3
-    CANVAS_COLOR_PACK = 4
     MAX_AMMO = 5
     REFILL_TIME = 6
     INSTANT_AMMO = 7

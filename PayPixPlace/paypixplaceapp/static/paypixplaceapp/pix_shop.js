@@ -56,19 +56,61 @@ function display_informations(data) {
 
             case 3:
 
-            para = document.createElement("p");
-            textPara = document.createTextNode("New color slot acquired!");
-            para.appendChild(textPara);
+                para = document.createElement("p");
+                textPara = document.createTextNode("New color slot acquired!");
+                para.appendChild(textPara);
 
-            unlockItem.appendChild(para);
+                unlockItem.appendChild(para);
 
-            node = document.createElement("div");
-            node.className += " ppp-unlock-item-icon mb-3 fas fa-palette";
-            node.style.backgroundColor = data.Result[2];
+                node = document.createElement("div");
+                node.className += " ppp-unlock-item-icon mb-3 fas fa-palette";
+                node.style.backgroundColor = data.Result[2];
 
-            unlockItem.appendChild(node);
-            break;
+                unlockItem.appendChild(node);
+                break;
 
+            case 5:
+
+                para = document.createElement("p");
+                textPara = document.createTextNode("Max ammo increased by one!");
+                para.appendChild(textPara);
+
+                unlockItem.appendChild(para);
+
+                node = document.createElement("div");
+                node.className += " ppp-unlock-item-icon mb-3 fas fa-arrows-alt";
+                node.style.backgroundColor = data.Result[2];
+
+                unlockItem.appendChild(node);
+                break;
+
+            case 6:
+
+                para = document.createElement("p");
+                textPara = document.createTextNode("Refill time was reduced by 5 seconds!");
+                para.appendChild(textPara);
+
+                unlockItem.appendChild(para);
+
+                node = document.createElement("div");
+                node.className += " ppp-unlock-item-icon mb-3 fas fa-hourglass-end";
+                node.style.backgroundColor = data.Result[2];
+                unlockItem.appendChild(node);
+                break;
+
+            case 7:
+
+                para = document.createElement("p");
+                textPara = document.createTextNode("Refill time was reduced by 5 seconds!");
+                para.appendChild(textPara);
+
+                unlockItem.appendChild(para);
+
+                node = document.createElement("div");
+                node.className += " ppp-unlock-item-icon mb-3 fas fa-plus-circle";
+                node.style.backgroundColor = data.Result[2];
+                unlockItem.appendChild(node);
+                break;
             default:
                 break;
         }
