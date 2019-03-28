@@ -28,7 +28,22 @@ function display_informations(data) {
 }
 
 $(document).ready(function() {
+
+    //Source : https://stackoverflow.com/questions/19305821/multiple-modals-overlay
+    //Exact code source : http://jsfiddle.net/CxdUQ/
+    //Allows to have multiple modal open
+    $(document).on('show.bs.modal', '.modal', function (event) {
+        var zIndex = 1040 + (10 * $('.modal:visible').length);
+        $(this).css('z-index', zIndex);
+        setTimeout(function() {
+            $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+        }, 0);
+    });
     
+    $('#unlock-item-modal').on('hidden.bs.modal', function () {
+        $('body').addClass('modal-open');
+    })
+
     document.getElementById("btnFixColor").addEventListener("click", function(){
         $.ajax({
             type: "POST",
