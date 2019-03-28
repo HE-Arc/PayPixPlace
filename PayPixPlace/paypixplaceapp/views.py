@@ -141,7 +141,7 @@ class CanvasDetailsView(DetailView):
 
 def getCanvas(page, place):
     canvas_list = Canvas.objects.filter(place=int(place))
-    paginator = Paginator(canvas_list, 6)
+    paginator = Paginator(canvas_list, 3)
     canvas = paginator.get_page(page)
     for c in canvas:
         c.pixels = Pixel.objects.filter(canvas=c.id)
@@ -200,7 +200,7 @@ def createCanvas(request):
 @login_required
 def userCanvas(request):
     canvas_list = Canvas.objects.filter(user=request.user)
-    paginator = Paginator(canvas_list, 6)
+    paginator = Paginator(canvas_list, 3)
     canvas = paginator.get_page(request.GET.get('page'))
 
     context = {
