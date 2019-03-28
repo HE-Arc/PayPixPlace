@@ -8,7 +8,7 @@
     <div class="row">
         {% for c in canvas %}
 
-            <div class="text-center col-12 col-sm-6 col-lg-4">
+            <div class="text-center col-12 col-sm-6 col-lg-4 mb-5">
                 <a href="{% url 'canvas-detail' c.id %}">
                     <h2>{{ c.name }}</h2>
                     <div class="img-container">
@@ -24,7 +24,7 @@
         {% endfor %}
     </div>
 
-    <div class="fixed-bottom container mb-3">
+    <div class="fixed-bottom container mb-1">
         <div class="pagination">
             <span class="step-links">
                 {% if canvas.has_previous %}

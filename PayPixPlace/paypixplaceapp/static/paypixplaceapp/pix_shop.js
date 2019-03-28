@@ -1,12 +1,40 @@
 function display_informations(data) {
+
     transactionState = data.TransactionSuccess ? "success" : "error";
+
     console.log(data);
+
     message = data.Result[1];
     if (data.TransactionSuccess) {
+
         $("#unlock-item-modal").modal();
 
-        if (data.Result[0] == 0 || data.Result[0] == 2) {
-            document.getElementById("unlockItem").style.backgroundColor = data.Result[2];
+        let unlockItem = document.getElementById("unlockItem");
+
+        //Remove all child of unlockItem
+        while (unlockItem.firstChild) {
+            unlockItem.removeChild(unlockItem.firstChild);
+        }
+
+        switch (data.Result[0]) {
+            case 0:
+            case 2:
+                unlockItem.style.backgroundColor = data.Result[2];
+                unlockItem.className += " ppp-unlock-item ppp-unlock-item-border mb-3";
+                break;
+            case 1:
+                for (let i = 0; i < data.Result[2].length; i++) {
+                    const color = data.Result[2][i];
+
+                    let node = document.createElement("div");
+                    node.className += " ppp-unlock-item ppp-unlock-item-border mb-3";
+                    node.style.backgroundColor = color;
+
+                    unlockItem.appendChild(node);
+                }
+
+            default:
+                break;
         }
     }
 

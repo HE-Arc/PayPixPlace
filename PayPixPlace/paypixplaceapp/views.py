@@ -535,17 +535,23 @@ def buy_slot(user):
     return transaction_success, result_message
 
 def buy_color_pack(color_pack, user):
-    result_message = "You already possess all colors from this pack"
+    result_message = "You already possess one or more colors from this pack"
+    addedColor = []
     transaction_success = False
 
     for color in color_pack.contains.all():
         try:
             user.owns.all().get(hex=color.hex)
+            break
             # The user already owns the color
         except Color.DoesNotExist:
             add_color_to_user(color.hex, user)
             transaction_success = True
-            result_message = "Colors successfully added!"
+            addedColor.append(color.hex)
+            result_message = ["Colors successfully added!"]
+
+    if isinstance(result_message, (list,)):
+        result_message.append(addedColor)
 
     return transaction_success, result_message
 
@@ -624,16 +630,16 @@ def buy_with_pix(request, id):
         elif id == int(PixPriceNumType.CANVAS_PROFIT_ACTIVATION):
             transaction_success, result_message = activate_profit(request.POST["canvas_id"])
 
-        res = [id]
-        if isinstance(result_message, (list,) ):
-            res.extend(result_message)
-        else:
-            res.append(result_message)
-
-        result_message = res
-
     else:
         result_message = "You do not have enough pix!"
+
+    res = [id]
+    if isinstance(result_message, (list,) ):
+        res.extend(result_message)
+    else:
+        res.append(result_message)
+
+    result_message = res
 
     if transaction_success:
         user.pix -= price

@@ -45,3 +45,7 @@
     height: 100px;
     background-color: black;
 }
+
+.ppp-unlock-item-border {
+    border: 3px solid #3a3a3a;
+}
