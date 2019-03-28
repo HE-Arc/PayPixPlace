@@ -40,6 +40,27 @@
                             </div>
                         </div>
                     </li>
+                    <li class="list-group-item text-white bg-dark">
+                        <label class="font-weight-bold m-0 align-middle">Selection Tool</label>
+                        <label class="switch m-0">
+                            <input id="selectCB" type="checkbox" class="default">
+                            <span class="slider round"></span>
+                        </label>
+                        <div id="selectionToolbox">
+                            <div class="form-group">
+                                <label for="canvasTheme" class="font-weight-bold">Pixel Owner</label>
+                                <input type="text" class="form-control font-weight-bold pixelOwner" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="canvasTheme" class="font-weight-bold">Pixel Protection</label>
+                                <input type="text" class="form-control font-weight-bold pixelProtected" disabled>
+                                <label class="switch m-0">
+                                    <input id="pixelLocked" type="checkbox" class="default">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </li>
                     {% endif %}
                     <li class="list-group-item text-white bg-dark">
                         <label class="font-weight-bold m-0 align-middle">Show Grid</label>

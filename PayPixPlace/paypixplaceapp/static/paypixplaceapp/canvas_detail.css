@@ -99,3 +99,7 @@
 .ppp-canvas-control {
     font-size: 30px;
 }
+
+#selectionToolbox {
+    display: none;
+}

@@ -334,6 +334,48 @@ def get_user_ammo(request):
     else:
         raise Http404()
 
+
+def get_cursor(request, hex):
+    """Returns a img a a paintBrush with the given hex color"""
+    img = Image.new('RGBA', (32, 32))
+    draw = ImageDraw.Draw(img)
+    draw.line(
+        [(20,20),(10,10)],
+        width=7,
+        fill="#AAAAAA",
+    )
+    draw.ellipse(
+        [(18,18),(24,24)],
+        fill="#AAAAAA"
+    )
+    draw.line(
+        [(20,20),(10,10)],
+        width=6,
+        fill="#000000",
+    )
+    draw.ellipse(
+        [(18,18),(22,22)],
+        fill="#000000"
+    )
+
+    draw.rectangle(
+        [(0,0),(8,8)],
+        fill= "#" + hex
+    )
+    draw.ellipse(
+        [(3,3),(14,14)],
+        fill= "#" + hex
+    )
+    draw.ellipse(
+        [(1,1),(12,12)],
+        fill= "#" + hex
+    )
+    del draw
+
+    response = HttpResponse(content_type="image/png")
+    img.save(response, "png")
+    return response
+
 def get_json(request, id):
     """returns the canvas and all its pixels (and bonus infos) in a json format"""
     if not id:
@@ -347,9 +389,15 @@ def get_json(request, id):
     pixels = list(Pixel.objects.filter(canvas=id).values('x', 'y', 'hex', 'user__username'))
     pixels2Darray = [list(range(canvas.width)) for p in pixels if p["x"] == 0]
     for pixel in pixels:
+        try:
+            timeLeft = int((timezone.now() - pixel.end_protection_date).total_seconds())
+        except:
+            timeLeft = 0
+        
         pixels2Darray[pixel["x"]][pixel["y"]] = {
             "hex" : pixel["hex"],
-            "username" : pixel["user__username"] 
+            "username" : pixel["user__username"],
+            "timeLeft" : timeLeft
         }
     
     try:

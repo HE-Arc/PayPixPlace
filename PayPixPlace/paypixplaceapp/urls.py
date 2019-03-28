@@ -17,4 +17,5 @@ urlpatterns = [
     path('pix/purchase/<int:id>/', views.payment, name='pix-payment'),
     path('buy/<int:id>', views.buy_with_pix, name='buy-element'),
     path('ammo/', views.get_user_ammo, name="ammo"),
+    path('cursor/<str:hex>/', views.get_cursor, name="cursor"),
 ]

@@ -6,7 +6,7 @@ let canvasWidth;
 let displayGrid;
 let pixelWidth;
 let canMove;
-let hasMoved;
+let countMove;
 let canvasContainer;
 let pixelInfoDisplay;
 let sidebarTrigger;
@@ -15,9 +15,10 @@ let panZoomInstance;
 let mainLoop;
 let downloadButton;
 let mouseLastPos;
-let drawingColor = undefined;
+let drawingColor;
+let isColoring;
 
-const canvasPixelSize = 4000;
+const CANVAS_PIXEL_WIDTH = 4000;
 
 /**
  * Loads the pixels of the actual canvas from the database
@@ -42,12 +43,12 @@ function loadPixels() {
 }
 
 /**
- * returns the name of the owner of the pixel at the given position
+ * returns the pixel at the given position
  * @param {Integer} x 
  * @param {Integer} y 
  */
-function getOwner(x,y) {
-    return pixels.length > 0 ? pixels[x][y].username : null;
+function getPixel(x,y) {
+    return pixels.length > 0 ? pixels[x][y] : null;
 }
 
 /**
@@ -82,6 +83,18 @@ function drawPixels() {
             }
         }
     }
+
+    if (selectedPixel) {
+        ctx.lineWidth = 5 / scale;
+        ctx.strokeStyle = "black";
+        ctx.strokeRect(
+            selectedPixel.x * pixelWidth, 
+            selectedPixel.y * pixelWidth, 
+            pixelWidth, 
+            pixelWidth
+        );
+    }
+
     canvas.style.border = 2 / scale + "px solid #AAAAAA";
 }
 
@@ -147,11 +160,11 @@ function canvasMouseMoveHover(event) {
 
     if (x !=undefined && y != undefined) {
         ctx.lineWidth = 1 / scale;
-        if (drawingColor) {
+        if (drawingColor && isColoring) {
             let c = hexToRgb(drawingColor);
             ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.3)";
         } else {
-            ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
         }
         ctx.fillRect(
             x * pixelWidth, 
@@ -166,12 +179,6 @@ function canvasMouseMoveHover(event) {
             pixelWidth, 
             pixelWidth
         );
-        let ownerName = getOwner(x,y);
-        if (ownerName != null) {
-            displayInfos(ownerName, "False");
-        } else {
-            displayInfos();
-        }
     }
 }
 
@@ -199,7 +206,7 @@ function getOffsetPosition(evt, target){
  * action to fill a pixel (used to respond to events)
  * @param {Event} event 
  */
-function fillPixel(event) {
+function fillPixel(event=undefined) {
     let pos = getOffsetPosition(event, canvas);
     let x = parseInt((pos.x) / pixelWidth);
     let y = parseInt((pos.y) / pixelWidth);
@@ -274,16 +281,21 @@ function fillPixel(event) {
 }
 
 /**
- * prevent the context menu from showing when exiting the canvas area with right click pressed
+ * Sets the cursor to be a paintbrush of the same color as the drawing color 
  */
-function preventContextMenu() {
-    function removeContextMenu(event) {
-        document.removeEventListener("contextmenu", preventDefault, false);
-        document.removeEventListener("contextmenu", removeContextMenu, false);
+function setCursor() {
+    if (drawingColor != null && isColoring) {
+        canvasContainer.style.cursor = "url(/cursor/"+drawingColor.replace("#","")+"), auto";
+        canvas.style.cursor = "url(/cursor/"+drawingColor.replace("#","")+"), auto";
+    } else {
+        canvasContainer.style.cursor = "pointer";
+        canvas.style.cursor = "pointer";
     }
-    document.addEventListener("contextmenu", removeContextMenu, false);
 }
 
+/**
+ * Resets the canvas position and scale
+ */
 function resetTransform() {
     let rectCanvas = canvas.getBoundingClientRect();
     let rectContainer = canvasContainer.getBoundingClientRect();
@@ -297,6 +309,65 @@ function resetTransform() {
 }
 
 /**
+ * Select the pixel below the mouse/Touch
+ * @param {Event} event 
+ */
+function selectPixel(event) {
+    let pos = getOffsetPosition(event, canvas);
+    let x = parseInt((pos.x) / pixelWidth);
+    let y = parseInt((pos.y) / pixelWidth);
+    if (x < 0 || y < 0 || x > canvasWidth-1 || y > canvasWidth-1) {
+        return;
+    }
+    
+    let pixel = getPixel(x,y);
+    if (pixel != null) {
+        displayInfos(pixel.username, pixel.timeLeft);
+    } else {
+        displayInfos();
+    }
+    selectedPixel = {
+        x : x,
+        y : y
+    }
+    canvasMouseMoveHover();
+}
+
+/**
+ * On mouseup of touchstart action 
+ * @param {Event} event 
+ */
+function onPointerUp(event) {
+    canMove = false;
+    if (countMove <= 1) {
+        if (isColoring) {
+            fillPixel(event);
+        } else {
+            selectPixel(event);
+        }
+    }
+}
+
+/**
+ * On mouseup or touchend action
+ * @param {Event} event 
+ */
+function onPointerDown(event) {
+    countMove = 0;
+    canMove = true;
+}
+
+/**
+ * On mouse or touch move action
+ * @param {Event} event 
+ */
+function onPointerMove(event) {
+    if (canMove) {
+        countMove++;
+    }
+}
+
+/**
  * Initialise all the events on the mouse and touch
  */
 function initEvents() {
@@ -304,8 +375,7 @@ function initEvents() {
     // redraw the canvas when the mouse leaves the area
     canvas.addEventListener("mouseleave", function() {
         drawPixels();
-        displayInfos();
-        mouseLastPos = undefined;
+        mouseLastPos = null;
     });
     
     // draw a pixel on right click, prevent the context menu 
@@ -315,51 +385,25 @@ function initEvents() {
     canvas.addEventListener("mousemove", canvasMouseMoveHover);
     
     //redraw the pixels when zoomed in or out
-    canvas.addEventListener("wheel", drawPixels, false);
+    canvas.addEventListener("wheel", drawPixels);
+
     
     // Mouse events
-    canvas.addEventListener("mousedown", function(event){
-        hasMoved = false;
-        canMove = true;
-    });
-    canvas.addEventListener("mouseup", function(event){
-        canMove = false;
-        if (!hasMoved) {
-            fillPixel(event);
-        }
-    });
-    canvasContainer.addEventListener("mousemove", function(event){
-        if (canMove) {
-            hasMoved = true;
-        }
-    });
+    canvas.addEventListener("mousedown", onPointerDown);
+    canvas.addEventListener("mouseup", onPointerUp);
+    canvasContainer.addEventListener("mousemove", onPointerMove);
 
     // Mobile events
-    canvas.addEventListener("touchstart", function(event){
-        hasMoved = false;
-        canMove = true;
-    });
-    canvas.addEventListener("touchend", function(event){
-        canMove = false;
-        if (!hasMoved) {
-            fillPixel(event);
-        }
-    });
-    canvasContainer.addEventListener("touchmove", function(event){
-        if (canMove) {
-            hasMoved = true;
-        }
-    });
-    document.addEventListener("touchend", function(event){
-        canMove = false;
-    });
+    canvas.addEventListener("touchstart", onPointerDown);
+    canvas.addEventListener("touchend", onPointerUp);
+    canvasContainer.addEventListener("touchmove", onPointerMove);
 
     // Calculate the current scale and store it on zoom event
     panZoomInstance.on('zoom', function(e) {
         setTimeout(
             function() {
                 let rectCanvas = canvas.getBoundingClientRect();
-                scale = rectCanvas.width / canvasPixelSize;
+                scale = rectCanvas.width / CANVAS_PIXEL_WIDTH;
                 
             }, 10
         );
@@ -378,8 +422,9 @@ function initEvents() {
  */
 function initParams() {
     canvas  = document.getElementById("canvas");
-    canvas.width = canvasPixelSize;
-    canvas.height = canvasPixelSize;
+    canvas.width = CANVAS_PIXEL_WIDTH;
+    canvas.height = CANVAS_PIXEL_WIDTH;
+
     ctx = canvas.getContext("2d");
 
     isSidebarHidden = false;
@@ -402,7 +447,9 @@ function initParams() {
 
     pixels = [];
 
-    mouseLastPos = undefined;
+    mouseLastPos = null;
+    drawingColor = null;
+    selecting = false;
 
     panZoomInstance = panzoom(canvas, {
         maxZoom: 10,
@@ -413,7 +460,9 @@ function initParams() {
     
     displayGrid = false;
     canMove = false;
-    hasMoved = false;
+    countMove = 0;
+
+    isColoring = true;
 }
 
 // Execute when the page is fully loaded
@@ -422,7 +471,8 @@ $(document).ready(function(){
     initParams();
     resetTransform();
     initEvents();
-    
+    setCursor();
+
     // display the grid when the checkbox is checked
     let showGridCBs = document.getElementsByClassName("showGridCB");
     for (let index = 0; index < showGridCBs.length; index++) {
@@ -462,7 +512,7 @@ $(document).ready(function(){
         }
     });
 
-    setInterval(function() {
+    mainLoop = setInterval(function() {
         loadPixels();
     }, 4000)
     

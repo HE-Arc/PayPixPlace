@@ -1,5 +1,7 @@
 let pickers;
 let currentSlot;
+let selectCB;
+let selectedPixel;
 
 /**
  * Change the current slot
@@ -29,10 +31,9 @@ function changeSlotColor(newColor) {
         currentPicker[i].classList.add("ppp-picker-selected");
         currentPicker[i].addEventListener("click", function() {
             drawingColor = newColor;
+            setCursor();
         }, false);
     }
-    
-    drawingColor = newColor;
 
     $.ajax({
         type: "POST",
@@ -44,7 +45,8 @@ function changeSlotColor(newColor) {
         },
         dataType: "json",
         success: function(data) {
-
+            drawingColor = newColor;
+            setCursor();
         }
     });
 }
@@ -71,6 +73,7 @@ function setDrawingColor(id) {
     }
 
     isColoring = true;
+    setCursor();
 }
 
 
@@ -78,7 +81,7 @@ function setDrawingColor(id) {
 $(document).ready(function(){
     
     drawingColor = colors[0];
-
+    setCursor();
     pickers = []
 
     pickers.push(document.getElementsByClassName("picker1"));
@@ -101,4 +104,14 @@ $(document).ready(function(){
     for (let i = 0; i < pickerMove.length; i++) {
         pickerMove[i].addEventListener("click", clickMove, false);
     }
+
+    selectCB = document.getElementById("selectCB");
+    selectCB.addEventListener("click", function() {
+        isColoring = !this.checked;
+        setCursor();
+        $("#selectionToolbox").slideToggle();
+        selectedPixel = null;
+        drawPixels();
+    });
+    selectedPixel = null;
 });
