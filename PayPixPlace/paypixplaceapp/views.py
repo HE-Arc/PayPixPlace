@@ -269,6 +269,8 @@ def lock_pixel(request):
                 x = request.POST['x']
                 y = request.POST['y']
                 user = request.user
+                #TODO make the user pay the price
+
                 pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
                 pixel.user = user
                 pixel.end_protection_date = timezone.now() + timedelta(hours=1)
@@ -322,6 +324,7 @@ def change_pixel_color(request):
     return JsonResponse(data)
 
 def can_modify_pixel(pixel, color, user, current_date):
+    """Test if the user can modify a pixel"""
     returnBool = True
     returnBool &= (
         pixel.end_protection_date is None or

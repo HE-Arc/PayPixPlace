@@ -177,7 +177,7 @@
             </div>
         </div>
     </div>
-
+    <img id="lockImage" src="{% static 'paypixplaceapp/images/lock.png' %}" style="display:none" />
     <script>
         window.CSRF_TOKEN = "{{ csrf_token }}";
         const canvasId = "{{ object.id }}";

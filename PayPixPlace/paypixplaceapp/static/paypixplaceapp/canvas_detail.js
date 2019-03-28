@@ -19,6 +19,7 @@ let drawingColor;
 let isColoring;
 let selectedPixel;
 let hideProtectedCB;
+let lockImage;
 
 const CANVAS_PIXEL_WIDTH = 4000;
 
@@ -63,7 +64,11 @@ function drawPixels() {
         for (let y = 0 ; y < pixels[x].length ; y++) {
             if (hideProtected && pixels[x][y].timeLeft > 0) {
                 ctx.drawImage(
-                    
+                    lockImage,
+                    x * pixelWidth, 
+                    y * pixelWidth, 
+                    pixelWidth,
+                    pixelWidth
                 );
             } else {
                 ctx.fillStyle = pixels[x][y].hex;
@@ -141,14 +146,11 @@ function displayInfos(x,y) {
         if (pixel.timeLeft <= 0) {
             protectedMsg = "Not protected";
             pixelLocked.checked = false;
-            pixelLocked.enabled = true;
+            pixelLocked.disabled = false;
         } else {
             protectedMsg = secondsToTime(pixel.timeLeft);
             pixelLocked.checked = true;
-            pixelLocked.enabled = false;
-        }
-        if(pixel.timeLeft == "") {
-            protectedMsg = "";
+            pixelLocked.disabled = true;
         }
         pixelInfoDisplay.protected[i].value = protectedMsg;
     }
@@ -484,6 +486,7 @@ function initParams() {
     
     canvasContainer = document.getElementById("canvasContainer");
     hideProtectedCB = document.getElementById("hideProtectedCB");
+    lockImage = document.getElementById("lockImage");
     hideProtected = false;
     pixelInfoDisplay = {
         owner : document.getElementsByClassName("pixelOwner"),
@@ -566,6 +569,9 @@ $(document).ready(function(){
 
     mainLoop = setInterval(function() {
         loadPixels();
+        if (selectedPixel) {
+            displayInfos(selectedPixel.x,selectedPixel.y);
+        }
     }, 4000)
     
     loadPixels();

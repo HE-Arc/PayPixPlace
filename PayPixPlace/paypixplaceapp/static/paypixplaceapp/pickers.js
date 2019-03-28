@@ -96,8 +96,12 @@ function lockPixel(x,y) {
         },
         dataType: "json",
         success: function(data) {
-            loadPixels();
-            displayInfos(x,y);
+            if (data.is_valid) {
+                loadPixels();
+                pixelLocked.checked = true;
+                pixelLocked.disabled = true;
+                displayInfos(x,y);
+            }
         }
     });
 }
@@ -144,7 +148,7 @@ $(document).ready(function(){
 
     pixelLocked = document.getElementById("pixelLocked");
     pixelLocked.addEventListener("click", function() {
-        if (selectedPixel) {
+        if (selectedPixel && !this.disabled) {
             lockPixel(selectedPixel.x, selectedPixel.y);
         }
     });
