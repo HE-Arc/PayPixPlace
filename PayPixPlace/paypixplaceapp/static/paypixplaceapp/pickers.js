@@ -12,7 +12,7 @@ function changeCurrentSlot(id) {
 }
 
 /**
- * Change the color for the selected slot and in the data base
+ * Check if the color for the selected slot can be changed
  * @param {string} newColor 
  */
 function changeSlotColor(newColor) {
@@ -36,6 +36,10 @@ function changeSlotColor(newColor) {
     });
 }
 
+/**
+ * Change the color for the selected slot and in the data base
+ * @param {string} newColor 
+ */
 function applyChangeSlotColor(newColor) {
     
     let currentPicker = document.getElementsByClassName("picker" + currentSlot);
