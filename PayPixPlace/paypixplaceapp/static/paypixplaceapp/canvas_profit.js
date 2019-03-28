@@ -35,11 +35,19 @@ document.getElementsByName("btn-confirm-profit").forEach(element => element.addE
     });
 }));
 
-document.getElementsByName("btn-close-profit").forEach(element => element.addEventListener("click", function(event) {
-    id = element.dataset.canvasId;
+// document.getElementsByName("btn-close-profit").forEach(element => element.addEventListener("click", function(event) {
+//     id = element.dataset.canvasId;
+//     document.getElementsByName("checkbox_profit").forEach(checkbox => {
+//         checkboxid = checkbox.dataset.canvasId;
+//         if (id == checkboxid)
+//             checkbox.checked = false;
+//     });
+// }));
+
+$('[id^=confirm-enable-profit-]').on("hide.bs.modal", function () {
     document.getElementsByName("checkbox_profit").forEach(checkbox => {
         checkboxid = checkbox.dataset.canvasId;
         if (id == checkboxid)
             checkbox.checked = false;
     });
-}));
+});
