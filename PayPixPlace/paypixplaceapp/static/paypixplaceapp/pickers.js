@@ -12,10 +12,36 @@ function changeCurrentSlot(id) {
 }
 
 /**
- * Change the color for the selected slot and in the data base
+ * Check if the color for the selected slot can be changed
  * @param {string} newColor 
  */
 function changeSlotColor(newColor) {
+
+    $.ajax({
+        type: "POST",
+        url: "/change_user_slot_color/",
+        data: {
+            slot: currentSlot, 
+            color: newColor, 
+            userId: userId
+        },
+        dataType: "json",
+        success: function(data) {
+            if(data.is_valid) {
+                drawingColor = newColor;
+                setCursor();
+                applyChangeSlotColor(newColor);
+            }
+        }
+    });
+}
+
+/**
+ * Change the color for the selected slot and in the data base
+ * @param {string} newColor 
+ */
+function applyChangeSlotColor(newColor) {
+    
     let currentPicker = document.getElementsByClassName("picker" + currentSlot);
     
     for (let i = 0 ; i < pickers.length ; i++) {
@@ -34,21 +60,6 @@ function changeSlotColor(newColor) {
             setCursor();
         }, false);
     }
-
-    $.ajax({
-        type: "POST",
-        url: "/change_user_slot_color/",
-        data: {
-            slot: currentSlot, 
-            color: newColor, 
-            userId: userId
-        },
-        dataType: "json",
-        success: function(data) {
-            drawingColor = newColor;
-            setCursor();
-        }
-    });
 }
 
 /**
