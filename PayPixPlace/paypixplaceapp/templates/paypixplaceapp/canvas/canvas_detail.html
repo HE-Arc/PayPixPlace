@@ -88,12 +88,12 @@
                         </div>
                     </li>
                     <li class="list-group-item text-white bg-dark">
-                        <button class="btn btn-sm btn-outline-info d-inline" data-toggle="modal" data-target=".canvas-control-modal">
+                        <button class="btn btn-md btn-outline-info d-inline" data-toggle="modal" data-target=".canvas-control-modal">
                             <i class="fas fa-info-circle ppp-canvas-control"></i>
                         </button>
-                        <button id="downloadButton" class="btn btn-sm btn-outline-info d-inline">
+                        <a id="downloadButton" class="btn btn-lg btn-outline-info d-inline" href="{% url 'canvas-img' id=object.id %}" download>
                             <i class="fas fa-file-download ppp-canvas-control"></i>
-                        </button>                        
+                        </a>                        
                     </li>
                 </ul>
             </div>
