@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import logging
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'nplusone.ext.django',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'nplusone.ext.django.NPlusOneMiddleware',
 ]
 
 ROOT_URLCONF = 'PayPixPlace.urls'
@@ -133,3 +136,21 @@ LOGIN_URL = 'login'
 #LOGOUT_REDIRECT_URL = 'paypixplace-home'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+NPLUSONE_LOGGER = logging.getLogger('nplusone')
+NPLUSONE_LOG_LEVEL = logging.WARN
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'nplusone': {
+            'handlers': ['console'],
+            'level': 'WARN',
+        },
+    },
+}
