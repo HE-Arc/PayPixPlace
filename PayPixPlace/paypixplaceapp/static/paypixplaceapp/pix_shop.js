@@ -7,9 +7,11 @@ function display_informations(data) {
     message = data.Result[1];
     if (data.TransactionSuccess) {
 
-        $("#unlock-item-modal").modal();
-
+        let openUnlockModal = true;
         let unlockItem = document.getElementById("unlockItem");
+        let node;
+        let para;
+        let textPara;
 
         //Remove all child of unlockItem
         while (unlockItem.firstChild) {
@@ -19,22 +21,60 @@ function display_informations(data) {
         switch (data.Result[0]) {
             case 0:
             case 2:
-                unlockItem.style.backgroundColor = data.Result[2];
-                unlockItem.className += " ppp-unlock-item ppp-unlock-item-border mb-3";
+
+                para = document.createElement("p");
+                textPara = document.createTextNode("New color acquired!");
+                para.appendChild(textPara);
+
+                unlockItem.appendChild(para);
+
+                node = document.createElement("div");
+                node.className += " ppp-unlock-item ppp-unlock-item-border mb-3";
+                node.style.backgroundColor = data.Result[2];
+
+                unlockItem.appendChild(node);
                 break;
+
             case 1:
+
+                para = document.createElement("p");
+                textPara = document.createTextNode("New color pack acquired!");
+                para.appendChild(textPara);
+
+                unlockItem.appendChild(para);
+
                 for (let i = 0; i < data.Result[2].length; i++) {
                     const color = data.Result[2][i];
 
-                    let node = document.createElement("div");
+                    node = document.createElement("div");
                     node.className += " ppp-unlock-item ppp-unlock-item-border mb-3";
                     node.style.backgroundColor = color;
 
                     unlockItem.appendChild(node);
                 }
+                break;
+
+            case 3:
+
+            para = document.createElement("p");
+            textPara = document.createTextNode("New color slot acquired!");
+            para.appendChild(textPara);
+
+            unlockItem.appendChild(para);
+
+            node = document.createElement("div");
+            node.className += " ppp-unlock-item-icon mb-3 fas fa-palette";
+            node.style.backgroundColor = data.Result[2];
+
+            unlockItem.appendChild(node);
+            break;
 
             default:
                 break;
+        }
+
+        if(openUnlockModal) {
+            $("#unlock-item-modal").modal();
         }
     }
 
@@ -70,7 +110,9 @@ $(document).ready(function() {
     });
     
     $('#unlock-item-modal').on('hidden.bs.modal', function () {
-        $('body').addClass('modal-open');
+        if($('.modal:visible').length > 0) {
+            $('body').addClass('modal-open');
+        }
     })
 
     document.getElementById("btnFixColor").addEventListener("click", function(){

@@ -49,3 +49,7 @@
 .ppp-unlock-item-border {
     border: 3px solid #3a3a3a;
 }
+
+.ppp-unlock-item-icon {
+    font-size: 80px;
+}

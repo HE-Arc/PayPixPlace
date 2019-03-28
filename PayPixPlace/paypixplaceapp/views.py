@@ -248,9 +248,9 @@ def change_user_slot_color(request):
             ).first()
             
             if(slot == None):
-                slot = Slot()
-                slot.user = user
-                slot.place_num = slotId
+                return JsonResponse({
+                    'is_valid': False,
+                })
                 
             slot.color = color
             slot.save()
