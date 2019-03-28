@@ -1,0 +1,47 @@
+.ppp-pix-shop-main-title {
+    font-size: 2em;
+    font-weight: bold;
+    color: rgb(119, 0, 0);
+}
+
+.ppp-buy-color-pack {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.ppp-pix-shop-title {
+    font-size: 1.6em;
+    font-weight: bold;
+    color: rgb(161, 0, 0);
+}
+
+.ppp-border-right {
+    border-right: 3px solid #3a3a3a;
+}
+
+.ppp-buy-color-case {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    border: 3px solid #3a3a3a;
+}
+
+.ppp-color-pack-row {
+    height: 320px;
+}
+
+.colorpicker-alpha {
+    display:none !important;
+}
+
+.colorpicker {
+    min-width:128px !important;
+}
+
+.ppp-unlock-item {
+    position: relative;
+    left: calc(50% - 50px);
+    width: 100px;
+    height: 100px;
+    background-color: black;
+}

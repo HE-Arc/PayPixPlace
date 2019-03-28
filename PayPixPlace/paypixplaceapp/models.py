@@ -22,6 +22,7 @@ class User(AbstractUser):
 
 class Pixie(models.Model):
     title = models.CharField(max_length=30)
+    num_type = models.IntegerField(unique=True)
     price = models.IntegerField()
     number = models.IntegerField()
     bonus = models.IntegerField()
@@ -37,6 +38,8 @@ class Canvas(models.Model):
     place = models.SmallIntegerField()
     width = models.IntegerField(default=20, validators=[ MaxValueValidator(300), MinValueValidator(10) ])
     is_profit_on = models.BooleanField()
+    is_modified = models.BooleanField(default=True)
+    interactions = models.IntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
 class Pixel(models.Model):

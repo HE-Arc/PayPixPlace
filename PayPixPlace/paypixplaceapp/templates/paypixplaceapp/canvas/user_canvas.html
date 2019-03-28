@@ -1,8 +1,28 @@
 {% extends "paypixplaceapp/base_standard.html" %}
+{% load staticfiles %}
 {% block content %}
 
     <div class="row">
         {% for c in canvas %}
+
+
+            <div id="confirm-enable-profit-{{ c.id }}" class="modal fade confirm-enable-profit" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-body" style="display: inline-block;">
+                            Do you want to spend 
+                            {% with profit_activation=prices|get_item:9 %}
+                            {{ profit_activation.price }}
+                            {% endwith %}
+                            PIX to enable profit?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-success" name="btn-confirm-profit" data-dismiss="modal" data-canvas-id="{{ c.id }}">Confirm</button>
+                            <button type="button" class="btn btn-outline-danger" name="btn-close-profit" data-dismiss="modal" data-canvas-id="{{ c.id }}">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="col-12 col-sm-6 col-lg-4 mb-5">
                 <div class="card">
@@ -24,7 +44,7 @@
                                     {% if c.is_profit_on %}
                                         <input type="checkbox" class="default showGridCB" disabled checked>
                                     {% else %}
-                                        <input type="checkbox" class="default showGridCB">
+                                        <input type="checkbox" name="checkbox_profit" class="default showGridCB" data-canvas-id="{{ c.id }}">
                                     {% endif %}
                                     <span class="slider round"></span>
                                 </label>
@@ -66,4 +86,5 @@
         </div>
     </div>
     
+    <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_profit.js' %}"></script>
 {% endblock content %}

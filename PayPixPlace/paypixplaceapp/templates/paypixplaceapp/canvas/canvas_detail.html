@@ -2,19 +2,24 @@
 {% load staticfiles %}
 {% block content %}
     
+    <script type="text/javascript" src="{% static 'paypixplaceapp/panzoom.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>
+    
     <div id="sidebarContainer" class="ppp-sidebar-container">
 
         <div id="sidebarTrigger" class="ppp-sidebar-trigger">
             <i id="sidebarTriggerOpen" class="fas fa-caret-square-left ppp-icon ppp-sidebar-trigger-icon align-top"></i>
             <i id="sidebarTriggerClose" class="fas fa-caret-square-right ppp-icon ppp-sidebar-trigger-icon align-top" hidden></i>
         </div>
-
+        
         <div id="sidebarContent" class="card text-white bg-dark ppp-sidebar-content text-center align-middle">
             <div class="card-header">
                 <h2>{{ object.name }}</h2>
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush">
+                    {% if user.is_authenticated %}
+                    <script src="{% static 'paypixplaceapp/pickers.js' %}"></script>
                     <li class="list-group-item text-white bg-dark">
                         <div class="row">
                             <div class="col-6 mb-3 p-0">
@@ -35,6 +40,28 @@
                             </div>
                         </div>
                     </li>
+                    <li class="list-group-item text-white bg-dark">
+                        <label class="font-weight-bold m-0 align-middle">Selection Tool</label>
+                        <label class="switch m-0">
+                            <input id="selectCB" type="checkbox" class="default">
+                            <span class="slider round"></span>
+                        </label>
+                        <div id="selectionToolbox">
+                            <div class="form-group">
+                                <label for="canvasTheme" class="font-weight-bold">Pixel Owner</label>
+                                <input type="text" class="form-control font-weight-bold pixelOwner" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="canvasTheme" class="font-weight-bold">Pixel Protection</label>
+                                <input type="text" class="form-control font-weight-bold pixelProtected" disabled>
+                                <label class="switch m-0">
+                                    <input id="pixelLocked" type="checkbox" class="default">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </li>
+                    {% endif %}
                     <li class="list-group-item text-white bg-dark">
                         <label class="font-weight-bold m-0 align-middle">Show Grid</label>
                         <label class="switch m-0">
@@ -72,10 +99,10 @@
             </div>
         </div>
     </div>
-
     <div id="downbarContainer" class="ppp-downbar-container">
         <div class="row p-1">
             <div class="col-12 col-md-8 offset-0 offset-md-2">
+                {% if user.is_authenticated %}
                 <div class="row">
                     <div class="col-3 d-inline-block">
                         <div class="picker1 ppp-picker-sm ppp-picker-selected"></div>
@@ -94,6 +121,7 @@
                         <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -104,6 +132,7 @@
         </canvas>
     </div>
     
+    {% if user.is_authenticated %}
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -118,7 +147,8 @@
             </div>
         </div>
     </div>
-    
+    {% endif %}
+
     <div id="canvas-control-modal" class="modal fade canvas-control-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -127,25 +157,12 @@
                         <li class="list-group-item">
                             <label class="font-weight-bold">Canvas Controls</label>
                             <ul class="pl-3 text-left">
-                                <li>Hold right click to move canvas</li>
-                                <li>Use mousewheel to zoom</li>
-                                <li>Click to change the color of pixels</li>    
+                                <li>Hold left click to move the canvas</li>
+                                <li>Use mousewheel or fingers to zoom</li>
+                                <li>Click/Touch to change the color of a pixel</li>    
                             </ul>
                         </li>
                     </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="alert-ammo-modal" class="modal fade alert-ammo-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-body" style="display: inline-block;">
-                    No ammo left, can place pixel
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
@@ -158,15 +175,14 @@
         window.CSRF_TOKEN = "{{ csrf_token }}";
         const canvasId = "{{ object.id }}";
         const canvasName = "{{ object.name }}";
+        {% if user.is_authenticated %}
         const userId = "{{ user.id }}";
 
         colors = [];
         {% for slot in slots %}
             colors.push('{{ slot.color.hex }}')
         {% endfor %}
+        {% endif %}
     </script>
-    <script type="text/javascript" src="{% static 'paypixplaceapp/panzoom.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'paypixplaceapp/notify.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>
     
 {% endblock content %}

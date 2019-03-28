@@ -4,6 +4,7 @@ from django.utils import timezone
 from enum import IntEnum
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
@@ -23,14 +24,22 @@ import stripe
 import random
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+MAX_PLAYER_SLOT = 4
+MAX_PLAYER_AMMO = 20
+MIN_REFILL_TIME = 10
+REDUCE_REFILL_TIME = 5
 
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
 
 @register.filter
-def get_enum_value(value):
-    return int(value)
+def get_pix_price():
+    pix_prices = PixPrice.objects.all()
+    prices = {}
+    for price in pix_prices:
+        prices[price.num_type] = price
+    return prices
 
 class Place(IntEnum):
     OFFICIAL = 0
@@ -42,39 +51,47 @@ class PixPriceNumType(IntEnum):
     RANDOM_COLOR = 2
     UNLOCK_SLOT = 3
     CANVAS_COLOR_PACK = 4
+    MAX_AMMO = 5
+    REFILL_TIME = 6
+    INSTANT_AMMO = 7
+    CANVAS_PROFIT_CREATION = 8
+    CANVAS_PROFIT_ACTIVATION = 9
 
-def get_highest_title(user):
+def get_highest_title_num(user):
     purchases = Purchase.objects.filter(user=user)
-    title = "Pixer"
+    num = 0
     max_id = 0
 
     for purchase in purchases:
         if purchase.pixie.id > max_id:
-            title = purchase.pixie.title
+            num = purchase.pixie.num_type
             max_id = purchase.pixie.id
     
-    return title
-
-
-def get_pix_price():
-    pix_prices = PixPrice.objects.all()
-    prices = {}
-    for price in pix_prices:
-        prices[price.num_type] = price
-    return prices
-
+    return num
 
 def home(request):
+    try:
+        pixie_num = get_highest_title_num(request.user)
+        user_title = Pixie.objects.filter(num_type=pixie_num).first()
+
+        if(user_title == None):
+            user_title = "Pixer"
+        else:
+            user_title = user_title.title
+    except:
+        pixie_num = -1
+        user_title = "Anonymous"
+
     context = {
         'title': 'Home',
-        'prices': get_pix_price,
+        'prices': get_pix_price(),
         'colors_pack': Colors_pack.objects.all(),
-        'user_title': get_highest_title(request.user)
-
+        'user_title_num': pixie_num,
+        'user_title': user_title
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
-class CanvasView(ListView):
+class CommunityCanvasView(ListView):
     model = Canvas
     template_name = 'paypixplaceapp/canvas/community_canvas.html'
 
@@ -83,7 +100,23 @@ class CanvasView(ListView):
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context['title'] = 'Community Canvas'
+        context['prices'] = get_pix_price()
+        context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
+        return context
+
+class OfficialCanvasView(ListView):
+    model = Canvas
+    template_name = 'paypixplaceapp/canvas/official_canvas.html'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['title'] = 'Official Canvas'
+        context['prices'] = get_pix_price()
+        context['colors_pack'] = Colors_pack.objects.all()
+        context['canvas'] = getCanvas(self.request.GET.get('page'), Place.OFFICIAL)
         return context
 
 class CanvasDetailsView(DetailView):
@@ -97,12 +130,14 @@ class CanvasDetailsView(DetailView):
         context['slots'] = Slot.objects.filter(user=self.request.user.id)
 
         place_text = "Invalid"
-        if self.object.place == 0:
+        if self.object.place == Place.OFFICIAL:
             place_text = "Official"
-        elif self.object.place == 1:
+        elif self.object.place == Place.COMMUNITY:
             place_text = "Community"
 
         context['place_text'] = place_text
+        context['prices'] = get_pix_price()
+        context['colors_pack'] = Colors_pack.objects.all()
         return context
 
 def getCanvas(page, place):
@@ -113,6 +148,7 @@ def getCanvas(page, place):
         c.pixels = Pixel.objects.filter(canvas=c.id)
     return canvas
 
+@login_required
 def createCanvas(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -124,20 +160,30 @@ def createCanvas(request):
             canvas.user = request.user
 
             # Check if the given place is a valid one
-            if canvas.place >= 0 and canvas.place <= 1:
-                canvas.save()
+            if canvas.place >= Place.OFFICIAL and canvas.place <= Place.COMMUNITY:
 
-                instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
-                Pixel.objects.bulk_create(instances)  
+                if request.user.role.name == "admin" or (request.user.role.name == "user" and canvas.place == Place.COMMUNITY):
+                    canvas.save()
 
-                messages.success(request, f'You create a new canvas successfully!')
+                    instances = [create_pixel(x, y, "#FFFFFF", canvas.id) for x in range(canvas.width) for y in range(canvas.width)]
+                    Pixel.objects.bulk_create(instances)
 
-                if canvas.place == int(Place.COMMUNITY):
-                    return redirect('canvas-community')
-                else:
-                    return redirect('canvas-official')
-            else:
-                messages.error(request, f'The place is invalid!')
+                    if canvas.is_profit_on:
+                        price = PixPrice.objects.get(num_type=int(PixPriceNumType.CANVAS_PROFIT_CREATION)).price
+                        if canvas.user.pix >= price:
+                            canvas.user.pix -= price
+                            canvas.user.save()
+                        else:
+                            messages.error(request, f"You don't have enough pix to enable the profit!")
+
+                    messages.success(request, f'You created a new canvas successfully!')
+
+                    if canvas.place == int(Place.COMMUNITY):
+                        return redirect('canvas-community')
+                    else:
+                        return redirect('canvas-official')
+
+            messages.error(request, f'The place is invalid!')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -145,18 +191,14 @@ def createCanvas(request):
 
     context = {
         'title': 'Create Canvas',
-        'form': form
+        'form': form,
+        'prices': get_pix_price(),
+        'colors_pack': Colors_pack.objects.all(),
     }
 
     return render(request, 'paypixplaceapp/canvas/create_canvas.html', context)
 
-def officialCanvas(request):
-    context = {
-        'title': 'Official Canvas',
-        'canvas': getCanvas(request.GET.get('page'), Place.OFFICIAL)
-    }
-    return render(request, 'paypixplaceapp/canvas/official_canvas.html', context)
-
+@login_required
 def userCanvas(request):
     canvas_list = Canvas.objects.filter(user=request.user)
     paginator = Paginator(canvas_list, 6)
@@ -164,7 +206,9 @@ def userCanvas(request):
 
     context = {
         'title': 'User\'s Canvas',
-        'canvas': canvas
+        'canvas': canvas,
+        'prices': get_pix_price(),
+        'colors_pack': Colors_pack.objects.all(),
     }
     return render(request, 'paypixplaceapp/canvas/user_canvas.html', context)
 
@@ -172,10 +216,13 @@ def get_pixies_info():
     pixies = Pixie.objects.all()
     return pixies
 
+@login_required
 def purchase(request):
     context = {
         'title': 'Purchase PIX',
-        'pixies': get_pixies_info()
+        'pixies': get_pixies_info(),
+        'prices': get_pix_price(),
+        'colors_pack': Colors_pack.objects.all(),
     }
     return render(request, 'paypixplaceapp/purchase_pix.html', context)
       
@@ -213,31 +260,38 @@ def change_user_slot_color(request):
             })
 
 def change_pixel_color(request):
-    canvas_id = request.POST['canvas_id']
-    x = request.POST['x']
-    y = request.POST['y']
-    hex = request.POST['hex']
-    user = request.user
-
-    current_date = timezone.now()
-
+    """Changes the color of one pixel of a canvas, if the user have the rights to do so"""
     modification_valid = False
+    if request.user.is_authenticated:
+        if request.is_ajax():
+            if request.method == 'POST':
+                canvas_id = request.POST['canvas_id']
+                x = request.POST['x']
+                y = request.POST['y']
+                hex = request.POST['hex']
+                user = request.user
 
-    pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
-    if can_modify_pixel(pixel, hex, user, current_date):
-        pixel.hex = hex
-        pixel.user = user
-        pixel.save()
+                current_date = timezone.now()
 
-        if user.ammo == user.max_ammo:
-            user.last_ammo_usage = current_date
-        user.ammo -= 1
-        user.save()
-        modification_valid = True
+                pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
+                if can_modify_pixel(pixel, hex, user, current_date):
+                    pixel.hex = hex
+                    pixel.user = user
+                    pixel.save()
 
-    # TODO send user confirmation
+                    if user.ammo == user.max_ammo:
+                        user.last_ammo_usage = current_date
+                    user.ammo -= 1
+                    user.pix += 1
+                    user.save()
+                    modification_valid = True
+                    canvas = Canvas.objects.get(id=canvas_id)
+                    canvas.is_modified = True
+                    canvas.interactions += 1
+                    canvas.save()
     data = {
-        'is_valid': modification_valid
+        'is_valid' : modification_valid,
+        'user_authenticated' : request.user.is_authenticated
     }
     return JsonResponse(data)
 
@@ -252,8 +306,78 @@ def can_modify_pixel(pixel, color, user, current_date):
     
     return returnBool
 
+@login_required
+def get_user_ammo(request):
+    """Returns informations about the user's ammunitions"""
+    if request.is_ajax():
+        user = request.user
+
+        timeBeforeReload = 0
+        if user.last_ammo_usage:
+            timeBeforeReload = (timezone.now() - user.last_ammo_usage).total_seconds()
+            while timeBeforeReload > user.ammo_reloading_seconds:
+                timeBeforeReload -= user.ammo_reloading_seconds
+                if user.ammo < user.max_ammo:
+                    user.ammo += 1
+                    user.last_ammo_usage = timezone.now()
+            
+            timeBeforeReload = user.ammo_reloading_seconds - abs(int(timeBeforeReload))
+        user.save()
+
+        data = {
+            'ammo' : user.ammo,
+            'maxAmmo' : user.max_ammo,
+            'reloadTime' : user.ammo_reloading_seconds,
+            'timeBeforeReload' : timeBeforeReload
+        }
+        return JsonResponse(data)
+    else:
+        raise Http404()
+
+
+def get_cursor(request, hex):
+    """Returns a img a a paintBrush with the given hex color"""
+    img = Image.new('RGBA', (32, 32))
+    draw = ImageDraw.Draw(img)
+    draw.line(
+        [(20,20),(10,10)],
+        width=7,
+        fill="#AAAAAA",
+    )
+    draw.ellipse(
+        [(18,18),(24,24)],
+        fill="#AAAAAA"
+    )
+    draw.line(
+        [(20,20),(10,10)],
+        width=6,
+        fill="#000000",
+    )
+    draw.ellipse(
+        [(18,18),(22,22)],
+        fill="#000000"
+    )
+
+    draw.rectangle(
+        [(0,0),(8,8)],
+        fill= "#" + hex
+    )
+    draw.ellipse(
+        [(3,3),(14,14)],
+        fill= "#" + hex
+    )
+    draw.ellipse(
+        [(1,1),(12,12)],
+        fill= "#" + hex
+    )
+    del draw
+
+    response = HttpResponse(content_type="image/png")
+    img.save(response, "png")
+    return response
+
 def get_json(request, id):
-    """returns the canvas and all its pixels by its id in a json format"""
+    """returns the canvas and all its pixels (and bonus infos) in a json format"""
     if not id:
         raise Http404()
 
@@ -265,39 +389,31 @@ def get_json(request, id):
     pixels = list(Pixel.objects.filter(canvas=id).values('x', 'y', 'hex', 'user__username'))
     pixels2Darray = [list(range(canvas.width)) for p in pixels if p["x"] == 0]
     for pixel in pixels:
+        try:
+            timeLeft = int((timezone.now() - pixel.end_protection_date).total_seconds())
+        except:
+            timeLeft = 0
+        
         pixels2Darray[pixel["x"]][pixel["y"]] = {
             "hex" : pixel["hex"],
-            "username" : pixel["user__username"] 
+            "username" : pixel["user__username"],
+            "timeLeft" : timeLeft
         }
-    user = request.user
-
-    timeBeforeReload = 0
-    if user.last_ammo_usage:
-        timeBeforeReload = (timezone.now() - user.last_ammo_usage).total_seconds()
-        while timeBeforeReload > user.ammo_reloading_seconds:
-            timeBeforeReload -= user.ammo_reloading_seconds
-            if user.ammo < user.max_ammo:
-                user.ammo += 1
-                user.last_ammo_usage = timezone.now()
-        
-        timeBeforeReload = user.ammo_reloading_seconds - abs(int(timeBeforeReload))
-        
-    user.save()
-
+    
+    try:
+        pix = request.user.pix
+    except:
+        pix = -1
     data = {
         'canvas': model_to_dict(canvas),
         'pixels': pixels2Darray,
-        'ammoInfos' : {
-            'ammo' : user.ammo,
-            'maxAmmo' : user.max_ammo,
-            'reloadTime' : user.ammo_reloading_seconds,
-            'timeBeforeReload' : timeBeforeReload
-        }
+        'pix' : pix
     }
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data)
+
 
 def get_img(request, id):
-    """returns the canvas by its id, as an PNG img"""
+    """returns the canvas by its id, as a PNG img"""
     if not id:
         raise Http404()
 
@@ -322,10 +438,14 @@ def get_img(request, id):
             ), fill=pixel["hex"]
         )
     del draw
-
+    
     response = HttpResponse(content_type="image/png")
     img.save(response, "PNG")
     return response
+
+# Dict to store imgs already generated
+get_img.images = {}
+
 
 def buy(request, id):
     pixie = Pixie.objects.filter(id=id).first()
@@ -373,7 +493,7 @@ def buy_fix_color(hex, user):
     except Color.DoesNotExist:
         # The user does not own the color
         add_color_to_user(hex, user)
-        result_message = "Color successfuly added!"
+        result_message = ["Color successfuly added!", hex]
         transaction_success = True
 
     return transaction_success, result_message
@@ -392,8 +512,25 @@ def buy_random_color(user):
             result_message = "You already own this color!"
         except Color.DoesNotExist:
             add_color_to_user(hex, user)
-            result_message = "Color successfuly added! (" + hex + ")"
+            result_message = ["Color successfully added!", hex]
             transaction_success = True
+
+    return transaction_success, result_message
+
+def buy_slot(user):
+    result_message = ""
+    transaction_success = False
+
+    player_slots = Slot.objects.filter(user=user).order_by('-place_num')
+    
+    if player_slots.count() < MAX_PLAYER_SLOT:
+        last_slot_number = player_slots.first().place_num
+        Slot.objects.create(place_num= last_slot_number + 1, user=user, color=user.owns.first())
+        result_message = "Slot successfully added"
+        transaction_success = True
+
+    else:
+         result_message = "You can't buy anymore slots!"
 
     return transaction_success, result_message
 
@@ -408,7 +545,56 @@ def buy_color_pack(color_pack, user):
         except Color.DoesNotExist:
             add_color_to_user(color.hex, user)
             transaction_success = True
-            result_message = "Colors successfuly added!"
+            result_message = "Colors successfully added!"
+
+    return transaction_success, result_message
+
+def increase_max_ammo(user):
+    result_message = "You already have the max ammo possible!"
+    transaction_success = False
+
+    if user.max_ammo < MAX_PLAYER_AMMO:
+        user.max_ammo += 1
+        user.ammo += 1
+        transaction_success = True
+        result_message = "Max ammo increased!"
+
+    return transaction_success, result_message
+
+def reduce_refill_time(user):
+    result_message = "You already have the lowest refill time possible!"
+    transaction_success = False
+
+    if user.ammo_reloading_seconds > MIN_REFILL_TIME:
+        user.ammo_reloading_seconds -= REDUCE_REFILL_TIME
+        transaction_success = True
+        result_message = "Refill time decreased!"
+
+    return transaction_success, result_message
+
+def get_instant_ammo(user):
+    user.ammo += 1
+    transaction_success = True
+    result_message = "Received an ammo!"
+
+    return transaction_success, result_message
+
+def activate_profit(canvas_id):
+    transaction_success = False
+    result_message = ""
+    try:
+        canvas = Canvas.objects.get(id=canvas_id)
+        if not canvas.is_profit_on:
+            canvas.is_profit_on = True
+            canvas.save()
+            transaction_success = True
+            result_message = "Profit successfully enabled!"
+        else:
+            transaction_success = False
+            result_message = "The profit is already enabled"
+    except:
+        result_message = "Don't try to modify the html, you little b*stard"
+        transaction_success = False
 
     return transaction_success, result_message
 
@@ -427,6 +613,24 @@ def buy_with_pix(request, id):
             transaction_success, result_message = buy_color_pack(Colors_pack.objects.get(id=request.POST["pack_id"]), user)
         elif id == int(PixPriceNumType.RANDOM_COLOR):
             transaction_success, result_message = buy_random_color(user)
+        elif id == int(PixPriceNumType.UNLOCK_SLOT):
+            transaction_success, result_message = buy_slot(user)
+        elif id == int(PixPriceNumType.MAX_AMMO):
+            transaction_success, result_message = increase_max_ammo(user)
+        elif id == int(PixPriceNumType.REFILL_TIME):
+            transaction_success, result_message = reduce_refill_time(user)
+        elif id == int(PixPriceNumType.INSTANT_AMMO):
+            transaction_success, result_message = get_instant_ammo(user)
+        elif id == int(PixPriceNumType.CANVAS_PROFIT_ACTIVATION):
+            transaction_success, result_message = activate_profit(request.POST["canvas_id"])
+
+        res = [id]
+        if isinstance(result_message, (list,) ):
+            res.extend(result_message)
+        else:
+            res.append(result_message)
+
+        result_message = res
 
     else:
         result_message = "You do not have enough pix!"
@@ -435,4 +639,4 @@ def buy_with_pix(request, id):
         user.pix -= price
         user.save()
     
-    return JsonResponse({'Result' : result_message, 'UserPix' : user.pix}, safe=False)
+    return JsonResponse({'Result' : result_message, "TransactionSuccess" : transaction_success, 'UserPix' : user.pix, "Ammo" : user.ammo}, safe=False)

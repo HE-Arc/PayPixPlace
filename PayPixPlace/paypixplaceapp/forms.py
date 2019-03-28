@@ -21,12 +21,11 @@ class CreateCanvas(forms.ModelForm):
         super(CreateCanvas, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'POST'
-        self.helper.form_action = './'
         self.helper.layout = Layout(
             PrependedText('name', '<i class="fas fa-user"></i>'),
             PrependedText('theme', '<i class="fas fa-book"></i>'),
             PrependedText('width', '<i class="fas fa-arrows-alt-h"></i>'),
             'is_profit_on',
-            InlineRadios('place', css_class='p-0'),
+            InlineRadios('place', css_class='p-0', id="place"),
             StrictButton('Create Canvas', type='submit', css_class='btn-outline-info'),
         )
