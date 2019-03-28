@@ -4,6 +4,7 @@ let pixels;
 let scale;
 let canvasWidth;
 let displayGrid;
+let hideProtected;
 let pixelWidth;
 let canMove;
 let countMove;
@@ -13,10 +14,12 @@ let sidebarTrigger;
 let isSidebarHidden;
 let panZoomInstance;
 let mainLoop;
-let downloadButton;
 let mouseLastPos;
 let drawingColor;
 let isColoring;
+let selectedPixel;
+let hideProtectedCB;
+let lockImage;
 
 const CANVAS_PIXEL_WIDTH = 4000;
 
@@ -59,13 +62,23 @@ function drawPixels() {
     
     for (let x = 0 ; x < pixels.length ; x++) {
         for (let y = 0 ; y < pixels[x].length ; y++) {
-            ctx.fillStyle = pixels[x][y].hex;
-            ctx.fillRect(
-                x * pixelWidth, 
-                y * pixelWidth, 
-                pixelWidth,
-                pixelWidth
-            );    
+            if (hideProtected && pixels[x][y].timeLeft > 0) {
+                ctx.drawImage(
+                    lockImage,
+                    x * pixelWidth, 
+                    y * pixelWidth, 
+                    pixelWidth,
+                    pixelWidth
+                );
+            } else {
+                ctx.fillStyle = pixels[x][y].hex;
+                ctx.fillRect(
+                    x * pixelWidth, 
+                    y * pixelWidth, 
+                    pixelWidth,
+                    pixelWidth
+                );
+            }
         }
     }
 
@@ -122,15 +135,46 @@ function preventDefault(event) {
  * display new informations about the selected pixels
  * call without params to clear
  * @param {String} owner 
- * @param {String} protected 
+ * @param {String} timeLeft : number of seconds of protection left
  */
-function displayInfos(owner="", protected="") {
+function displayInfos(x,y) {
+    let pixel = getPixel(x,y);
     for (let i = 0 ; i < pixelInfoDisplay.owner.length ; i++) {
-        pixelInfoDisplay.owner[i].value = owner;
+        pixelInfoDisplay.owner[i].value = pixel.username;
     }
     for (let i = 0 ; i < pixelInfoDisplay.protected.length ; i++) {
-        pixelInfoDisplay.protected[i].value = protected;
+        if (pixel.timeLeft <= 0) {
+            protectedMsg = "Not protected";
+            pixelLocked.checked = false;
+            pixelLocked.disabled = false;
+        } else {
+            protectedMsg = secondsToTime(pixel.timeLeft);
+            pixelLocked.checked = true;
+            pixelLocked.disabled = true;
+        }
+        pixelInfoDisplay.protected[i].value = protectedMsg;
     }
+}
+
+/**
+ * Resets the info panel
+ */
+function cleanInfos() {
+    for (let i = 0 ; i < pixelInfoDisplay.owner.length ; i++) {
+        pixelInfoDisplay.owner[i].value = "";
+    }
+    for (let i = 0 ; i < pixelInfoDisplay.protected.length ; i++) {
+        pixelLocked.checked = false;
+        pixelLocked.enabled = true;
+        pixelInfoDisplay.protected[i].value = "";
+    }
+}
+/**
+ * Transforms a integer of seconds into a HH:MM:SS format
+ * @param {Integer} timeLeft 
+ */
+function secondsToTime(timeLeft) {
+    return parseInt(timeLeft/3600) + ":" + parseInt(timeLeft/60)%60 + ":" + timeLeft%60;
 }
 
 /**
@@ -247,19 +291,35 @@ function fillPixel(event=undefined) {
                 )
             } else {
                 if (data.user_authenticated) {
-                    $.notify(
-                        "Can't place pixel, next ammo in " + Math.round(timeRemaining) + " seconds", 
-                        {
-                            // whether to hide the notification on click
-                            clickToHide: true,
-                            // whether to auto-hide the notification
-                            autoHide: true,
-                            // if autoHide, hide after milliseconds
-                            autoHideDelay: 4000,
-                            position: "bottom right",
-                            gap: 2
-                        }
-                    );
+                    if (data.pixel_locked) {
+                        $.notify(
+                            "Pixel Protected, can't place", 
+                            {
+                                // whether to hide the notification on click
+                                clickToHide: true,
+                                // whether to auto-hide the notification
+                                autoHide: true,
+                                // if autoHide, hide after milliseconds
+                                autoHideDelay: 4000,
+                                position: "bottom right",
+                                gap: 2
+                            }
+                        );
+                    } else {
+                        $.notify(
+                            "Can't place pixel, next ammo in " + Math.round(timeRemaining) + " seconds", 
+                            {
+                                // whether to hide the notification on click
+                                clickToHide: true,
+                                // whether to auto-hide the notification
+                                autoHide: true,
+                                // if autoHide, hide after milliseconds
+                                autoHideDelay: 4000,
+                                position: "bottom right",
+                                gap: 2
+                            }
+                        );
+                    }
                 } else {
                     $.notify(
                         "You need to login before placing pixels", 
@@ -320,12 +380,8 @@ function selectPixel(event) {
         return;
     }
     
-    let pixel = getPixel(x,y);
-    if (pixel != null) {
-        displayInfos(pixel.username, pixel.timeLeft);
-    } else {
-        displayInfos();
-    }
+    displayInfos(x, y);
+    
     selectedPixel = {
         x : x,
         y : y
@@ -409,11 +465,9 @@ function initEvents() {
         );
     });
 
-    downloadButton.addEventListener("click", function() {
-        let link = document.createElement("a");
-        link.download = canvasName;
-        link.href = "/canvas/" + canvasId + "/img";
-        link.click();
+    hideProtectedCB.addEventListener("click", function() {
+        hideProtected = this.checked;
+        drawPixels();
     });
 }
 
@@ -429,10 +483,11 @@ function initParams() {
 
     isSidebarHidden = false;
     sidebarTrigger = document.getElementById("sidebarTrigger");
-    downloadButton = document.getElementById("downloadButton");
     
     canvasContainer = document.getElementById("canvasContainer");
-
+    hideProtectedCB = document.getElementById("hideProtectedCB");
+    lockImage = document.getElementById("lockImage");
+    hideProtected = false;
     pixelInfoDisplay = {
         owner : document.getElementsByClassName("pixelOwner"),
         protected : document.getElementsByClassName("pixelProtected"),
@@ -514,6 +569,9 @@ $(document).ready(function(){
 
     mainLoop = setInterval(function() {
         loadPixels();
+        if (selectedPixel) {
+            displayInfos(selectedPixel.x,selectedPixel.y);
+        }
     }, 4000)
     
     loadPixels();

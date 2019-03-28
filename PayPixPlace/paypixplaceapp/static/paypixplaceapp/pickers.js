@@ -1,7 +1,7 @@
 let pickers;
 let currentSlot;
 let selectCB;
-let selectedPixel;
+let pixelLocked;
 
 /**
  * Change the current slot
@@ -84,7 +84,37 @@ function setDrawingColor(id) {
     }
 
     isColoring = true;
+    selectCB.checked = false;
     setCursor();
+    $("#selectionToolbox").hide();
+    selectedPixel = null;
+    drawPixels();
+}
+
+/**
+ * Locks a pixel in the canvas
+ * @param {Integer} x 
+ * @param {Integer} y 
+ */
+function lockPixel(x,y) {
+    $.ajax({
+        type: "POST",
+        url: "/lock_pixel/",
+        data: {
+            canvas_id : canvasId,
+            x : x,
+            y : y
+        },
+        dataType: "json",
+        success: function(data) {
+            if (data.is_valid) {
+                loadPixels();
+                pixelLocked.checked = true;
+                pixelLocked.disabled = true;
+                displayInfos(x,y);
+            }
+        }
+    });
 }
 
 
@@ -122,7 +152,15 @@ $(document).ready(function(){
         setCursor();
         $("#selectionToolbox").slideToggle();
         selectedPixel = null;
+        cleanInfos();
         drawPixels();
     });
     selectedPixel = null;
+
+    pixelLocked = document.getElementById("pixelLocked");
+    pixelLocked.addEventListener("click", function() {
+        if (selectedPixel && !this.disabled) {
+            lockPixel(selectedPixel.x, selectedPixel.y);
+        }
+    });
 });

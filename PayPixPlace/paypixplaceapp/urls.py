@@ -18,4 +18,5 @@ urlpatterns = [
     path('buy/<int:id>', views.buy_with_pix, name='buy-element'),
     path('ammo/', views.get_user_ammo, name="ammo"),
     path('cursor/<str:hex>/', views.get_cursor, name="cursor"),
+    path('lock_pixel/', views.lock_pixel, name="lock-pixel"),
 ]

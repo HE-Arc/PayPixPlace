@@ -48,7 +48,7 @@ class Pixel(models.Model):
     x = models.IntegerField()
     y = models.IntegerField()
     hex = models.CharField(max_length=9)
-    end_protection_date = models.DateField(null=True)
+    end_protection_date = models.DateTimeField(blank=True, null=True)
     canvas = models.ForeignKey(Canvas, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True) 
 
