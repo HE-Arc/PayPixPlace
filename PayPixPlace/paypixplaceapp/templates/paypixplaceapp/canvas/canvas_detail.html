@@ -172,7 +172,9 @@
                 </div>
                 <div class="modal-footer">
                     <button id="lockPixelButton" type="button" class="btn btn-outline-dark ppp-btn-lg" data-dismiss="modal">
-                        Lock Pixel for <span id="lockPrice"></span>
+                        {% with price=prices|get_item:11 %}
+                        Lock Pixel for <span id="lockPrice">{{ price.price }}</span>
+                        {% endwith %}
                         <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                     </button>
                     <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
