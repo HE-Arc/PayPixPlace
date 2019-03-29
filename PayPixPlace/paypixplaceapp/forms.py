@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout
+from crispy_forms.layout import Layout, Div
 from crispy_forms.bootstrap import InlineRadios, PrependedText, StrictButton
 from .models import Canvas
 
@@ -27,5 +27,6 @@ class CreateCanvas(forms.ModelForm):
             PrependedText('width', '<i class="fas fa-arrows-alt-h"></i>'),
             'is_profit_on',
             InlineRadios('place', css_class='p-0', id="place"),
-            StrictButton('Create Canvas', type='submit', css_class='btn-outline-info'),
+            Div(css_class="ppp-hr-gray mb-3"),
+            Div(StrictButton('Create Canvas', type='submit', css_class='btn btn-dark ppp-btn-lg'), css_class="text-right"),
         )
