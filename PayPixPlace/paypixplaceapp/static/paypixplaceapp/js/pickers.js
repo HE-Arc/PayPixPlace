@@ -103,7 +103,8 @@ function lockPixel(x,y) {
         data: {
             canvas_id : canvasId,
             x : x,
-            y : y
+            y : y,
+            duration_id : 11
         },
         dataType: "json",
         success: function(data) {
@@ -112,6 +113,35 @@ function lockPixel(x,y) {
                 pixelLocked.checked = true;
                 pixelLocked.disabled = true;
                 displayInfos(x,y);
+                $.notify(
+                    data.result_message,
+                    {
+                        className : "success",
+                        // whether to hide the notification on click
+                        clickToHide: true,
+                        // whether to auto-hide the notification
+                        autoHide: true,
+                        // if autoHide, hide after milliseconds
+                        autoHideDelay: 4000,
+                        position: "bottom right",
+                        gap: 2
+                    }
+                );
+            } else {
+                $.notify(
+                    data.result_message,
+                    {
+                        className : "error",
+                        // whether to hide the notification on click
+                        clickToHide: true,
+                        // whether to auto-hide the notification
+                        autoHide: true,
+                        // if autoHide, hide after milliseconds
+                        autoHideDelay: 4000,
+                        position: "bottom right",
+                        gap: 2
+                    }
+                );
             }
         }
     });

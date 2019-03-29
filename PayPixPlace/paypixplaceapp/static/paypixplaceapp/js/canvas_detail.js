@@ -288,7 +288,7 @@ function fillPixel(event=undefined) {
                         position: "bottom right",
                         gap: 2
                     }
-                )
+                );
             } else {
                 if (data.user_authenticated) {
                     if (data.pixel_locked) {
