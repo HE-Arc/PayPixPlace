@@ -723,7 +723,7 @@ def lock_with_pix(user, id, canvas):
     if transaction_success:
         user.pix -= price
         user.save()
-        if canvas.is_profit_on:
+        if canvas.is_profit_on and user != canvas.user:
             canvas.user.pix += int(price * PROFIT_POURCENT)
             canvas.user.save()
 
