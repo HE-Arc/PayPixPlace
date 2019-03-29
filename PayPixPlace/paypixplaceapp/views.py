@@ -29,6 +29,8 @@ MAX_PLAYER_AMMO = 20
 MIN_REFILL_TIME = 10
 REDUCE_REFILL_TIME = 5
 
+PROFIT_POURCENT = 0.1
+
 @register.filter
 def get_item(dictionary, key):
     """Used to get a dictionary value based on its key on the template"""
@@ -57,6 +59,11 @@ class PixPriceNumType(IntEnum):
     INSTANT_AMMO = 7
     CANVAS_PROFIT_CREATION = 8
     CANVAS_PROFIT_ACTIVATION = 9
+    LOCK5MINS = 10
+    LOCK1HOUR = 11
+    LOCK6HOURS = 12
+    LOCK12HOURS = 13
+    LOCK24HOURS = 14
 
 def get_highest_title_num(user):
     """Return the highest title of the player"""
@@ -88,7 +95,7 @@ def home(request):
     context = {
         'title': 'Home',
         'prices': get_pix_price(),
-        # 'colors_pack': Colors_pack.objects.all(),
+        'colors_pack': Colors_pack.objects.all(),
         'user_title_num': pixie_num,
         'user_title': user_title
     }
@@ -105,7 +112,7 @@ class CommunityCanvasView(ListView):
         # Add in a QuerySet of all the books
         context['title'] = 'Community Canvas'
         context['prices'] = get_pix_price()
-        # context['colors_pack'] = Colors_pack.objects.all()
+        context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
         return context
 
@@ -120,7 +127,7 @@ class OfficialCanvasView(ListView):
         # Add in a QuerySet of all the books
         context['title'] = 'Official Canvas'
         context['prices'] = get_pix_price()
-        # context['colors_pack'] = Colors_pack.objects.all()
+        context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.OFFICIAL)
         return context
 
@@ -143,13 +150,13 @@ class CanvasDetailsView(DetailView):
 
         context['place_text'] = place_text
         context['prices'] = get_pix_price()
-        # context['colors_pack'] = Colors_pack.objects.all()
+        context['colors_pack'] = Colors_pack.objects.all()
         return context
 
 def getCanvas(page, place):
     """Return canvas list on the specified page for the specified place (community or official)"""
     canvas_list = Canvas.objects.filter(place=int(place))
-    paginator = Paginator(canvas_list, 6)
+    paginator = Paginator(canvas_list, 3)
     canvas = paginator.get_page(page)
     for c in canvas:
         c.pixels = Pixel.objects.filter(canvas=c.id)
@@ -208,7 +215,7 @@ def createCanvas(request):
 @login_required
 def userCanvas(request):
     canvas_list = Canvas.objects.filter(user=request.user)
-    paginator = Paginator(canvas_list, 6)
+    paginator = Paginator(canvas_list, 3)
     canvas = paginator.get_page(request.GET.get('page'))
 
     context = {
@@ -270,28 +277,34 @@ def change_user_slot_color(request):
 def lock_pixel(request):
     """Locks a pixel for a given time, becoming only modifiable by the owner"""
     modification_valid = False
+    result_message = "Request Invalid"
     if request.user.is_authenticated:
         if request.is_ajax():
             if request.method == 'POST':
                 canvas_id = request.POST['canvas_id']
                 x = request.POST['x']
                 y = request.POST['y']
+                duration_id = int(request.POST['duration_id'])
                 user = request.user
-                #TODO make the user pay the price
-
-                pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
-                pixel.user = user
-                pixel.end_protection_date = timezone.now() + timedelta(hours=1)
-                pixel.save()
-                modification_valid = True
+                canvas = Canvas.objects.get(id=canvas_id)
+                transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id, canvas) # duration_id from 10 to 14
+                
+                if transaction_success:
+                    pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
+                    pixel.user = user
+                    pixel.end_protection_date = timezone.now() + timedelta(minutes=minutes, hours=hours)
+                    pixel.save()
+                    modification_valid = True
     data = {
-        'is_valid' : modification_valid
+        'is_valid' : modification_valid,
+        'result_message' : result_message
     }
     return JsonResponse(data)
 
 def change_pixel_color(request):
     """Changes the color of one pixel of a canvas, if the user have the rights to do so"""
     modification_valid = False
+    pixel_locked = False
     if request.user.is_authenticated:
         if request.is_ajax():
             if request.method == 'POST':
@@ -696,3 +709,43 @@ def buy_with_pix(request, id):
         user.save()
     
     return JsonResponse({'Result' : result_message, "TransactionSuccess" : transaction_success, 'UserPix' : user.pix, "Ammo" : user.ammo}, safe=False)
+
+def lock_with_pix(user, id, canvas):
+    """Makes a user pay a price for locking a pixel"""
+    price = PixPrice.objects.get(num_type=id).price
+
+    result_message = ""
+    transaction_success = False
+    minutes = 0
+    hours = 0
+
+    if user_has_enough_pix(user, price):
+        transaction_success = True
+        if id == int(PixPriceNumType.LOCK5MINS):
+            result_message = "Pixel locked for 5 minutes" 
+            minutes = 5
+        elif id == int(PixPriceNumType.LOCK1HOUR):
+            result_message = "Pixel locked for 1 hour"
+            hours = 1
+        elif id == int(PixPriceNumType.LOCK6HOURS):
+            result_message = "Pixel locked for 6 hours"
+            hours = 6
+        elif id == int(PixPriceNumType.LOCK12HOURS):
+            result_message = "Pixel locked for 12 hours"
+            hours = 12
+        elif id == int(PixPriceNumType.LOCK24HOURS):
+            result_message = "Pixel locked for 24 hours"
+            hours = 24
+        else:
+            transaction_success = False
+    else:
+        result_message = "You do not have enough pix!"
+    
+    if transaction_success:
+        user.pix -= price
+        user.save()
+        if canvas.is_profit_on and user != canvas.user:
+            canvas.user.pix += int(price * PROFIT_POURCENT)
+            canvas.user.save()
+
+    return transaction_success, result_message, minutes, hours

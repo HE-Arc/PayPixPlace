@@ -17,7 +17,7 @@
                         <p class="card-text mt-0">
                             {{ pixie.number }} + {{ pixie.bonus }} bonus PIX
                         </p>
-                        <button id='{{ pixie.num_type }}' type="submit" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                        <button id='{{ pixie.num_type }}' type="submit" class="btn btn-outline-dark ppp-btn-lg">
                             {{ pixie.number|add:pixie.bonus }}
                             <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                         </button>
@@ -37,14 +37,32 @@
                         <p class="card-text mt-0">
                             {{ pixie.number }} + {{ pixie.bonus }} bonus PIX
                         </p>
-                        <button id='{{ pixie.num_type }}' type="submit" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                        <button id='{{ pixie.num_type }}' type="submit" class="btn btn-outline-dark ppp-btn-lg">
                             {{ pixie.number|add:pixie.bonus }}
                             <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                         </button>
                     </div>
                 </div>
             </div>
-            {% else %}
+            {% elif pixie.num_type == 2 %}
+            <div class="col-md-6 p-3">
+                <div class="card text-center p-0">
+                    <div class="card-header ppp-purchase-header-md">
+                        <h2 class="ppp-purchase-title m-0 font-weight-bold">{{ pixie.title }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mb-3 font-weight-bold">{{ pixie.price }} CHF</h5>
+                        <p class="card-text mt-0">
+                            {{ pixie.number }} + {{ pixie.bonus }} bonus PIX
+                        </p>
+                        <button id='{{ pixie.num_type }}' type="submit" class="btn btn-outline-dark ppp-btn-lg">
+                            {{ pixie.number|add:pixie.bonus }}
+                            <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% elif pixie.num_type == 1 %}
             <div class="col-md-6 p-3">
                 <div class="card text-center p-0">
                     <div class="card-header ppp-purchase-header-md">
@@ -55,7 +73,7 @@
                         <p class="card-text mt-0">
                             {{ pixie.number }} + {{ pixie.bonus }} bonus PIX
                         </p>
-                        <button id='{{ pixie.num_type }}' type="submit" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                        <button id='{{ pixie.num_type }}' type="submit" class="btn btn-outline-dark ppp-btn-lg">
                             {{ pixie.number|add:pixie.bonus }}
                             <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
                         </button>
@@ -78,5 +96,5 @@
         {% endfor %}
     </script>
     
-    <script type="text/javascript" src="{% static 'paypixplaceapp/payment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/js/payment.js' %}"></script>
 {% endblock content %}

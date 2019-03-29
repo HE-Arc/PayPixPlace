@@ -17,11 +17,11 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold" name="btn-confirm-profit" data-dismiss="modal" data-canvas-id="{{ c.id }}">
+                            <button type="button" class="btn btn-success ppp-btn-md font-weight-bold" name="btn-confirm-profit" data-dismiss="modal" data-canvas-id="{{ c.id }}">
                                 Confirm
                             </button>
 
-                            <button type="button" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold" name="btn-close-profit" data-dismiss="modal" data-canvas-id="{{ c.id }}">
+                            <button type="button" class="btn btn-danger ppp-btn-md font-weight-bold" name="btn-close-profit" data-dismiss="modal" data-canvas-id="{{ c.id }}">
                                 Cancel
                             </button>
                         </div>
@@ -72,12 +72,12 @@
         {% endfor %}
     </div>
 
-    <div class="fixed-bottom container mb-3">
+    <div class="fixed-bottom container mb-1">
         <div class="pagination">
             <span class="step-links">
                 {% if canvas.has_previous %}
-                    <a role="button" href="?page=1" class="btn btn-outline-dark">&laquo; first</a>
-                    <a role="button" href="?page={{ canvas.previous_page_number }}" class="btn btn-outline-dark">previous</a>
+                    <a role="button" href="?page=1" class="btn btn-dark btn-sm ppp-btn-md">&laquo; first</a>
+                    <a role="button" href="?page={{ canvas.previous_page_number }}" class="btn btn-dark btn-sm ppp-btn-md">previous</a>
                 {% endif %}
         
                 <span class="current font-weight-bold">
@@ -85,12 +85,12 @@
                 </span>
         
                 {% if canvas.has_next %}
-                    <a role="button" href="?page={{ canvas.next_page_number }}" class="btn btn-outline-dark">next</a>
-                    <a role="button" href="?page={{ canvas.paginator.num_pages }}" class="btn btn-outline-dark">last &raquo;</a>
+                    <a role="button" href="?page={{ canvas.next_page_number }}" class="btn btn-dark btn-sm ppp-btn-md">next</a>
+                    <a role="button" href="?page={{ canvas.paginator.num_pages }}" class="btn btn-dark btn-sm ppp-btn-md">last &raquo;</a>
                 {% endif %}
             </span>
         </div>
     </div>
     
-    <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_profit.js' %}"></script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/js/canvas_profit.js' %}"></script>
 {% endblock content %}

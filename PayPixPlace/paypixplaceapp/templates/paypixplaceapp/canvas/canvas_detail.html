@@ -2,8 +2,8 @@
 {% load staticfiles %}
 {% block content %}
     
-    <script type="text/javascript" src="{% static 'paypixplaceapp/panzoom.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/libraries/panzoom.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/js/canvas_detail.js' %}"></script>
     
     <div id="sidebarContainer" class="ppp-sidebar-container">
 
@@ -19,7 +19,7 @@
             <div class="card-body">
                 <ul class="list-group list-group-flush">
                     {% if user.is_authenticated %}
-                    <script src="{% static 'paypixplaceapp/pickers.js' %}"></script>
+                    <script src="{% static 'paypixplaceapp/js/pickers.js' %}"></script>
                     <li class="list-group-item text-white bg-dark">
                         <div class="row">
                             <div class="col-6 mb-3 p-0">
@@ -52,12 +52,9 @@
                                 <input type="text" class="form-control font-weight-bold pixelOwner" disabled>
                             </div>
                             <div class="form-group">
-                                <label for="canvasTheme" class="font-weight-bold">Pixel Protection</label>
+                                <label for="canvasTheme" class="font-weight-bold">Pixel Protection  <i id="pixelLocked" class="fas fa-lock-open"></i></label>
                                 <input type="text" class="form-control font-weight-bold pixelProtected" disabled>
-                                <label class="switch m-0">
-                                    <input id="pixelLocked" type="checkbox" class="default">
-                                    <span class="slider round"></span>
-                                </label>
+                                <button id="lockModalButton" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target=".lock-pixel-modal">Lock Pixel</button>
                             </div>
                         </div>
                     </li>
@@ -90,7 +87,7 @@
                         <button class="btn btn-md btn-outline-info d-inline" data-toggle="modal" data-target=".canvas-control-modal">
                             <i class="fas fa-info-circle ppp-canvas-control"></i>
                         </button>
-                        <a id="downloadButton" class="btn btn-lg btn-outline-info d-inline" href="{% url 'canvas-img' id=object.id %}" download>
+                        <a id="downloadButton" class="btn btn-lg btn-outline-info d-inline" href="{% url 'canvas-img' id=object.id %}" download="{{ object.name }}">
                             <i class="fas fa-file-download ppp-canvas-control"></i>
                         </a>                        
                     </li>
@@ -133,15 +130,30 @@
     
     {% if user.is_authenticated %}
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <div class="modal-body" style="display: inline-block;">
+                <div class="modal-body text-center">
                     {% for color in user.owns.all %}
                         <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeSlotColor('{{ color.hex }}')"></div>
                     {% endfor %}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lock-pixel-modal" class="modal fade lock-pixel-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <h3>Lock Pixel for a given duration</h3>
+                    <input type="range" min="10" max="14" step="1" value="11">
+                </div>
+                <div class="modal-footer">
+                    <button id="lockPixelButton" type="button" class="btn btn-success ppp-btn-lg" data-dismiss="modal">Lock Pixel</button>
+                    <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -149,38 +161,36 @@
     {% endif %}
 
     <div id="canvas-control-modal" class="modal fade canvas-control-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <div class="modal-body" style="display: inline-block;">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <label class="font-weight-bold">Canvas Controls</label>
-                            <ul class="pl-3 text-left">
-                                <li>Hold left click to move the canvas</li>
-                                <li>Use mousewheel or fingers to zoom</li>
-                                <li>Click/Touch to change the color of a pixel</li>    
-                            </ul>
-                        </li>
+                <div class="modal-body">
+                    <label class="font-weight-bold">Canvas Controls</label>
+                    <ul class="pl-3 text-left">
+                        <li>Hold left click to move the canvas</li>
+                        <li>Use mousewheel or fingers to zoom</li>
+                        <li>Click/Touch to change the color of a pixel</li>    
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
+
     <img id="lockImage" src="{% static 'paypixplaceapp/images/lock.png' %}" style="display:none" />
+
     <script>
         window.CSRF_TOKEN = "{{ csrf_token }}";
         const canvasId = "{{ object.id }}";
         const canvasName = "{{ object.name }}";
         {% if user.is_authenticated %}
-        const userId = "{{ user.id }}";
+            const userId = "{{ user.id }}";
 
-        colors = [];
-        {% for slot in slots %}
-            colors.push('{{ slot.color.hex }}')
-        {% endfor %}
+            colors = [];
+            {% for slot in slots %}
+                colors.push('{{ slot.color.hex }}')
+            {% endfor %}
         {% endif %}
     </script>
     

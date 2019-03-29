@@ -2,6 +2,8 @@ let pickers;
 let currentSlot;
 let selectCB;
 let pixelLocked;
+let lockPixelButton
+let lockModalButton;
 
 /**
  * Change the current slot
@@ -103,15 +105,44 @@ function lockPixel(x,y) {
         data: {
             canvas_id : canvasId,
             x : x,
-            y : y
+            y : y,
+            duration_id : 11
         },
         dataType: "json",
         success: function(data) {
             if (data.is_valid) {
                 loadPixels();
-                pixelLocked.checked = true;
-                pixelLocked.disabled = true;
-                displayInfos(x,y);
+                pixelLocked.removeClass("fa-lock-open");
+                pixelLocked.addClass("fa-lock");
+                $.notify(
+                    data.result_message,
+                    {
+                        className : "success",
+                        // whether to hide the notification on click
+                        clickToHide: true,
+                        // whether to auto-hide the notification
+                        autoHide: true,
+                        // if autoHide, hide after milliseconds
+                        autoHideDelay: 4000,
+                        position: "bottom right",
+                        gap: 2
+                    }
+                );
+            } else {
+                $.notify(
+                    data.result_message,
+                    {
+                        className : "error",
+                        // whether to hide the notification on click
+                        clickToHide: true,
+                        // whether to auto-hide the notification
+                        autoHide: true,
+                        // if autoHide, hide after milliseconds
+                        autoHideDelay: 4000,
+                        position: "bottom right",
+                        gap: 2
+                    }
+                );
             }
         }
     });
@@ -152,13 +183,19 @@ $(document).ready(function(){
         setCursor();
         $("#selectionToolbox").slideToggle();
         selectedPixel = null;
+        pixelLocked.removeClass("fa-lock-open");
+        pixelLocked.removeClass("fa-lock");
         cleanInfos();
         drawPixels();
     });
     selectedPixel = null;
 
-    pixelLocked = document.getElementById("pixelLocked");
-    pixelLocked.addEventListener("click", function() {
+    pixelLocked = $("#pixelLocked");
+    lockModalButton = $("#lockModalButton");
+    lockModalButton.hide();
+
+    lockPixelButton = document.getElementById("lockPixelButton");
+    lockPixelButton.addEventListener("click", function() {
         if (selectedPixel && !this.disabled) {
             lockPixel(selectedPixel.x, selectedPixel.y);
         }
