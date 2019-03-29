@@ -29,6 +29,8 @@ MAX_PLAYER_AMMO = 20
 MIN_REFILL_TIME = 10
 REDUCE_REFILL_TIME = 5
 
+PROFIT_POURCENT = 0.1
+
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
@@ -275,8 +277,8 @@ def lock_pixel(request):
                 y = request.POST['y']
                 duration_id = int(request.POST['duration_id'])
                 user = request.user
-                
-                transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id) # duration_id from 10 to 14
+                canvas = Canvas.objects.get(id=canvas_id)
+                transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id, canvas) # duration_id from 10 to 14
                 
                 if transaction_success:
                     pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
@@ -687,7 +689,7 @@ def buy_with_pix(request, id):
     
     return JsonResponse({'Result' : result_message, "TransactionSuccess" : transaction_success, 'UserPix' : user.pix, "Ammo" : user.ammo}, safe=False)
 
-def lock_with_pix(user, id):
+def lock_with_pix(user, id, canvas):
     """Makes a user pay a price for locking a pixel"""
     price = PixPrice.objects.get(num_type=id).price
 
@@ -721,5 +723,8 @@ def lock_with_pix(user, id):
     if transaction_success:
         user.pix -= price
         user.save()
+        if canvas.is_profit_on:
+            canvas.user.pix += int(price * PROFIT_POURCENT)
+            canvas.user.save()
 
     return transaction_success, result_message, minutes, hours

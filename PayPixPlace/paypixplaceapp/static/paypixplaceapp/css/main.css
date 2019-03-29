@@ -230,7 +230,7 @@ html, body {
 }
 
 .canvas-img {
-    background-image: url("images/loader.gif");
+    background-image: url("../images/loader.gif");
     background-repeat: no-repeat;
     background-size: 30%;
     background-position: center;
