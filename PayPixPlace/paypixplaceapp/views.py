@@ -126,7 +126,7 @@ class CommunityCanvasView(ListView):
         # Add in a QuerySet of all the books
         context['title'] = 'Community Canvas'
         context['prices'] = get_pix_price()
-        context['colors_pack'] = Colors_pack.objects.all()
+        context['colors_pack'] = Colors_pack.objects.all().prefetch_related('contains')
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
         return context
 
@@ -141,7 +141,7 @@ class OfficialCanvasView(ListView):
         # Add in a QuerySet of all the books
         context['title'] = 'Official Canvas'
         context['prices'] = get_pix_price()
-        context['colors_pack'] = Colors_pack.objects.all()
+        context['colors_pack'] = Colors_pack.objects.all().prefetch_related('contains')
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.OFFICIAL)
         return context
 
@@ -164,7 +164,7 @@ class CanvasDetailsView(DetailView):
 
         context['place_text'] = place_text
         context['prices'] = get_pix_price()
-        context['colors_pack'] = Colors_pack.objects.all()
+        context['colors_pack'] = Colors_pack.objects.all().prefetch_related('contains')
         return context
 
 def getCanvas(page, place):
@@ -679,7 +679,7 @@ def activate_profit(canvas_id):
 
     return transaction_success, result_message
 
-def buy_with_pix(request, id):
+def buy_with_pix(request, id): 
     """Handle the purchase with pix"""
     user = request.user
     price = PixPrice.objects.get(num_type=id).price
