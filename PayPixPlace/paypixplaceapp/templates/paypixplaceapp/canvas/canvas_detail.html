@@ -2,8 +2,8 @@
 {% load staticfiles %}
 {% block content %}
     
-    <script type="text/javascript" src="{% static 'paypixplaceapp/panzoom.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'paypixplaceapp/canvas_detail.js' %}"></script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/libraries/panzoom.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'paypixplaceapp/js/canvas_detail.js' %}"></script>
     
     <div id="sidebarContainer" class="ppp-sidebar-container">
 
@@ -19,7 +19,7 @@
             <div class="card-body">
                 <ul class="list-group list-group-flush">
                     {% if user.is_authenticated %}
-                    <script src="{% static 'paypixplaceapp/pickers.js' %}"></script>
+                    <script src="{% static 'paypixplaceapp/js/pickers.js' %}"></script>
                     <li class="list-group-item text-white bg-dark">
                         <div class="row">
                             <div class="col-6 mb-3 p-0">
@@ -175,12 +175,12 @@
         const canvasId = "{{ object.id }}";
         const canvasName = "{{ object.name }}";
         {% if user.is_authenticated %}
-        const userId = "{{ user.id }}";
+            const userId = "{{ user.id }}";
 
-        colors = [];
-        {% for slot in slots %}
-            colors.push('{{ slot.color.hex }}')
-        {% endfor %}
+            colors = [];
+            {% for slot in slots %}
+                colors.push('{{ slot.color.hex }}')
+            {% endfor %}
         {% endif %}
     </script>
     
