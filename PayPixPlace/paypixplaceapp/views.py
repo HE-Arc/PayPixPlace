@@ -32,6 +32,20 @@ REDUCE_REFILL_TIME = 5
 PROFIT_POURCENT = 0.1
 
 @register.filter
+def div( value, arg ):
+    '''
+    Divides the value; argument is the divisor.
+    Returns empty string on any error.
+    Source : https://stackoverflow.com/questions/5848967/django-how-to-do-calculation-inside-the-template-html-page
+    '''
+    try:
+        value = int( value )
+        arg = int( arg )
+        if arg: return int(value / arg)
+    except: pass
+    return ''
+
+@register.filter
 def get_item(dictionary, key):
     """Used to get a dictionary value based on its key on the template"""
     return dictionary.get(key)
@@ -585,7 +599,6 @@ def buy_slot(user):
         Slot.objects.create(place_num= last_slot_number + 1, user=user, color=user.owns.first())
         result_message = "Slot successfully added"
         transaction_success = True
-
     else:
          result_message = "You can't buy anymore slots!"
 
