@@ -58,7 +58,7 @@ def profile(request):
         'title': 'Profile',
         'form': form,
         'prices': get_pix_price(),
-        'colors_pack': Colors_pack.objects.all(),
+        'colors_pack': Colors_pack.objects.all().prefetch_related('contains'),
     }
     return render(request, 'users/profile.html', context)
 

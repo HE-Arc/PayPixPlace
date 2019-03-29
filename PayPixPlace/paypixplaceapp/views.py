@@ -238,7 +238,7 @@ def createCanvas(request):
         'title': 'Create Canvas',
         'form': form,
         'prices': get_pix_price(),
-        'colors_pack': Colors_pack.objects.all(),
+        'colors_pack': Colors_pack.objects.all().prefetch_related('contains'),
     }
 
     return render(request, 'paypixplaceapp/canvas/create_canvas.html', context)
@@ -253,7 +253,7 @@ def userCanvas(request):
         'title': 'User\'s Canvas',
         'canvas': canvas,
         'prices': get_pix_price(),
-        'colors_pack': Colors_pack.objects.all(),
+        'colors_pack': Colors_pack.objects.all().prefetch_related('contains'),
     }
     return render(request, 'paypixplaceapp/canvas/user_canvas.html', context)
 
@@ -267,7 +267,7 @@ def purchase(request):
         'title': 'Purchase PIX',
         'pixies': get_pixies_info(),
         'prices': get_pix_price(),
-        'colors_pack': Colors_pack.objects.all(),
+        'colors_pack': Colors_pack.objects.all().prefetch_related('contains'),
     }
     return render(request, 'paypixplaceapp/purchase_pix.html', context)
       
