@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column
+from crispy_forms.layout import Layout, Row, Column, Div, HTML
 from crispy_forms.bootstrap import PrependedText, StrictButton
 from paypixplaceapp.models import User
 
@@ -32,7 +32,8 @@ class RegisterForm(UserCreationForm):
             PrependedText('email', '<i class="fas fa-at"></i>'),
             PrependedText('password1', '<i class="fas fa-key"></i>'),
             PrependedText('password2', '<i class="fas fa-lock"></i>'),
-            StrictButton('Register', type='submit', css_class='btn-outline-info mb-3'),
+            Div(css_class="ppp-hr-gray mb-3"),
+            Div(StrictButton('Register', type='submit', css_class='btn btn-dark ppp-btn-lg'), css_class="text-right"),
         )
 
 class UpdateForm(forms.ModelForm):
@@ -60,7 +61,8 @@ class UpdateForm(forms.ModelForm):
                 css_class='row'
             ),
             PrependedText('email', '<i class="fas fa-at"></i>'),
-            StrictButton('Update', type='submit', css_class='btn-outline-info mb-3'),
+            Div(css_class="ppp-hr-gray mb-3"),
+            Div(StrictButton('Update', type='submit', css_class='btn btn-dark ppp-btn-lg'), css_class="text-right"),
         )
 
 class LoginForm(AuthenticationForm):
@@ -76,5 +78,6 @@ class LoginForm(AuthenticationForm):
         self.helper.layout = Layout(
             PrependedText('username', '<i class="fas fa-user"></i>'),
             PrependedText('password', '<i class="fas fa-key"></i>'),
-            StrictButton('Login', type='submit', css_class='btn-outline-info mb-3'),
+            Div(css_class="ppp-hr-gray mb-3"),
+            Div(StrictButton('Login', type='submit', css_class='btn btn-dark ppp-btn-lg'), css_class="text-right"),
         )

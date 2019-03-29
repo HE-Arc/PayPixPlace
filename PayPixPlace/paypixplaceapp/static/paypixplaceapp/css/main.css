@@ -1,6 +1,7 @@
 #canvas {
     cursor: pointer;
 }
+
 #ammoProgressbar {
     position: relative;
     left : 5px;
@@ -45,20 +46,28 @@ html, body {
 }
 
 .ppp-hr {
-    color: #3a3a3a;
     background-color: #3a3a3a;
     height: 1px;
 }
 
-.ppp-btn-rounded {
+.ppp-hr-gray {
+    background-color: #dee2e6;
+    height: 1px;
+}
+
+.ppp-btn-lg {
     border-radius: 0.8em;
     border: 0em solid rgb(54, 54, 54);
     font-size: 1.5em;
     box-shadow: #3a3a3a 0em 0em 0.3em;
+    font-weight: bold;
 }
 
-.ppp-btn-sm {
-    font-size: 1em;
+.ppp-btn-md {
+    border-radius: 0.8em;
+    border: 0em solid rgb(54, 54, 54);
+    box-shadow: #3a3a3a 0em 0em 0.3em;
+    font-weight: bold;
 }
 
 .ppp-color-case {
