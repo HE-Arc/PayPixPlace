@@ -40,11 +40,27 @@ class UpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = (
-            'username',
-            'email',
-            'first_name',
-            'last_name'
+        fields = ( 'username', 'email', 'first_name', 'last_name' )
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'POST'
+        self.helper.layout = Layout(
+            PrependedText('username', '<i class="fas fa-user"></i>'),
+            Row(
+                Column(
+                    PrependedText('first_name', '<i class="fas fa-user-tag"></i>'),
+                    css_class='col-md-6'
+                ),
+                Column(
+                    PrependedText('last_name', '<i class="fas fa-user-tag"></i>'),
+                    css_class='col-md-6'
+                ),
+                css_class='row'
+            ),
+            PrependedText('email', '<i class="fas fa-at"></i>'),
+            StrictButton('Update', type='submit', css_class='btn-outline-info mb-3'),
         )
 
 class LoginForm(AuthenticationForm):
