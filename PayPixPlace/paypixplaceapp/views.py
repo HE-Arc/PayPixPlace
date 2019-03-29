@@ -32,11 +32,27 @@ REDUCE_REFILL_TIME = 5
 PROFIT_POURCENT = 0.1
 
 @register.filter
+def div( value, arg ):
+    '''
+    Divides the value; argument is the divisor.
+    Returns empty string on any error.
+    Source : https://stackoverflow.com/questions/5848967/django-how-to-do-calculation-inside-the-template-html-page
+    '''
+    try:
+        value = int( value )
+        arg = int( arg )
+        if arg: return int(value / arg)
+    except: pass
+    return ''
+
+@register.filter
 def get_item(dictionary, key):
+    """Used to get a dictionary value based on its key on the template"""
     return dictionary.get(key)
 
 @register.filter
 def get_pix_price():
+    """Return a dictionary containing the prices"""
     pix_prices = PixPrice.objects.all()
     prices = {}
     for price in pix_prices:
@@ -77,6 +93,7 @@ class PixPriceNumType(IntEnum):
     LOCK24HOURS = 14
 
 def get_highest_title_num(user):
+    """Return the highest title of the player"""
     purchases = Purchase.objects.filter(user=user)
     num = 0
     max_id = 0
@@ -89,6 +106,7 @@ def get_highest_title_num(user):
     return num
 
 def home(request):
+    """Get values and return the homepage"""
     try:
         pixie_num = get_highest_title_num(request.user)
         user_title = Pixie.objects.filter(num_type=pixie_num).first()
@@ -111,6 +129,7 @@ def home(request):
     return render(request, 'paypixplaceapp/home.html', context)
 
 class CommunityCanvasView(ListView):
+    """Get the comunity canvas"""
     model = Canvas
     template_name = 'paypixplaceapp/canvas/community_canvas.html'
 
@@ -122,9 +141,12 @@ class CommunityCanvasView(ListView):
         context['prices'] = get_pix_price()
         context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
+        context['canvas_count'] = Canvas.objects.filter(place=Place.COMMUNITY).count
+        context['place'] = Place.COMMUNITY
         return context
 
 class OfficialCanvasView(ListView):
+    """Get the official canvas"""
     model = Canvas
     template_name = 'paypixplaceapp/canvas/official_canvas.html'
 
@@ -136,9 +158,12 @@ class OfficialCanvasView(ListView):
         context['prices'] = get_pix_price()
         context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.OFFICIAL)
+        context['canvas_count'] = Canvas.objects.filter(place=Place.OFFICIAL).count
+        context['place'] = Place.OFFICIAL
         return context
 
 class CanvasDetailsView(DetailView):
+    """Display the detail of a canvas"""
     model = Canvas
     template_name = 'paypixplaceapp/canvas/canvas_detail.html'
 
@@ -160,6 +185,7 @@ class CanvasDetailsView(DetailView):
         return context
 
 def getCanvas(page, place):
+    """Return canvas list on the specified page for the specified place (community or official)"""
     canvas_list = Canvas.objects.filter(place=int(place))
     paginator = Paginator(canvas_list, 3)
     canvas = paginator.get_page(page)
@@ -246,6 +272,7 @@ def purchase(request):
     return render(request, 'paypixplaceapp/purchase_pix.html', context)
       
 def create_pixel(x, y, hex, canvas_id):
+    """Create a pixel (used for the bulk creation)"""
     p = Pixel()
     p.x = x
     p.y = y
@@ -504,8 +531,8 @@ def get_img(request, id):
 # Dict to store imgs already generated
 get_img.images = {}
 
-
 def buy(request, id):
+    """ Create a stripe charge, the amount depends on the id"""
     pixie = Pixie.objects.filter(id=id).first()
     token = request.POST['stripeToken']
     price = pixie.price * 100
@@ -531,9 +558,11 @@ def payment(request, id):
     return JsonResponse("OK", safe=False)
 
 def user_has_enough_pix(user, price):
+    """Check if the user has enough pix"""
     return user.pix >= price
 
 def add_color_to_user(hex, user):
+    """Check if the user has a color, if not, add it"""
     try:
         color = Color.objects.get(hex=hex)
         user.owns.add(color)
@@ -541,6 +570,7 @@ def add_color_to_user(hex, user):
         user.owns.create(hex=hex)   
 
 def buy_fix_color(hex, user):
+    """Handle the fix color purchase"""
     result_message = ""
     transaction_success = False
     
@@ -557,6 +587,7 @@ def buy_fix_color(hex, user):
     return transaction_success, result_message
 
 def buy_random_color(user):
+    """Handle the random color purchase"""
     result_message = ""
     transaction_success = False
     
@@ -576,6 +607,7 @@ def buy_random_color(user):
     return transaction_success, result_message
 
 def buy_slot(user):
+    """Handle the slot purchase"""
     result_message = ""
     transaction_success = False
 
@@ -586,13 +618,13 @@ def buy_slot(user):
         Slot.objects.create(place_num= last_slot_number + 1, user=user, color=user.owns.first())
         result_message = "Slot successfully added"
         transaction_success = True
-
     else:
          result_message = "You can't buy anymore slots!"
 
     return transaction_success, result_message
 
 def buy_color_pack(color_pack, user):
+    """Handle the color pack purchase"""
     result_message = "You already possess one or more colors from this pack"
     addedColor = []
     transaction_success = False
@@ -614,6 +646,7 @@ def buy_color_pack(color_pack, user):
     return transaction_success, result_message
 
 def increase_max_ammo(user):
+    """Handle the max ammo increase purchase"""
     result_message = "You already have the max ammo possible!"
     transaction_success = False
 
@@ -626,6 +659,7 @@ def increase_max_ammo(user):
     return transaction_success, result_message
 
 def reduce_refill_time(user):
+    """Handle the refill time decrease purchase"""
     result_message = "You already have the lowest refill time possible!"
     transaction_success = False
 
@@ -637,6 +671,7 @@ def reduce_refill_time(user):
     return transaction_success, result_message
 
 def get_instant_ammo(user):
+    """Handle the instant ammo purchase"""
     user.ammo += 1
     transaction_success = True
     result_message = "Received an ammo!"
@@ -644,6 +679,7 @@ def get_instant_ammo(user):
     return transaction_success, result_message
 
 def activate_profit(canvas_id):
+    """Activate the profit on a canvas"""
     transaction_success = False
     result_message = ""
     try:
@@ -663,6 +699,7 @@ def activate_profit(canvas_id):
     return transaction_success, result_message
 
 def buy_with_pix(request, id):
+    """Handle the purchase with pix"""
     user = request.user
     price = PixPrice.objects.get(num_type=id).price
 

@@ -75,6 +75,7 @@ html, body {
     height: 40px;
     display: inline-block;
     cursor: pointer;
+    border: 0.1em solid rgb(54, 54, 54);
 }
 
 .ppp-canvas-property {
@@ -103,6 +104,10 @@ html, body {
 
 .ppp-icon {
     width: 1em;
+}
+
+.ppp-icon-xl {
+    font-size: 6em;
 }
 
 .ppp-purchase-title-legend {
