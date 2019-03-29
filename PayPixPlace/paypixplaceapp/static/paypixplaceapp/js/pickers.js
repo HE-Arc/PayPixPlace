@@ -112,7 +112,6 @@ function lockPixel(x,y) {
                 loadPixels();
                 pixelLocked.checked = true;
                 pixelLocked.disabled = true;
-                displayInfos(x,y);
                 $.notify(
                     data.result_message,
                     {

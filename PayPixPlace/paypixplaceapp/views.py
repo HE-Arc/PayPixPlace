@@ -273,9 +273,11 @@ def lock_pixel(request):
                 canvas_id = request.POST['canvas_id']
                 x = request.POST['x']
                 y = request.POST['y']
-                duration_id = request.POST['duration_id']
+                duration_id = int(request.POST['duration_id'])
                 user = request.user
+                
                 transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id) # duration_id from 10 to 14
+                
                 if transaction_success:
                     print("Pixel Locked", flush=True)
                     pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)

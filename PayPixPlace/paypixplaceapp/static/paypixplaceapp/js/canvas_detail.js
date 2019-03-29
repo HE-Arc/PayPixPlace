@@ -41,6 +41,9 @@ function loadPixels() {
                 document.getElementById("userPix").innerHTML = data.pix;
             }
             canvasMouseMoveHover();
+            if (selectedPixel) {
+                displayInfos(selectedPixel.x,selectedPixel.y);
+            }
         }
     });
 }
@@ -569,9 +572,6 @@ $(document).ready(function(){
 
     mainLoop = setInterval(function() {
         loadPixels();
-        if (selectedPixel) {
-            displayInfos(selectedPixel.x,selectedPixel.y);
-        }
     }, 4000)
     
     loadPixels();
