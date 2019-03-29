@@ -84,7 +84,7 @@ def home(request):
     context = {
         'title': 'Home',
         'prices': get_pix_price(),
-        # 'colors_pack': Colors_pack.objects.all(),
+        'colors_pack': Colors_pack.objects.all(),
         'user_title_num': pixie_num,
         'user_title': user_title
     }
@@ -100,7 +100,7 @@ class CommunityCanvasView(ListView):
         # Add in a QuerySet of all the books
         context['title'] = 'Community Canvas'
         context['prices'] = get_pix_price()
-        # context['colors_pack'] = Colors_pack.objects.all()
+        context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
         return context
 
@@ -114,7 +114,7 @@ class OfficialCanvasView(ListView):
         # Add in a QuerySet of all the books
         context['title'] = 'Official Canvas'
         context['prices'] = get_pix_price()
-        # context['colors_pack'] = Colors_pack.objects.all()
+        context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.OFFICIAL)
         return context
 
@@ -136,7 +136,7 @@ class CanvasDetailsView(DetailView):
 
         context['place_text'] = place_text
         context['prices'] = get_pix_price()
-        # context['colors_pack'] = Colors_pack.objects.all()
+        context['colors_pack'] = Colors_pack.objects.all()
         return context
 
 def getCanvas(page, place):
