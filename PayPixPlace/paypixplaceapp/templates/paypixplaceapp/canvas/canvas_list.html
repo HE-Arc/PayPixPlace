@@ -1,19 +1,36 @@
 {% extends "paypixplaceapp/base_standard.html" %}
 {% load staticfiles %}
 {% block content %}
-    {% block title %}
-    
-    {% endblock title %}
+
+    {% block title %}{% endblock title %}
 
     <div class="row">
+        {% if canvas_count <= 0 %}
+            {% if place == 0 %}
+                <div class="col-12 text-center mt-3">
+                    <i class="fas fa-ghost ppp-icon-xl"></i>
+                    <h3>
+                        No canvas has been created yet. The admins will soon create some!
+                    </h3>
+                </div>
+            {% elif place == 1 %}
+                <div class="col-12 text-center mt-3">
+                    <i class="fas fa-ghost ppp-icon-xl"></i>
+                    <h3>
+                        No canvas has been created yet. Be the first one and <a href="{% url 'canvas-create' %}">start now!</a>
+                    </h3>
+                </div>
+            {% endif %}
+        {% endif %}
+
         {% for c in canvas %}
 
             <div class="text-center col-12 col-sm-6 col-lg-4 mb-5">
                 <a href="{% url 'canvas-detail' c.id %}">
                     <h2>{{ c.name }}</h2>
-                    <div class="img-container">
+                    <div class="ppp-img-container">
                         <img
-                            class="canvas-img img-fluid img-thumbnail"
+                            class="ppp-canvas-img img-fluid img-thumbnail"
                             src="{% url 'canvas-img' c.id %}"
                             alt="canvas named {{c.name}}"
                         />
@@ -24,12 +41,13 @@
         {% endfor %}
     </div>
 
+    {% if canvas.paginator.num_pages > 1 %}
     <div class="fixed-bottom container mb-1">
         <div class="pagination">
             <span class="step-links">
                 {% if canvas.has_previous %}
-                    <a role="button" href="?page=1" class="btn btn-dark btn-sm ppp-btn-rounded ppp-btn-sm">&laquo; first</a>
-                    <a role="button" href="?page={{ canvas.previous_page_number }}" class="btn btn-dark btn-sm ppp-btn-rounded ppp-btn-sm">previous</a>
+                    <a role="button" href="?page=1" class="btn btn-dark btn-sm ppp-btn-md">&laquo; first</a>
+                    <a role="button" href="?page={{ canvas.previous_page_number }}" class="btn btn-dark btn-sm ppp-btn-md">previous</a>
                 {% endif %}
         
                 <span class="current font-weight-bold">
@@ -37,11 +55,12 @@
                 </span>
         
                 {% if canvas.has_next %}
-                    <a role="button" href="?page={{ canvas.next_page_number }}" class="btn btn-dark btn-sm ppp-btn-rounded ppp-btn-sm">next</a>
-                    <a role="button" href="?page={{ canvas.paginator.num_pages }}" class="btn btn-dark btn-sm ppp-btn-rounded ppp-btn-sm">last &raquo;</a>
+                    <a role="button" href="?page={{ canvas.next_page_number }}" class="btn btn-dark ppp-btn-md">next</a>
+                    <a role="button" href="?page={{ canvas.paginator.num_pages }}" class="btn btn-dark ppp-btn-md">last &raquo;</a>
                 {% endif %}
             </span>
         </div>
     </div>
+    {% endif %}
     
 {% endblock content %}

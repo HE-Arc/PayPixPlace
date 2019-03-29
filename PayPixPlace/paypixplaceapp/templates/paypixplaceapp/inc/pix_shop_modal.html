@@ -21,7 +21,7 @@
                             <input id="fix_color" type="text" class="form-control mb-1 col-8 offset-2"/>
                         </div>
                         
-                        <button id="btnFixColor" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                        <button id="btnFixColor" class="btn btn-outline-dark ppp-btn-lg">
                             {% with fix_color=prices|get_item:0 %}
                             {{ fix_color.price }}
                             {% endwith %}
@@ -44,7 +44,7 @@
                                         {% endfor %}
                                     </div>
                                     
-                                    <button type="submit" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                                    <button type="submit" class="btn btn-outline-dark ppp-btn-lg">
                                         {% with color_pack_price=prices|get_item:1 %}
                                         {{ color_pack_price.price }}
                                         {% endwith %}
@@ -66,7 +66,7 @@
                     <div class="col-6">
                         <h3 class="ppp-pix-shop-title mb-3">Random Color</h3>
 
-                        <button id="btnRandomColor" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                        <button id="btnRandomColor" class="btn btn-outline-dark ppp-btn-lg">
                             {% with random_color=prices|get_item:2 %}
                             {{ random_color.price }}
                             {% endwith %}
@@ -77,7 +77,7 @@
                     <div class="col-6">
                         <h3 class="ppp-pix-shop-title mb-3">Color Slot</h3>
                         
-                        <button id="btnBuySlot" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                        <button id="btnBuySlot" class="btn btn-outline-dark ppp-btn-lg">
                             {% with unlock_slot=prices|get_item:3 %}
                             {{ unlock_slot.price }}
                             {% endwith %}
@@ -90,7 +90,7 @@
                     <div class="col-6">
                         <h3 class="ppp-pix-shop-title mb-3">Increase Max Ammo</h3>
                         
-                        <button id="btnIncreaseMaxAmmo" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                        <button id="btnIncreaseMaxAmmo" class="btn btn-outline-dark ppp-btn-lg">
                             {% with max_ammo=prices|get_item:5 %}
                             {{ max_ammo.price }}
                             {% endwith %}
@@ -101,7 +101,7 @@
                     <div class="col-6">
                         <h3 class="ppp-pix-shop-title mb-3">Reduce Refill Time</h3>
                         
-                        <button id="btnReduceRefillTime" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                        <button id="btnReduceRefillTime" class="btn btn-outline-dark ppp-btn-lg">
                             {% with refill_time=prices|get_item:6 %}
                             {{ refill_time.price }}
                             {% endwith %}
@@ -114,7 +114,7 @@
                     <div class="col-6">
                         <h3 class="ppp-pix-shop-title mb-3">Instant Ammo</h3>
                         
-                        <button id="btnInstantAmmo" class="btn btn-outline-dark ppp-btn-rounded font-weight-bold">
+                        <button id="btnInstantAmmo" class="btn btn-outline-dark ppp-btn-lg">
                             {% with instant_ammo=prices|get_item:7 %}
                             {{ instant_ammo.price }}
                             {% endwith %}
@@ -124,7 +124,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-dark ppp-btn-rounded" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -137,7 +137,7 @@
                 <h2 class="mb-3">Unlocked</h2>
                 <div id="unlockItem" class="mb-3"></div>
 
-                <button type="button" class="btn btn-outline-dark ppp-btn-rounded" data-dismiss="modal">Accept</button>
+                <button type="button" class="btn btn-outline-dark ppp-btn-md" data-dismiss="modal">Accept</button>
             </div>
         </div>
     </div>

@@ -33,10 +33,10 @@ class Purchase(models.Model):
     purchase_date = models.DateField()
 
 class Canvas(models.Model):
-    name = models.CharField(max_length=50)
-    theme = models.CharField(max_length=50)
+    name = models.CharField(max_length=20)
+    theme = models.CharField(max_length=20)
     place = models.SmallIntegerField()
-    width = models.IntegerField(default=20, validators=[ MaxValueValidator(300), MinValueValidator(10) ])
+    width = models.IntegerField(default=20, validators=[ MaxValueValidator(100), MinValueValidator(10) ])
     is_profit_on = models.BooleanField()
     is_modified = models.BooleanField(default=True)
     interactions = models.IntegerField(default=0)

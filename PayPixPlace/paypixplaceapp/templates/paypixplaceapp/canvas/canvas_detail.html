@@ -16,58 +16,70 @@
             <div class="card-header">
                 <h2>{{ object.name }}</h2>
             </div>
-            <div class="card-body">
+            <div class="card-body p-2">
                 <ul class="list-group list-group-flush">
                     {% if user.is_authenticated %}
                     <script src="{% static 'paypixplaceapp/js/pickers.js' %}"></script>
-                    <li class="list-group-item text-white bg-dark">
+                    <li class="list-group-item text-white bg-dark border-top-0 p-2">
+                        {% with slots_count=slots.count %}
                         <div class="row">
+                            {% if slots_count > 0 %}
                             <div class="col-6 mb-3 p-0">
                                 <div class="picker1 ppp-picker ppp-picker-selected"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
                             </div>
+                            {% endif %}
+                            {% if slots_count > 1 %}
                             <div class="col-6 mb-3 p-0">
                                 <div class="picker2 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
                             </div>
-                            <div class="col-6 p-">
+                            {% endif %}
+                            {% if slots_count > 2 %}
+                            <div class="col-6 p-0">
                                 <div class="picker3 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
                             </div>
+                            {% endif %}
+                            {% if slots_count > 3 %}
                             <div class="col-6 p-0">
                                 <div class="picker4 ppp-picker"></div>
                                 <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
                             </div>
+                            {% endif %}
                         </div>
+                        {% endwith %}
                     </li>
-                    <li class="list-group-item text-white bg-dark">
+                    <li class="list-group-item text-white text-left bg-dark">
                         <label class="font-weight-bold m-0 align-middle">Selection Tool</label>
                         <label class="switch m-0">
                             <input id="selectCB" type="checkbox" class="default">
                             <span class="slider round"></span>
                         </label>
-                        <div id="selectionToolbox">
+                        <div id="selectionToolbox" class="border-top mt-3 text-center">
                             <div class="form-group">
                                 <label for="canvasTheme" class="font-weight-bold">Pixel Owner</label>
                                 <input type="text" class="form-control font-weight-bold pixelOwner" disabled>
                             </div>
                             <div class="form-group">
                                 <label for="canvasTheme" class="font-weight-bold">Pixel Protection  <i id="pixelLocked" class="fas fa-lock-open"></i></label>
-                                <input type="text" class="form-control font-weight-bold pixelProtected" disabled>
-                                <button id="lockModalButton" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target=".lock-pixel-modal">Lock Pixel</button>
+                                <input type="text" class="form-control font-weight-bold pixelProtected mb-1" disabled>
+                                <button id="lockModalButton" class="btn btn-success ppp-btn-md" data-toggle="modal" data-target=".lock-pixel-modal">
+                                    Lock Pixel
+                                </button>
                             </div>
                         </div>
                     </li>
                     {% endif %}
-                    <li class="list-group-item text-white bg-dark">
+                    <li class="list-group-item text-white text-left bg-dark">
                         <label class="font-weight-bold m-0 align-middle">Show Grid</label>
                         <label class="switch m-0">
                             <input type="checkbox" class="default showGridCB">
                             <span class="slider round"></span>
                         </label>
                     </li>
-                    <li class="list-group-item text-white bg-dark">
-                        <label class="font-weight-bold m-0 align-middle">Hide Protected pixels</label>
+                    <li class="list-group-item text-white text-left bg-dark">
+                        <label class="font-weight-bold m-0 align-middle">Show Locked</label>
                         <label class="switch m-0">
                             <input id="hideProtectedCB" type="checkbox" class="default">
                             <span class="slider round"></span>
@@ -78,16 +90,12 @@
                             <label for="canvasTheme" class="font-weight-bold">Canvas Theme</label>
                             <input type="text" class="form-control font-weight-bold" id="canvasTheme" value="{{ object.theme }}" disabled>
                         </div>
-                        <div class="form-group">
-                            <label for="canvasTheme" class="font-weight-bold">Canvas Place</label>
-                            <input type="text" class="form-control font-weight-bold" id="canvasTheme" value="{{ place_text }}" disabled>
-                        </div>
                     </li>
                     <li class="list-group-item text-white bg-dark">
                         <button class="btn btn-md btn-outline-info d-inline" data-toggle="modal" data-target=".canvas-control-modal">
                             <i class="fas fa-info-circle ppp-canvas-control"></i>
                         </button>
-                        <a id="downloadButton" class="btn btn-lg btn-outline-info d-inline" href="{% url 'canvas-img' id=object.id %}" download>
+                        <a id="downloadButton" class="btn btn-lg btn-outline-info d-inline" href="{% url 'canvas-img' id=object.id %}" download="{{ object.name }}">
                             <i class="fas fa-file-download ppp-canvas-control"></i>
                         </a>                        
                     </li>
@@ -96,27 +104,35 @@
         </div>
     </div>
     <div id="downbarContainer" class="ppp-downbar-container">
-        <div class="row p-1">
-            <div class="col-12 col-md-8 offset-0 offset-md-2">
+        <div class="row">
+            <div class="col-10 col-md-8 col-lg-4 offset-1 offset-md-2 offset-lg-4 ppp-downbar-content p-1">
                 {% if user.is_authenticated %}
-                <div class="row">
-                    <div class="col-3 d-inline-block">
-                        <div class="picker1 ppp-picker-sm ppp-picker-selected"></div>
-                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
-                    </div>
-                    <div class="col-3 d-inline-block">
-                        <div class="picker2 ppp-picker-sm"></div>
-                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
-                    </div>
-                    <div class="col-3 d-inline-block">
-                        <div class="picker3 ppp-picker-sm"></div>
-                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
-                    </div>
-                    <div class="col-3 d-inline-block">
-                        <div class="picker4 ppp-picker-sm"></div>
-                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
+                {% with slots_count=slots.count col_num=12|div:slots.count %}
+                <div class="col-8 offset-2 p-0">
+                    <div class="row text-center">
+                        {% if slots_count > 0 %}
+                        <div class="col-{{col_num}} d-inline-block">
+                            <div class="picker1 ppp-picker-sm ppp-picker-selected"></div>
+                        </div>
+                        {% endif %}
+                        {% if slots_count > 1 %}
+                        <div class="col-{{col_num}} d-inline-block">
+                            <div class="picker2 ppp-picker-sm"></div>
+                        </div>
+                        {% endif %}
+                        {% if slots_count > 2 %}
+                        <div class="col-{{col_num}} d-inline-block">
+                            <div class="picker3 ppp-picker-sm"></div>
+                        </div>
+                        {% endif %}
+                        {% if slots_count > 3 %}
+                        <div class="col-{{col_num}} d-inline-block">
+                            <div class="picker4 ppp-picker-sm"></div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
+                {% endwith %}
                 {% endif %}
             </div>
         </div>
@@ -130,28 +146,38 @@
     
     {% if user.is_authenticated %}
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <div class="modal-body" style="display: inline-block;">
+                <div class="modal-body text-center">
                     {% for color in user.owns.all %}
                         <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeSlotColor('{{ color.hex }}')"></div>
                     {% endfor %}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="lock-pixel-modal" class="modal fade lock-pixel-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <p>Lock Pixel for a given duration</p>
-                <input type="range" min="10" max="14" step="1" value="11">
+                <div class="modal-body text-center">
+                    <h3>Lock Pixel for a given duration</h3>
+                    {% with price=prices|get_item:11 %}
+                    <h4 id="lockDetails">{{ price.name }}</h4>
+                    {% endwith %}
+                    <input id="lockRange" type="range" min="10" max="14" step="1" value="11">
+                </div>
                 <div class="modal-footer">
-                    <button id="lockPixelButton" type="button" class="btn btn-outline-success" data-dismiss="modal">Lock Pixel</button>
-                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                    <button id="lockPixelButton" type="button" class="btn btn-outline-dark ppp-btn-lg" data-dismiss="modal">
+                        {% with price=prices|get_item:11 %}
+                        Lock Pixel for <span id="lockPrice">{{ price.price }}</span>
+                        {% endwith %}
+                        <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                    </button>
+                    <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -159,27 +185,25 @@
     {% endif %}
 
     <div id="canvas-control-modal" class="modal fade canvas-control-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <div class="modal-body" style="display: inline-block;">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <label class="font-weight-bold">Canvas Controls</label>
-                            <ul class="pl-3 text-left">
-                                <li>Hold left click to move the canvas</li>
-                                <li>Use mousewheel or fingers to zoom</li>
-                                <li>Click/Touch to change the color of a pixel</li>    
-                            </ul>
-                        </li>
+                <div class="modal-body">
+                    <label class="font-weight-bold">Canvas Controls</label>
+                    <ul class="pl-3 text-left">
+                        <li>Hold left click to move the canvas</li>
+                        <li>Use mousewheel or fingers to zoom</li>
+                        <li>Click/Touch to change the color of a pixel</li>    
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
+
     <img id="lockImage" src="{% static 'paypixplaceapp/images/lock.png' %}" style="display:none" />
+
     <script>
         window.CSRF_TOKEN = "{{ csrf_token }}";
         const canvasId = "{{ object.id }}";
@@ -191,6 +215,7 @@
             {% for slot in slots %}
                 colors.push('{{ slot.color.hex }}')
             {% endfor %}
+
         {% endif %}
     </script>
     
