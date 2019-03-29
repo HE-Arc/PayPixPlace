@@ -57,11 +57,13 @@
                             </div>
                             <div class="col-12">
                                 <a href="{% url 'canvas-detail' c.id %}">
-                                    <img
-                                        class="w-100 img-fluid img-thumbnail"
-                                        src="{% url 'canvas-img' c.id %}"
-                                        alt="canvas named {{c.name}}"
-                                    >        
+                                    <div class="ppp-img-container">
+                                        <img
+                                            class="ppp-canvas-img img-fluid img-thumbnail"
+                                            src="{% url 'canvas-img' c.id %}"
+                                            alt="canvas named {{c.name}}"
+                                        >
+                                    </div>       
                                 </a>
                             </div>
                         </div>
