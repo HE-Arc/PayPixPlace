@@ -39,13 +39,17 @@
     width: 100%;
     bottom: 0px;
     margin-bottom: -50px;
-    background-color: #343a40;
     z-index: 800;
     transition: all 1s ease;
 }
 
 .ppp-downbar-container-open {
     margin-bottom: 0px;
+}
+
+.ppp-downbar-content {
+    border-radius: 3em 3em 0 0;
+    background-color: #343a40;
 }
 
 .ppp-picker {

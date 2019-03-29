@@ -104,35 +104,33 @@
         </div>
     </div>
     <div id="downbarContainer" class="ppp-downbar-container">
-        <div class="row p-1">
-            <div class="col-12 col-md-8 offset-0 offset-md-2">
+        <div class="row">
+            <div class="col-10 col-md-8 col-lg-4 offset-1 offset-md-2 offset-lg-4 ppp-downbar-content p-1">
                 {% if user.is_authenticated %}
-                {% with slots_count=slots.count %}
-                <div class="row">
-                    {% if slots_count > 0 %}
-                    <div class="col-3 d-inline-block">
-                        <div class="picker1 ppp-picker-sm ppp-picker-selected"></div>
-                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
+                {% with slots_count=slots.count col_num=12|div:slots.count %}
+                <div class="col-8 offset-2 p-0">
+                    <div class="row text-center">
+                        {% if slots_count > 0 %}
+                        <div class="col-{{col_num}} d-inline-block">
+                            <div class="picker1 ppp-picker-sm ppp-picker-selected"></div>
+                        </div>
+                        {% endif %}
+                        {% if slots_count > 1 %}
+                        <div class="col-{{col_num}} d-inline-block">
+                            <div class="picker2 ppp-picker-sm"></div>
+                        </div>
+                        {% endif %}
+                        {% if slots_count > 2 %}
+                        <div class="col-{{col_num}} d-inline-block">
+                            <div class="picker3 ppp-picker-sm"></div>
+                        </div>
+                        {% endif %}
+                        {% if slots_count > 3 %}
+                        <div class="col-{{col_num}} d-inline-block">
+                            <div class="picker4 ppp-picker-sm"></div>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                    {% if slots_count > 1 %}
-                    <div class="col-3 d-inline-block">
-                        <div class="picker2 ppp-picker-sm"></div>
-                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
-                    </div>
-                    {% endif %}
-                    {% if slots_count > 2 %}
-                    <div class="col-3 d-inline-block">
-                        <div class="picker3 ppp-picker-sm"></div>
-                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
-                    </div>
-                    {% endif %}
-                    {% if slots_count > 3 %}
-                    <div class="col-3 d-inline-block">
-                        <div class="picker4 ppp-picker-sm"></div>
-                        <button class="btn btn-sm btn-outline-info ppp-btn-color-picker-sm" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
-                    </div>
-                    {% endif %}
                 </div>
                 {% endwith %}
                 {% endif %}
