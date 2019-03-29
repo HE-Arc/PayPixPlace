@@ -16,11 +16,11 @@
             <div class="card-header">
                 <h2>{{ object.name }}</h2>
             </div>
-            <div class="card-body">
+            <div class="card-body p-2">
                 <ul class="list-group list-group-flush">
                     {% if user.is_authenticated %}
                     <script src="{% static 'paypixplaceapp/js/pickers.js' %}"></script>
-                    <li class="list-group-item text-white bg-dark">
+                    <li class="list-group-item text-white bg-dark border-top-0 p-2">
                         <div class="row">
                             <div class="col-6 mb-3 p-0">
                                 <div class="picker1 ppp-picker ppp-picker-selected"></div>
@@ -40,34 +40,36 @@
                             </div>
                         </div>
                     </li>
-                    <li class="list-group-item text-white bg-dark">
+                    <li class="list-group-item text-white text-left bg-dark">
                         <label class="font-weight-bold m-0 align-middle">Selection Tool</label>
                         <label class="switch m-0">
                             <input id="selectCB" type="checkbox" class="default">
                             <span class="slider round"></span>
                         </label>
-                        <div id="selectionToolbox">
+                        <div id="selectionToolbox" class="border-top mt-3">
                             <div class="form-group">
                                 <label for="canvasTheme" class="font-weight-bold">Pixel Owner</label>
                                 <input type="text" class="form-control font-weight-bold pixelOwner" disabled>
                             </div>
                             <div class="form-group">
                                 <label for="canvasTheme" class="font-weight-bold">Pixel Protection  <i id="pixelLocked" class="fas fa-lock-open"></i></label>
-                                <input type="text" class="form-control font-weight-bold pixelProtected" disabled>
-                                <button id="lockModalButton" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target=".lock-pixel-modal">Lock Pixel</button>
+                                <input type="text" class="form-control font-weight-bold pixelProtected mb-1" disabled>
+                                <button id="lockModalButton" class="btn btn-success ppp-btn-md" data-toggle="modal" data-target=".lock-pixel-modal">
+                                    Lock Pixel
+                                </button>
                             </div>
                         </div>
                     </li>
                     {% endif %}
-                    <li class="list-group-item text-white bg-dark">
+                    <li class="list-group-item text-white text-left bg-dark">
                         <label class="font-weight-bold m-0 align-middle">Show Grid</label>
                         <label class="switch m-0">
                             <input type="checkbox" class="default showGridCB">
                             <span class="slider round"></span>
                         </label>
                     </li>
-                    <li class="list-group-item text-white bg-dark">
-                        <label class="font-weight-bold m-0 align-middle">Hide Protected pixels</label>
+                    <li class="list-group-item text-white text-left bg-dark">
+                        <label class="font-weight-bold m-0 align-middle">Show Locked</label>
                         <label class="switch m-0">
                             <input id="hideProtectedCB" type="checkbox" class="default">
                             <span class="slider round"></span>
@@ -77,10 +79,6 @@
                         <div class="form-group">
                             <label for="canvasTheme" class="font-weight-bold">Canvas Theme</label>
                             <input type="text" class="form-control font-weight-bold" id="canvasTheme" value="{{ object.theme }}" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label for="canvasTheme" class="font-weight-bold">Canvas Place</label>
-                            <input type="text" class="form-control font-weight-bold" id="canvasTheme" value="{{ place_text }}" disabled>
                         </div>
                     </li>
                     <li class="list-group-item text-white bg-dark">
