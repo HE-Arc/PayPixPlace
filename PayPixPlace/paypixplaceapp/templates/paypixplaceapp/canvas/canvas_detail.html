@@ -52,12 +52,9 @@
                                 <input type="text" class="form-control font-weight-bold pixelOwner" disabled>
                             </div>
                             <div class="form-group">
-                                <label for="canvasTheme" class="font-weight-bold">Pixel Protection</label>
+                                <label for="canvasTheme" class="font-weight-bold">Pixel Protection  <i id="pixelLocked" class="fas fa-lock-open"></i></label>
                                 <input type="text" class="form-control font-weight-bold pixelProtected" disabled>
-                                <label class="switch m-0">
-                                    <input id="pixelLocked" type="checkbox" class="default">
-                                    <span class="slider round"></span>
-                                </label>
+                                <button id="lockModalButton" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target=".lock-pixel-modal">Lock Pixel</button>
                             </div>
                         </div>
                     </li>
@@ -141,6 +138,19 @@
                     {% endfor %}
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lock-pixel-modal" class="modal fade lock-pixel-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <p>Lock Pixel for a given duration</p>
+                <input type="range" min="10" max="14" step="1" value="11">
+                <div class="modal-footer">
+                    <button id="lockPixelButton" type="button" class="btn btn-outline-success" data-dismiss="modal">Lock Pixel</button>
                     <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
                 </div>
             </div>

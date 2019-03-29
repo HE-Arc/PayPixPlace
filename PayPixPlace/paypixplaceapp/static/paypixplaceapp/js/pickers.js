@@ -2,6 +2,8 @@ let pickers;
 let currentSlot;
 let selectCB;
 let pixelLocked;
+let lockPixelButton
+let lockModalButton;
 
 /**
  * Change the current slot
@@ -110,8 +112,8 @@ function lockPixel(x,y) {
         success: function(data) {
             if (data.is_valid) {
                 loadPixels();
-                pixelLocked.checked = true;
-                pixelLocked.disabled = true;
+                pixelLocked.removeClass("fa-lock-open");
+                pixelLocked.addClass("fa-lock");
                 $.notify(
                     data.result_message,
                     {
@@ -181,13 +183,19 @@ $(document).ready(function(){
         setCursor();
         $("#selectionToolbox").slideToggle();
         selectedPixel = null;
+        pixelLocked.removeClass("fa-lock-open");
+        pixelLocked.removeClass("fa-lock");
         cleanInfos();
         drawPixels();
     });
     selectedPixel = null;
 
-    pixelLocked = document.getElementById("pixelLocked");
-    pixelLocked.addEventListener("click", function() {
+    pixelLocked = $("#pixelLocked");
+    lockModalButton = $("#lockModalButton");
+    lockModalButton.hide();
+
+    lockPixelButton = document.getElementById("lockPixelButton");
+    lockPixelButton.addEventListener("click", function() {
         if (selectedPixel && !this.disabled) {
             lockPixel(selectedPixel.x, selectedPixel.y);
         }

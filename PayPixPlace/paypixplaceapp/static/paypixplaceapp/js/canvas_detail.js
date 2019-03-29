@@ -148,12 +148,14 @@ function displayInfos(x,y) {
     for (let i = 0 ; i < pixelInfoDisplay.protected.length ; i++) {
         if (pixel.timeLeft <= 0) {
             protectedMsg = "Not protected";
-            pixelLocked.checked = false;
-            pixelLocked.disabled = false;
+            pixelLocked.removeClass("fa-lock");
+            pixelLocked.addClass("fa-lock-open");
+            lockModalButton.show();
         } else {
             protectedMsg = secondsToTime(pixel.timeLeft);
-            pixelLocked.checked = true;
-            pixelLocked.disabled = true;
+            pixelLocked.removeClass("fa-lock-open");
+            pixelLocked.addClass("fa-lock");
+            lockModalButton.hide();
         }
         pixelInfoDisplay.protected[i].value = protectedMsg;
     }

@@ -279,7 +279,6 @@ def lock_pixel(request):
                 transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id) # duration_id from 10 to 14
                 
                 if transaction_success:
-                    print("Pixel Locked", flush=True)
                     pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
                     pixel.user = user
                     pixel.end_protection_date = timezone.now() + timedelta(minutes=minutes, hours=hours)
