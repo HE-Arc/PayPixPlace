@@ -43,6 +43,19 @@ def get_pix_price():
         prices[price.num_type] = price
     return prices
 
+def get_pix_prices_json(request):
+    if request.is_ajax():
+        prices = {}
+        for key, price in get_pix_price().items():
+            prices[key] = {
+                "name" : price.name,
+                "price" : price.price
+            }
+
+        return JsonResponse(prices, safe=False)
+    else:
+        raise Http404()
+
 class Place(IntEnum):
     OFFICIAL = 0
     COMMUNITY = 1
@@ -276,6 +289,8 @@ def lock_pixel(request):
                 x = request.POST['x']
                 y = request.POST['y']
                 duration_id = int(request.POST['duration_id'])
+                if duration_id < 10 or duration_id > 14:
+                    duration_id = 11
                 user = request.user
                 canvas = Canvas.objects.get(id=canvas_id)
                 transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id, canvas) # duration_id from 10 to 14

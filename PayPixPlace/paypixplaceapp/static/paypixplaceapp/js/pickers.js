@@ -4,6 +4,9 @@ let selectCB;
 let pixelLocked;
 let lockPixelButton
 let lockModalButton;
+let lockRange;
+let lockPrice;
+let lockDetails;
 
 /**
  * Change the current slot
@@ -106,7 +109,7 @@ function lockPixel(x,y) {
             canvas_id : canvasId,
             x : x,
             y : y,
-            duration_id : 11
+            duration_id : lockRange.value
         },
         dataType: "json",
         success: function(data) {
@@ -200,4 +203,22 @@ $(document).ready(function(){
             lockPixel(selectedPixel.x, selectedPixel.y);
         }
     });
+
+    prices = [];
+    $.ajax({
+        type: "GET",
+        url: "/prices/",
+        dataType: "json",
+        success: function (data) {
+            prices = data;
+        }
+    });
+
+    lockRange = document.getElementById("lockRange");
+    lockPrice = document.getElementById("lockPrice");
+    lockDetails = document.getElementById("lockDetails");
+    lockRange.oninput = function() {
+        lockPrice.innerHTML = prices[this.value].price;
+        lockDetails.innerHTML = prices[this.value].name;
+    };
 });

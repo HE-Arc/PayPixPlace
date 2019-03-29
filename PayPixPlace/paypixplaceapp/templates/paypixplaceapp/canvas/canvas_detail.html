@@ -149,10 +149,16 @@
             <div class="modal-content">
                 <div class="modal-body text-center">
                     <h3>Lock Pixel for a given duration</h3>
-                    <input type="range" min="10" max="14" step="1" value="11">
+                    {% with price=prices|get_item:11 %}
+                    <h4 id="lockDetails">{{ price.name }}</h4>
+                    {% endwith %}
+                    <input id="lockRange" type="range" min="10" max="14" step="1" value="11">
                 </div>
                 <div class="modal-footer">
-                    <button id="lockPixelButton" type="button" class="btn btn-success ppp-btn-lg" data-dismiss="modal">Lock Pixel</button>
+                    <button id="lockPixelButton" type="button" class="btn btn-outline-dark ppp-btn-lg" data-dismiss="modal">
+                        Lock Pixel for <span id="lockPrice"></span>
+                        <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                    </button>
                     <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -191,6 +197,7 @@
             {% for slot in slots %}
                 colors.push('{{ slot.color.hex }}')
             {% endfor %}
+
         {% endif %}
     </script>
     
