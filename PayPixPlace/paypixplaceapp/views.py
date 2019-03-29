@@ -122,7 +122,7 @@ def home(request):
     context = {
         'title': 'Home',
         'prices': get_pix_price(),
-        'colors_pack': Colors_pack.objects.all(),
+        'colors_pack': Colors_pack.objects.all().prefetch_related('contains'),
         'user_title_num': pixie_num,
         'user_title': user_title
     }
@@ -171,7 +171,7 @@ class CanvasDetailsView(DetailView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
-        context['slots'] = Slot.objects.filter(user=self.request.user.id)
+        context['slots'] = Slot.objects.filter(user=self.request.user.id).select_related('color')
 
         place_text = "Invalid"
         if self.object.place == Place.OFFICIAL:
