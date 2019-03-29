@@ -65,17 +65,18 @@ function drawPixels() {
     
     for (let x = 0 ; x < pixels.length ; x++) {
         for (let y = 0 ; y < pixels[x].length ; y++) {
+
+            ctx.fillStyle = pixels[x][y].hex;
+            ctx.fillRect(
+                x * pixelWidth, 
+                y * pixelWidth, 
+                pixelWidth,
+                pixelWidth
+            );
+
             if (hideProtected && pixels[x][y].timeLeft > 0) {
                 ctx.drawImage(
                     lockImage,
-                    x * pixelWidth, 
-                    y * pixelWidth, 
-                    pixelWidth,
-                    pixelWidth
-                );
-            } else {
-                ctx.fillStyle = pixels[x][y].hex;
-                ctx.fillRect(
                     x * pixelWidth, 
                     y * pixelWidth, 
                     pixelWidth,
