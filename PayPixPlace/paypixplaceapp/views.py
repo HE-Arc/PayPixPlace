@@ -128,6 +128,8 @@ class CommunityCanvasView(ListView):
         context['prices'] = get_pix_price()
         context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
+        context['canvas_count'] = Canvas.objects.filter(place=Place.COMMUNITY).count
+        context['place'] = Place.COMMUNITY
         return context
 
 class OfficialCanvasView(ListView):
@@ -143,6 +145,8 @@ class OfficialCanvasView(ListView):
         context['prices'] = get_pix_price()
         context['colors_pack'] = Colors_pack.objects.all()
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.OFFICIAL)
+        context['canvas_count'] = Canvas.objects.filter(place=Place.OFFICIAL).count
+        context['place'] = Place.OFFICIAL
         return context
 
 class CanvasDetailsView(DetailView):
