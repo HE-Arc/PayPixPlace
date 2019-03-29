@@ -130,28 +130,30 @@
     
     {% if user.is_authenticated %}
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <div class="modal-body" style="display: inline-block;">
+                <div class="modal-body text-center">
                     {% for color in user.owns.all %}
                         <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeSlotColor('{{ color.hex }}')"></div>
                     {% endfor %}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="lock-pixel-modal" class="modal fade lock-pixel-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <p>Lock Pixel for a given duration</p>
-                <input type="range" min="10" max="14" step="1" value="11">
+                <div class="modal-body text-center">
+                    <h3>Lock Pixel for a given duration</h3>
+                    <input type="range" min="10" max="14" step="1" value="11">
+                </div>
                 <div class="modal-footer">
-                    <button id="lockPixelButton" type="button" class="btn btn-outline-success" data-dismiss="modal">Lock Pixel</button>
-                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                    <button id="lockPixelButton" type="button" class="btn btn-success ppp-btn-lg" data-dismiss="modal">Lock Pixel</button>
+                    <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -159,27 +161,25 @@
     {% endif %}
 
     <div id="canvas-control-modal" class="modal fade canvas-control-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <div class="modal-body" style="display: inline-block;">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <label class="font-weight-bold">Canvas Controls</label>
-                            <ul class="pl-3 text-left">
-                                <li>Hold left click to move the canvas</li>
-                                <li>Use mousewheel or fingers to zoom</li>
-                                <li>Click/Touch to change the color of a pixel</li>    
-                            </ul>
-                        </li>
+                <div class="modal-body">
+                    <label class="font-weight-bold">Canvas Controls</label>
+                    <ul class="pl-3 text-left">
+                        <li>Hold left click to move the canvas</li>
+                        <li>Use mousewheel or fingers to zoom</li>
+                        <li>Click/Touch to change the color of a pixel</li>    
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
+
     <img id="lockImage" src="{% static 'paypixplaceapp/images/lock.png' %}" style="display:none" />
+
     <script>
         window.CSRF_TOKEN = "{{ csrf_token }}";
         const canvasId = "{{ object.id }}";
