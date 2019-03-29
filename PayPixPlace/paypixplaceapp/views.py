@@ -1,27 +1,28 @@
+import random
 from datetime import datetime, timedelta
-import pytz
-from django.utils import timezone
 from enum import IntEnum
 
+import pytz
+import stripe
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
+from django.db import connection
+from django.db.models import Prefetch, Max
 from django.forms import model_to_dict
 from django.http import HttpResponse, JsonResponse
 from django.http.response import Http404
 from django.shortcuts import redirect, render
-from django.views.generic import DetailView, ListView
-from django.core.paginator import Paginator
-from django.db.models import Prefetch
 from django.template.defaulttags import register
+from django.utils import timezone
+from django.views.generic import DetailView, ListView
 from PIL import Image, ImageDraw
 
 from .forms import CreateCanvas
-from .models import Canvas, Pixel, Pixie, User, Slot, Color, PixPrice, Colors_pack, Purchase
-
-import stripe 
-import random
+from .models import (Canvas, Color, Colors_pack, Pixel, Pixie, PixPrice,
+                     Purchase, Slot, User)
 
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 MAX_PLAYER_SLOT = 4
@@ -94,22 +95,24 @@ class PixPriceNumType(IntEnum):
 
 def get_highest_title_num(user):
     """Return the highest title of the player"""
-    purchases = Purchase.objects.filter(user=user)
+    
+    purchases = Purchase.objects.filter(user=user).select_related('pixie')
     num = 0
     max_id = 0
+    pixie = None
 
     for purchase in purchases:
         if purchase.pixie.id > max_id:
             num = purchase.pixie.num_type
             max_id = purchase.pixie.id
+            pixie = purchase.pixie
     
-    return num
+    return num, pixie
 
 def home(request):
     """Get values and return the homepage"""
     try:
-        pixie_num = get_highest_title_num(request.user)
-        user_title = Pixie.objects.filter(num_type=pixie_num).first()
+        pixie_num, user_title = get_highest_title_num(request.user)
 
         if(user_title == None):
             user_title = "Pixer"
@@ -137,11 +140,14 @@ class CommunityCanvasView(ListView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
+
+        canvas = Canvas.objects.filter(place=Place.COMMUNITY)
+
         context['title'] = 'Community Canvas'
         context['prices'] = get_pix_price()
         context['colors_pack'] = Colors_pack.objects.all().prefetch_related('contains')
-        context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
-        context['canvas_count'] = Canvas.objects.filter(place=Place.COMMUNITY).count
+        context['canvas'] = getPaginatedCanvas(self.request.GET.get('page'), canvas)
+        context['canvas_count'] = len(canvas)
         context['place'] = Place.COMMUNITY
         return context
 
@@ -154,11 +160,14 @@ class OfficialCanvasView(ListView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
+
+        canvas = Canvas.objects.filter(place=Place.OFFICIAL)
+
         context['title'] = 'Official Canvas'
         context['prices'] = get_pix_price()
         context['colors_pack'] = Colors_pack.objects.all().prefetch_related('contains')
-        context['canvas'] = getCanvas(self.request.GET.get('page'), Place.OFFICIAL)
-        context['canvas_count'] = Canvas.objects.filter(place=Place.OFFICIAL).count
+        context['canvas'] = getPaginatedCanvas(self.request.GET.get('page'), canvas)
+        context['canvas_count'] = len(canvas)
         context['place'] = Place.OFFICIAL
         return context
 
@@ -184,14 +193,10 @@ class CanvasDetailsView(DetailView):
         context['colors_pack'] = Colors_pack.objects.all().prefetch_related('contains')
         return context
 
-def getCanvas(page, place):
+def getPaginatedCanvas(page, canvas):
     """Return canvas list on the specified page for the specified place (community or official)"""
-    canvas_list = Canvas.objects.filter(place=int(place))
-    paginator = Paginator(canvas_list, 3)
-    canvas = paginator.get_page(page)
-    for c in canvas:
-        c.pixels = Pixel.objects.filter(canvas=c.id)
-    return canvas
+    paginator = Paginator(canvas, 3)
+    return paginator.get_page(page)
 
 @login_required
 def createCanvas(request):
@@ -205,7 +210,7 @@ def createCanvas(request):
             canvas.user = request.user
 
             # Check if the given place is a valid one
-            if canvas.place >= Place.OFFICIAL and canvas.place <= Place.COMMUNITY:
+            if canvas.place == Place.OFFICIAL and canvas.place == Place.COMMUNITY:
 
                 if request.user.role.name == "admin" or (request.user.role.name == "user" and canvas.place == Place.COMMUNITY):
                     canvas.save()
@@ -284,12 +289,11 @@ def change_user_slot_color(request):
     if request.is_ajax():
         if request.method == 'POST':
 
-            user = User.objects.get(id=request.POST.get('userId'))
             slotId = request.POST.get('slot')
             color = Color.objects.get(hex=request.POST.get('color'))
 
             slot = Slot.objects.filter(
-                user=user,
+                user=request.user,
                 place_num=slotId
             ).first()
             
@@ -319,11 +323,10 @@ def lock_pixel(request):
                 if duration_id < 10 or duration_id > 14:
                     duration_id = 11
                 user = request.user
-                canvas = Canvas.objects.get(id=canvas_id)
-                transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id, canvas) # duration_id from 10 to 14
+                pixel = Pixel.objects.select_related('canvas').get(canvas=canvas_id, x=x, y=y)
+                transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id, pixel.canvas) # duration_id from 10 to 14
                 
                 if transaction_success:
-                    pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
                     pixel.user = user
                     pixel.end_protection_date = timezone.now() + timedelta(minutes=minutes, hours=hours)
                     pixel.save()
@@ -349,7 +352,8 @@ def change_pixel_color(request):
 
                 current_date = timezone.now()
 
-                pixel = Pixel.objects.get(canvas=canvas_id, x=x, y=y)
+                pixel = Pixel.objects.select_related('canvas').get(canvas=canvas_id, x=x, y=y)
+                print(pixel.canvas, flush=True)
                 if can_modify_pixel(pixel, hex, user, current_date):
                     pixel.hex = hex
                     pixel.user = user
@@ -361,7 +365,7 @@ def change_pixel_color(request):
                     user.pix += 1
                     user.save()
                     modification_valid = True
-                    canvas = Canvas.objects.get(id=canvas_id)
+                    canvas = pixel.canvas
                     canvas.is_modified = True
                     canvas.interactions += 1
                     canvas.save()
@@ -507,10 +511,10 @@ def get_img(request, id):
     except ObjectDoesNotExist:
         raise Http404()
 
-    pixels = [model_to_dict(pixel) for pixel in canvas.pixel_set.all()]
+    pixels = [pixel for pixel in Pixel.objects.filter(canvas=id).values('x', 'y', 'hex')]
     imgSize = 1000
     img = Image.new('RGB', (imgSize, imgSize))
-    pixelSize = imgSize // model_to_dict(canvas)["width"]
+    pixelSize = imgSize / model_to_dict(canvas)["width"]
 
     draw = ImageDraw.Draw(img)
     for pixel in pixels:
@@ -533,7 +537,7 @@ get_img.images = {}
 
 def buy(request, id):
     """ Create a stripe charge, the amount depends on the id"""
-    pixie = Pixie.objects.filter(id=id).first()
+    pixie = Pixie.objects.get(id=id)
     token = request.POST['stripeToken']
     price = pixie.price * 100
     totalPix = pixie.number + pixie.bonus
@@ -575,7 +579,7 @@ def buy_fix_color(hex, user):
     transaction_success = False
     
     try:
-        color = user.owns.all().get(hex=hex)
+        user.owns.get(hex=hex)
         # The user already owns the color
         result_message = "You already own this color!"
     except Color.DoesNotExist:
@@ -590,13 +594,14 @@ def buy_random_color(user):
     """Handle the random color purchase"""
     result_message = ""
     transaction_success = False
-    
+
+    # Not optimal, but will only cause trouble if the user owns a massive amout of colors
     while not transaction_success:
         r = lambda: random.randint(0,255)
         hex = ('#%02X%02X%02X' % (r(),r(),r()))
     
         try:
-            color = user.owns.all().get(hex=hex)
+            user.owns.get(hex=hex)
             # The user already owns the color
             result_message = "You already own this color!"
         except Color.DoesNotExist:
@@ -613,8 +618,8 @@ def buy_slot(user):
 
     player_slots = Slot.objects.filter(user=user).order_by('-place_num')
     
-    if player_slots.count() < MAX_PLAYER_SLOT:
-        last_slot_number = player_slots.first().place_num
+    if len(player_slots) < MAX_PLAYER_SLOT:
+        last_slot_number = player_slots[0].place_num
         Slot.objects.create(place_num= last_slot_number + 1, user=user, color=user.owns.first())
         result_message = "Slot successfully added"
         transaction_success = True
@@ -623,15 +628,16 @@ def buy_slot(user):
 
     return transaction_success, result_message
 
-def buy_color_pack(color_pack, user):
+def buy_color_pack(id, user):
     """Handle the color pack purchase"""
     result_message = "You already possess one or more colors from this pack"
     addedColor = []
     transaction_success = False
+    color_pack = Colors_pack.objects.prefetch_related('contains').get(id=id)
 
     for color in color_pack.contains.all():
         try:
-            user.owns.all().get(hex=color.hex)
+            user.owns.get(hex=color.hex)
             break
             # The user already owns the color
         except Color.DoesNotExist:
@@ -711,7 +717,7 @@ def buy_with_pix(request, id):
         if id == int(PixPriceNumType.FIX_COLOR):
             transaction_success, result_message = buy_fix_color(request.POST["hex"], user)
         elif id == int(PixPriceNumType.COLOR_PACK):
-            transaction_success, result_message = buy_color_pack(Colors_pack.objects.get(id=request.POST["pack_id"]), user)
+            transaction_success, result_message = buy_color_pack(request.POST["pack_id"], user)
         elif id == int(PixPriceNumType.RANDOM_COLOR):
             transaction_success, result_message = buy_random_color(user)
         elif id == int(PixPriceNumType.UNLOCK_SLOT):

@@ -12,21 +12,23 @@ def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
+
             new_user = form.save()
-            first_color = Color.objects.get(hex="#fbae00")
-            second_color = Color.objects.get(hex="#da5353")
-            new_user.owns.add(
-                first_color,
-                second_color,
-                Color.objects.get(hex="#693f7b"),
-                Color.objects.get(hex="#39589a"),
-                Color.objects.get(hex="#338984")
-            )
+
+            colors = [
+                '#fbae00',
+                '#da5353',
+                '#693f7b',
+                '#39589a',
+                '#338984'
+            ]
+            colors = list(Color.objects.filter(hex__in=colors))
+
+            new_user.owns.add(*colors)
             new_user.role = Role.objects.get(name="user")
             new_user.save()
 
-            Slot.objects.create(place_num=1, user=new_user, color=first_color)
-            Slot.objects.create(place_num=2, user=new_user, color=second_color)
+            Slot.objects.create(place_num=1, user=new_user, color=colors[0])
 
             new_user = authenticate(
                 username=form.cleaned_data['username'],
@@ -36,7 +38,7 @@ def register(request):
 
             messages.success(request, "Thank you for registering. You are now logged in.")
 
-            return redirect('paypixplace-home')
+            #return redirect('paypixplace-home')
     else:
         form = RegisterForm()
 
