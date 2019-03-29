@@ -295,6 +295,7 @@ def lock_pixel(request):
 def change_pixel_color(request):
     """Changes the color of one pixel of a canvas, if the user have the rights to do so"""
     modification_valid = False
+    pixel_locked = False
     if request.user.is_authenticated:
         if request.is_ajax():
             if request.method == 'POST':
