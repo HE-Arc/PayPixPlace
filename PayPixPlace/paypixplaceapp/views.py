@@ -59,6 +59,19 @@ def get_pix_price():
         prices[price.num_type] = price
     return prices
 
+def get_pix_prices_json(request):
+    if request.is_ajax():
+        prices = {}
+        for key, price in get_pix_price().items():
+            prices[key] = {
+                "name" : price.name,
+                "price" : price.price
+            }
+
+        return JsonResponse(prices, safe=False)
+    else:
+        raise Http404()
+
 class Place(IntEnum):
     OFFICIAL = 0
     COMMUNITY = 1
@@ -128,6 +141,8 @@ class CommunityCanvasView(ListView):
         context['prices'] = get_pix_price()
         context['colors_pack'] = Colors_pack.objects.all().prefetch_related('contains')
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.COMMUNITY)
+        context['canvas_count'] = Canvas.objects.filter(place=Place.COMMUNITY).count
+        context['place'] = Place.COMMUNITY
         return context
 
 class OfficialCanvasView(ListView):
@@ -143,6 +158,8 @@ class OfficialCanvasView(ListView):
         context['prices'] = get_pix_price()
         context['colors_pack'] = Colors_pack.objects.all().prefetch_related('contains')
         context['canvas'] = getCanvas(self.request.GET.get('page'), Place.OFFICIAL)
+        context['canvas_count'] = Canvas.objects.filter(place=Place.OFFICIAL).count
+        context['place'] = Place.OFFICIAL
         return context
 
 class CanvasDetailsView(DetailView):
@@ -299,6 +316,8 @@ def lock_pixel(request):
                 x = request.POST['x']
                 y = request.POST['y']
                 duration_id = int(request.POST['duration_id'])
+                if duration_id < 10 or duration_id > 14:
+                    duration_id = 11
                 user = request.user
                 canvas = Canvas.objects.get(id=canvas_id)
                 transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id, canvas) # duration_id from 10 to 14
