@@ -570,7 +570,6 @@ def buy_slot(user):
         Slot.objects.create(place_num= last_slot_number + 1, user=user, color=user.owns.first())
         result_message = "Slot successfully added"
         transaction_success = True
-
     else:
          result_message = "You can't buy anymore slots!"
 
