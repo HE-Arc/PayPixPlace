@@ -15,11 +15,107 @@
             <h2>{{ user_title }}</h2>
             <a href="{% url 'pix-purchase' %}">Upgrade and get bonus ?</a>
         {% else %}
-            <h2>{{ user_title }}</h2>
-            <a href="{% url 'register' %}">Create an account ?</a>
-            <br>
-            <a href="{% url 'login' %}">Already have an account ?</a>
+
+            <div class="col-12 col-md-10 col-xl-6 offset-0 offset-md-1 offset-xl-3 p-0">
+                <h3>
+                    <strong>Welcome to Pay Pix Place!</strong>
+                </h3>
+                <p>
+                    The place to draw canvas with your friends and the community!
+                </p>
+                
+                <a href="{% url 'register' %}">Create an account ?</a>
+                <br>
+                <a href="{% url 'login' %}">Already have an account ?</a>
+            </div>
         {% endif %}
+    </div>
+
+    <hr class="ppp-hr">
+
+    <div class="row mt-5">
+
+        <div class="text-center col-12 col-sm-6 col-lg-4 mb-5">
+            <a href="{% url 'canvas-official' %}">
+                <img class="img-fluid mb-3 ppp-home-img" src="{% static 'paypixplaceapp/images/officialPPP.png' %}" alt="Official">
+            </a>
+
+            {% if canvas_off == None %}
+                <div class="ppp-img-container">
+                    <div class="ppp-no-img border p-3">
+                        <i class="fas fa-ghost ppp-icon-xl"></i>
+                        <h3 class="ppp-text-home">
+                            No canvas has been created yet. The admins will soon create some!
+                        </h3>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'canvas-official' %}">
+                    <div class="ppp-img-container">
+                        <img
+                            class="ppp-canvas-img img-fluid img-thumbnail"
+                            src="{% url 'canvas-img' canvas_off.id %}"
+                            alt="canvas named {{canvas_off.name}}"
+                        />
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="text-center col-12 col-sm-6 col-lg-4 mb-5">
+            <a href="{% url 'canvas-community' %}">
+                <img class="img-fluid mb-3 ppp-home-img" src="{% static 'paypixplaceapp/images/communityPPP.png' %}" alt="Community">
+            </a>
+
+            {% if canvas_comm == None %}
+                <div class="ppp-img-container">
+                    <div class="ppp-no-img border p-3">
+                        <i class="fas fa-ghost ppp-icon-xl"></i>
+                        <h3 class="ppp-text-home">
+                                No canvas has been created yet. Be the first one and <a href="{% url 'canvas-create' %}">start now!</a>
+                        </h3>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'canvas-community' %}">
+                    <div class="ppp-img-container">
+                        <img
+                            class="ppp-canvas-img img-fluid img-thumbnail"
+                            src="{% url 'canvas-img' canvas_comm.id %}"
+                            alt="canvas named {{canvas_comm.name}}"
+                        />
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="text-center col-12 col-sm-6 col-lg-4 mb-5">
+            <a data-toggle="modal" data-target=".buy-color-modal" style="cursor: pointer;">
+                <img class="img-fluid mb-3 ppp-home-img" src="{% static 'paypixplaceapp/images/pixShopPPP.png' %}" alt="PIX Shop">
+            </a>
+
+            <div class="ppp-img-container">
+                <div class="ppp-no-img border p-3">
+                    <div class="mb-1 mb-md-3 mb-xl-5">
+                        <h4 class="ppp-text-home">
+                            Spend your PIX to unlock new colors and more!
+                        </h4>
+                        <button class="btn btn-outline-dark ppp-btn-lg" data-toggle="modal" data-target=".buy-color-modal" style="cursor: pointer;">
+                            PIX Shop
+                        </button>
+                    </div>
+                    <div>
+                        <h4 class="ppp-text-home">
+                            Purchase more PIX to unlock new colors and more!
+                        </h4>
+                        <a class="btn btn-outline-dark ppp-btn-lg" href="{% url 'pix-purchase' %}">
+                            Purchase
+                            <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
 {% endblock content %}

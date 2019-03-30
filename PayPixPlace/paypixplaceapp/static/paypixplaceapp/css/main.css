@@ -78,6 +78,10 @@ html, body {
     border: 0.1em solid rgb(54, 54, 54);
 }
 
+.ppp-color-case:hover {
+    border: 0.2em solid rgb(54, 54, 54);
+}
+
 .ppp-canvas-property {
     display: inline-block;
 }
@@ -162,6 +166,25 @@ html, body {
     position:relative;
 }
 
+.ppp-no-img {
+    width:100%;
+    height:100%;
+    display:block;
+    position:absolute;
+}
+
+.ppp-home-img {
+    height: 50px;
+}
+
+.ppp-home-text-img {
+    height: 20px;
+}
+
+.ppp-text-home {
+    font-size: 1.5em;
+}
+
 /* Extra large devices (large desktops, 1200px and down) */
 @media (max-width: 1200px) {
     
@@ -171,6 +194,14 @@ html, body {
 
     .ppp-purchase-title-lord {
         height: 1.2em;
+    }
+
+    .ppp-home-img {
+        height: 40px;
+    }
+
+    .ppp-text-home {
+        font-size: 1em;
     }
 }
 
@@ -199,6 +230,10 @@ html, body {
 
     .ppp-section-title {
         height: 3em;
+    }
+
+    .ppp-home-img {
+        height: 30px;
     }
 }
 

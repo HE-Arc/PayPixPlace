@@ -122,12 +122,17 @@ def home(request):
         pixie_num = -1
         user_title = "Anonymous"
 
+    canvas_off = Canvas.objects.filter(place=Place.OFFICIAL).first()
+    canvas_comm = Canvas.objects.filter(place=Place.COMMUNITY).first()
+    
     context = {
         'title': 'Home',
         'prices': get_pix_price(),
         'colors_pack': Colors_pack.objects.all().prefetch_related('contains'),
         'user_title_num': pixie_num,
-        'user_title': user_title
+        'user_title': user_title,
+        'canvas_off': canvas_off,
+        'canvas_comm': canvas_comm,
     }
     return render(request, 'paypixplaceapp/home.html', context)
 
