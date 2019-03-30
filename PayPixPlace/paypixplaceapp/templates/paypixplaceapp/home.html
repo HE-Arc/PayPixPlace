@@ -15,16 +15,23 @@
             <h2>{{ user_title }}</h2>
             <a href="{% url 'pix-purchase' %}">Upgrade and get bonus ?</a>
         {% else %}
-            <h2>{{ user_title }}</h2>
-            <a href="{% url 'register' %}">Create an account ?</a>
-            <br>
-            <a href="{% url 'login' %}">Already have an account ?</a>
+
+            <div class="col-12 col-md-10 col-xl-6 offset-0 offset-md-1 offset-xl-3 p-0">
+                <h3>
+                    <strong>Welcome to Pay Pix Place!</strong>
+                </h3>
+                <p>
+                    The place to draw canvas with your friends and the community!
+                </p>
+                
+                <a href="{% url 'register' %}">Create an account ?</a>
+                <br>
+                <a href="{% url 'login' %}">Already have an account ?</a>
+            </div>
         {% endif %}
     </div>
 
-    <div class="col-12 text-center">
-        <h3></h3>
-    </div>
+    <hr class="ppp-hr">
 
     <div class="row mt-5">
 
@@ -91,7 +98,7 @@
                 <div class="ppp-no-img border p-3">
                     <div class="mb-1 mb-md-3 mb-xl-5">
                         <h4 class="ppp-text-home">
-                            You can spend your PIX to unlock new colors and more!
+                            Spend your PIX to unlock new colors and more!
                         </h4>
                         <button class="btn btn-outline-dark ppp-btn-lg" data-toggle="modal" data-target=".buy-color-modal" style="cursor: pointer;">
                             PIX Shop
