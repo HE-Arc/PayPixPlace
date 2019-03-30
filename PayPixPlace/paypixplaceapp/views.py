@@ -365,17 +365,14 @@ def change_pixel_color(request):
                 hex = request.POST['hex']
                 user = request.user
 
-                current_date = timezone.now()
-
                 pixel = Pixel.objects.select_related('canvas').get(canvas=canvas_id, x=x, y=y)
-                print(pixel.canvas, flush=True)
-                if can_modify_pixel(pixel, hex, user, current_date):
+                if can_modify_pixel(pixel, hex, user):
                     pixel.hex = hex
                     pixel.user = user
                     pixel.save()
 
                     if user.ammo == user.max_ammo:
-                        user.last_ammo_usage = current_date
+                        user.last_ammo_usage = timezone.now()
                     user.ammo -= 1
                     user.pix += 1
                     user.save()
@@ -393,13 +390,10 @@ def change_pixel_color(request):
     }
     return JsonResponse(data)
 
-def can_modify_pixel(pixel, color, user, current_date):
+def can_modify_pixel(pixel, color, user):
     """Test if the user can modify a pixel"""
     returnBool = True
-    returnBool &= (
-        pixel.end_protection_date is None or
-        current_date > pixel.end_protection_date
-        ) or (pixel.user == user)
+    returnBool &= not is_pixel_locked(pixel) or (pixel.user == user)
     returnBool &= user.ammo > 0
     returnBool &= user.owns.filter(hex=color).exists()
     
@@ -408,10 +402,9 @@ def can_modify_pixel(pixel, color, user, current_date):
 def is_pixel_locked(pixel):
     return (pixel.end_protection_date is not None and timezone.now() < pixel.end_protection_date)
 
-@login_required
 def get_user_ammo(request):
     """Returns informations about the user's ammunitions"""
-    if request.is_ajax():
+    if request.is_ajax() and request.user.is_authenticated:
         user = request.user
 
         timeBeforeReload = 0
@@ -802,3 +795,10 @@ def lock_with_pix(user, id, canvas):
             canvas.user.save()
 
     return transaction_success, result_message, minutes, hours
+
+def get_colors_json(request):
+    if request.is_ajax and request.user.is_authenticated:
+        colors = [color["hex"] for color in request.user.owns.values("hex")]
+        return JsonResponse(colors, safe=False)
+    else:
+        raise Http404()

@@ -113,7 +113,7 @@ function drawPixels() {
         );
     }
 
-    canvas.style.border = 2 / scale + "px solid #AAAAAA";
+    canvas.style.border = 1 / scale + "px solid #AAAAAA";
 }
 
 /**
@@ -491,6 +491,26 @@ function initEvents() {
         } else {
             panZoomInstance.resume();
         }
+    });
+
+    // refresh the colors selector when the user buys new colors
+    $("#buy-color-modal").on('hide.bs.modal', function(){
+        $.ajax({
+            type: "GET",
+            url: "/colors/",
+            dataType: "json",
+            success: function (data) {
+                try {
+                    let elem = document.getElementById("color-picker-modal-inner");
+                    let html = "";
+                    for (let i=0 ; i < data.length ; i++) {
+                        html += '<div class="ppp-color-case" style="background-color: ' + data[i] + ';" onclick="changeSlotColor(' + "'" + data[i] + "'" + ');"></div>\n';
+                    }
+                    elem.innerHTML = html;
+                } catch(error) {
+                }
+            }
+        });
     });
 }
 

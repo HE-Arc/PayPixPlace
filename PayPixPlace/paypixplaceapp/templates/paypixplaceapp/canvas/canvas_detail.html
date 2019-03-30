@@ -155,7 +155,7 @@
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <div class="modal-body text-center">
+                <div id="color-picker-modal-inner" class="modal-body text-center">
                     {% for color in user.owns.all %}
                         <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeSlotColor('{{ color.hex }}')"></div>
                     {% endfor %}
