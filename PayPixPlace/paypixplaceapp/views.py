@@ -226,7 +226,12 @@ def createCanvas(request):
                         else:
                             messages.error(request, f"You don't have enough pix to enable the profit!")
 
-                    messages.success(request, f'You created a new canvas successfully!')
+                    messages.success(
+                        request,
+                        f"You created a new canvas successfully! <a href='" +
+                            f"/canvas/{canvas.id}/" +
+                            f"'>Go to your new canvas!</a>",
+                        extra_tags='safe')
 
                     if canvas.place == int(Place.COMMUNITY):
                         return redirect('canvas-community')
@@ -259,6 +264,7 @@ def userCanvas(request):
         'canvas': canvas,
         'prices': get_pix_price(),
         'colors_pack': Colors_pack.objects.all().prefetch_related('contains'),
+        'canvas_count': len(canvas)
     }
     return render(request, 'paypixplaceapp/canvas/user_canvas.html', context)
 
