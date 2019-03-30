@@ -7,6 +7,7 @@ let lockModalButton;
 let lockRange;
 let lockPrice;
 let lockDetails;
+let allUserColors;
 
 /**
  * Change the current slot

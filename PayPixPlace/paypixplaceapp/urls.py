@@ -20,4 +20,5 @@ urlpatterns = [
     path('cursor/<str:hex>/', views.get_cursor, name='cursor'),
     path('lock_pixel/', views.lock_pixel, name='lock-pixel'),
     path('prices/', views.get_pix_prices_json, name='prices'),
+    path('colors/', views.get_colors_json, name='colors'),
 ]
