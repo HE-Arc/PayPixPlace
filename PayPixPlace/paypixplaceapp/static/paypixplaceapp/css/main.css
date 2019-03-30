@@ -162,6 +162,17 @@ html, body {
     position:relative;
 }
 
+.ppp-no-img {
+    width:100%;
+    height:100%;
+    display:block;
+    position:absolute;
+}
+
+.ppp-home-img {
+    height: 50px;
+}
+
 /* Extra large devices (large desktops, 1200px and down) */
 @media (max-width: 1200px) {
     
@@ -199,6 +210,10 @@ html, body {
 
     .ppp-section-title {
         height: 3em;
+    }
+
+    .ppp-text-sm {
+        font-size: 1.5em;
     }
 }
 

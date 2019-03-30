@@ -21,5 +21,66 @@
             <a href="{% url 'login' %}">Already have an account ?</a>
         {% endif %}
     </div>
+
+    <div class="col-12 text-center">
+        <h3></h3>
+    </div>
+
+    <div class="row mt-5">
+
+        <div class="text-center col-12 col-sm-6 col-lg-4 mb-5">
+            <a href="{% url 'canvas-official' %}">
+                <img class="img-fluid mb-3 ppp-home-img" src="{% static 'paypixplaceapp/images/officialPPP.png' %}" alt="Official">
+            </a>
+
+            {% if canvas_off == None %}
+                <div class="ppp-img-container">
+                    <div class="ppp-no-img border p-3">
+                        <i class="fas fa-ghost ppp-icon-xl"></i>
+                        <h3 class="ppp-text-sm">
+                            No canvas has been created yet. The admins will soon create some!
+                        </h3>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'canvas-official' %}">
+                    <div class="ppp-img-container">
+                        <img
+                            class="ppp-canvas-img img-fluid img-thumbnail"
+                            src="{% url 'canvas-img' canvas_off.id %}"
+                            alt="canvas named {{canvas_off.name}}"
+                        />
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="text-center col-12 col-sm-6 col-lg-4 mb-5">
+            <a href="{% url 'canvas-community' %}">
+                <img class="img-fluid mb-3 ppp-home-img" src="{% static 'paypixplaceapp/images/communityPPP.png' %}" alt="Community">
+            </a>
+
+            {% if canvas_comm == None %}
+                <div class="ppp-img-container">
+                    <div class="ppp-no-img border p-3">
+                        <i class="fas fa-ghost ppp-icon-xl"></i>
+                        <h3 class="ppp-text-sm">
+                                No canvas has been created yet. Be the first one and <a href="{% url 'canvas-create' %}">start now!</a>
+                        </h3>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'canvas-community' %}">
+                    <div class="ppp-img-container">
+                        <img
+                            class="ppp-canvas-img img-fluid img-thumbnail"
+                            src="{% url 'canvas-img' canvas_comm.id %}"
+                            alt="canvas named {{canvas_comm.name}}"
+                        />
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+    </div>
     
 {% endblock content %}
