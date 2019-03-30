@@ -181,6 +181,7 @@ $(document).ready(function(){
     }
 
     selectCB = document.getElementById("selectCB");
+    selectCB.checked = false;
     selectCB.addEventListener("click", function() {
         isColoring = !this.checked;
         setCursor();

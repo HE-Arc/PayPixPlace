@@ -210,7 +210,7 @@ def createCanvas(request):
             canvas.user = request.user
 
             # Check if the given place is a valid one
-            if canvas.place == Place.OFFICIAL and canvas.place == Place.COMMUNITY:
+            if canvas.place == Place.OFFICIAL or canvas.place == Place.COMMUNITY:
 
                 if request.user.role.name == "admin" or (request.user.role.name == "user" and canvas.place == Place.COMMUNITY):
                     canvas.save()
@@ -389,7 +389,7 @@ def can_modify_pixel(pixel, color, user, current_date):
         current_date > pixel.end_protection_date
         ) or (pixel.user == user)
     returnBool &= user.ammo > 0
-    returnBool &= color in [color.hex for color in user.owns.all()]
+    returnBool &= user.owns.filter(hex=color).exists()
     
     return returnBool
 
@@ -507,14 +507,14 @@ def get_img(request, id):
         raise Http404()
 
     try:
-        canvas = Canvas.objects.get(id=id)
-    except ObjectDoesNotExist:
+        canvas = Canvas.objects.filter(id=id).values("width")[0]
+    except:
         raise Http404()
 
-    pixels = [pixel for pixel in Pixel.objects.filter(canvas=id).values('x', 'y', 'hex')]
+    pixels = [pixel for pixel in Pixel.objects.filter(canvas=id).values('x', 'y', 'hex') if pixel["hex"] != "#FFFFFF"]
     imgSize = 1000
-    img = Image.new('RGB', (imgSize, imgSize))
-    pixelSize = imgSize / model_to_dict(canvas)["width"]
+    img = Image.new(mode="RGB", size=(imgSize, imgSize), color="#FFFFFF")
+    pixelSize = imgSize / canvas["width"]
 
     draw = ImageDraw.Draw(img)
     for pixel in pixels:

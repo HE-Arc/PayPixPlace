@@ -38,7 +38,7 @@ def register(request):
 
             messages.success(request, "Thank you for registering. You are now logged in.")
 
-            #return redirect('paypixplace-home')
+            return redirect('paypixplace-home')
     else:
         form = RegisterForm()
 

@@ -20,6 +20,7 @@ let isColoring;
 let selectedPixel;
 let hideProtectedCB;
 let lockImage;
+let pausePanzoomCB;
 
 const CANVAS_PIXEL_WIDTH = 4000;
 
@@ -256,12 +257,16 @@ function getOffsetPosition(evt, target){
  * action to fill a pixel (used to respond to events)
  * @param {Event} event 
  */
-function fillPixel(event=undefined) {
+function fillPixel(event) {
     let pos = getOffsetPosition(event, canvas);
     let x = parseInt((pos.x) / pixelWidth);
     let y = parseInt((pos.y) / pixelWidth);
     if (x < 0 || y < 0 || x > canvasWidth-1 || y > canvasWidth-1) {
         return;
+    }
+    if (mouseLastPos){
+        x = mouseLastPos.x;
+        y = mouseLastPos.y;
     }
     if (drawingColor) {
         pixels[x][y].hex = drawingColor;
@@ -385,6 +390,10 @@ function selectPixel(event) {
     if (x < 0 || y < 0 || x > canvasWidth-1 || y > canvasWidth-1) {
         return;
     }
+    if (mouseLastPos){
+        x = mouseLastPos.x;
+        y = mouseLastPos.y;
+    }
     
     displayInfos(x, y);
     
@@ -475,6 +484,14 @@ function initEvents() {
         hideProtected = this.checked;
         drawPixels();
     });
+
+    pausePanzoomCB.addEventListener("click", function() {
+        if (this.checked) {
+            panZoomInstance.pause();
+        } else {
+            panZoomInstance.resume();
+        }
+    });
 }
 
 /**
@@ -492,6 +509,11 @@ function initParams() {
     
     canvasContainer = document.getElementById("canvasContainer");
     hideProtectedCB = document.getElementById("hideProtectedCB");
+    hideProtectedCB.checked = false;
+
+    pausePanzoomCB = document.getElementById("pausePanzoomCB");
+    pausePanzoomCB.checked = false;
+
     lockImage = document.getElementById("lockImage");
     hideProtected = false;
     pixelInfoDisplay = {
@@ -537,6 +559,7 @@ $(document).ready(function(){
     // display the grid when the checkbox is checked
     let showGridCBs = document.getElementsByClassName("showGridCB");
     for (let index = 0; index < showGridCBs.length; index++) {
+        showGridCBs[index].checked = false;
         showGridCBs[index].addEventListener("click", function(event) {
             displayGrid = this.checked;
             drawPixels();
