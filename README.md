@@ -4,7 +4,7 @@
 Projet web Django 2019  
 Application qui permet à plusieur personnes de remplir des pixels de couleur sur des canvas communautaires.  
 Les fonctionnalités principales sont :
-* Créer un canvas de tailles allant de 10x10 à 50x50 pixels.
+* Créer un canvas de tailles allant de 10x10 à 100x100 pixels.
 * Colorier les Pixels de ce canvas à l'aide de l'éditeur fourni (limite à un par minute et système de munitions).
 * Acheter des Pix à l'aide de l'API [Stripe](https://stripe.com/ch).
 * Dépenser ces Pix dans la boutique pour acheter :
