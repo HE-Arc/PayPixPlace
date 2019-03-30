@@ -173,6 +173,10 @@ html, body {
     height: 50px;
 }
 
+.ppp-text-home {
+    font-size: 1.5em;
+}
+
 /* Extra large devices (large desktops, 1200px and down) */
 @media (max-width: 1200px) {
     
@@ -182,6 +186,14 @@ html, body {
 
     .ppp-purchase-title-lord {
         height: 1.2em;
+    }
+
+    .ppp-home-img {
+        height: 40px;
+    }
+
+    .ppp-text-home {
+        font-size: 1em;
     }
 }
 
@@ -212,8 +224,8 @@ html, body {
         height: 3em;
     }
 
-    .ppp-text-sm {
-        font-size: 1.5em;
+    .ppp-home-img {
+        height: 30px;
     }
 }
 

@@ -37,7 +37,7 @@
                 <div class="ppp-img-container">
                     <div class="ppp-no-img border p-3">
                         <i class="fas fa-ghost ppp-icon-xl"></i>
-                        <h3 class="ppp-text-sm">
+                        <h3 class="ppp-text-home">
                             No canvas has been created yet. The admins will soon create some!
                         </h3>
                     </div>
@@ -64,7 +64,7 @@
                 <div class="ppp-img-container">
                     <div class="ppp-no-img border p-3">
                         <i class="fas fa-ghost ppp-icon-xl"></i>
-                        <h3 class="ppp-text-sm">
+                        <h3 class="ppp-text-home">
                                 No canvas has been created yet. Be the first one and <a href="{% url 'canvas-create' %}">start now!</a>
                         </h3>
                     </div>
@@ -89,16 +89,16 @@
 
             <div class="ppp-img-container">
                 <div class="ppp-no-img border p-3">
-                    <div class="mb-5">
-                        <h4>
+                    <div class="mb-1 mb-md-3 mb-xl-5">
+                        <h4 class="ppp-text-home">
                             You can spend your PIX to unlock new colors and more!
                         </h4>
                         <button class="btn btn-outline-dark ppp-btn-lg" data-toggle="modal" data-target=".buy-color-modal" style="cursor: pointer;">
                             PIX Shop
                         </button>
                     </div>
-                    <div class="mb-3">
-                        <h4>
+                    <div>
+                        <h4 class="ppp-text-home">
                             Purchase more PIX to unlock new colors and more!
                         </h4>
                         <a class="btn btn-outline-dark ppp-btn-lg" href="{% url 'pix-purchase' %}">
