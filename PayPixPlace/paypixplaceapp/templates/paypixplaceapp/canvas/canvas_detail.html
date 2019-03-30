@@ -201,14 +201,32 @@
     {% endif %}
 
     <div id="canvas-control-modal" class="modal fade canvas-control-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Canvas Controls</h2>
+                </div>
                 <div class="modal-body">
-                    <label class="font-weight-bold">Canvas Controls</label>
+                    <label class="font-weight-bold">General</label>
+                    <ul class="pl-3 text-left">
+                        <li>Pick a color to draw</li>
+                        <li>Click on the palette, on the right of a color to change it</li>
+                        <li>Selection tool is useful to get more information or to lock a pixel</li>
+                        <li>Show grid is useful to be more precise</li>
+                        <li>Show locked is useful to know which pixel is protected</li>
+                        <li>Pause Panzoom is useful to disable the zoom and the movement on the canvas</li>
+                    </ul>
+                    <label class="font-weight-bold">Mobile</label>
                     <ul class="pl-3 text-left">
                         <li>Hold left click to move the canvas</li>
-                        <li>Use mousewheel or fingers to zoom</li>
-                        <li>Click/Touch to change the color of a pixel</li>    
+                        <li>Use mousewheel to zoom</li>
+                        <li>Click to change the color of a pixel</li>
+                    </ul>
+                    <label class="font-weight-bold">Computer</label>
+                    <ul class="pl-3 text-left">
+                        <li>Move your finger on your screen to move the canvas</li>
+                        <li>Pinch the screen to zoom</li>
+                        <li>Touch to change the color of a pixel</li>
                     </ul>
                 </div>
                 <div class="modal-footer">
