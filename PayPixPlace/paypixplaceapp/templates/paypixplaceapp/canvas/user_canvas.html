@@ -3,6 +3,15 @@
 {% block content %}
 
     <div class="row">
+        {% if canvas_count <= 0 %}
+            <div class="col-12 text-center mt-3">
+                <i class="fas fa-ghost ppp-icon-xl"></i>
+                <h3>
+                    You haven't created any canvas yet. Don't wait any longer and <a href="{% url 'canvas-create' %}">start now!</a>
+                </h3>
+            </div>
+        {% endif %}
+
         {% for c in canvas %}
 
             <div id="confirm-enable-profit-{{ c.id }}" class="modal fade confirm-enable-profit">

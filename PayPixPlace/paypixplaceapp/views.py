@@ -226,7 +226,12 @@ def createCanvas(request):
                         else:
                             messages.error(request, f"You don't have enough pix to enable the profit!")
 
-                    messages.success(request, f'You created a new canvas successfully!')
+                    messages.success(
+                        request,
+                        f"You created a new canvas successfully! <a href='" +
+                            f"/canvas/{canvas.id}/" +
+                            f"'>Go to your new canvas!</a>",
+                        extra_tags='safe')
 
                     if canvas.place == int(Place.COMMUNITY):
                         return redirect('canvas-community')
@@ -259,6 +264,7 @@ def userCanvas(request):
         'canvas': canvas,
         'prices': get_pix_price(),
         'colors_pack': Colors_pack.objects.all().prefetch_related('contains'),
+        'canvas_count': len(canvas)
     }
     return render(request, 'paypixplaceapp/canvas/user_canvas.html', context)
 
@@ -576,7 +582,7 @@ def buy_fix_color(hex, user):
     transaction_success = False
     
     try:
-        user.owns.get(hex=hex)
+        user.owns.get(hex__iexact=hex)
         # The user already owns the color
         result_message = "You already own this color!"
     except Color.DoesNotExist:
@@ -598,7 +604,7 @@ def buy_random_color(user):
         hex = ('#%02X%02X%02X' % (r(),r(),r()))
     
         try:
-            user.owns.get(hex=hex)
+            user.owns.get(hex__iexact=hex)
             # The user already owns the color
             result_message = "You already own this color!"
         except Color.DoesNotExist:
@@ -634,7 +640,7 @@ def buy_color_pack(id, user):
 
     for color in color_pack.contains.all():
         try:
-            user.owns.get(hex=color.hex)
+            user.owns.get(hex__iexact=color.hex)
             break
             # The user already owns the color
         except Color.DoesNotExist:
