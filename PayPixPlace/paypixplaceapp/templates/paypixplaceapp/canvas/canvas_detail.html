@@ -118,6 +118,14 @@
             </div>
         </div>
     </div>
+
+    <div id="canvasContainer" class="ppp-canvas-wrapper">
+        <canvas id="canvas">
+            Canvas are not supported
+        </canvas>
+    </div>
+
+    {% if user.is_authenticated %}
     <div id="downbarContainer" class="ppp-downbar-container">
         <div class="row">
             <div class="col-10 col-md-8 col-lg-4 offset-1 offset-md-2 offset-lg-4 ppp-downbar-content p-1">
@@ -152,14 +160,7 @@
             </div>
         </div>
     </div>
-
-    <div id="canvasContainer" class="ppp-canvas-wrapper">
-        <canvas id="canvas">
-            Canvas are not supported
-        </canvas>
-    </div>
     
-    {% if user.is_authenticated %}
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
