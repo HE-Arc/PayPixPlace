@@ -26,25 +26,33 @@
                             {% if slots_count > 0 %}
                             <div class="col-6 mb-3 p-0">
                                 <div class="picker1 ppp-picker ppp-picker-selected"></div>
-                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">></button>
+                                <button class="btn btn-sm btn-dark ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(1)">
+                                    <i class="fas fa-palette"></i>
+                                </button>
                             </div>
                             {% endif %}
                             {% if slots_count > 1 %}
                             <div class="col-6 mb-3 p-0">
                                 <div class="picker2 ppp-picker"></div>
-                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">></button>
+                                <button class="btn btn-sm btn-dark ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(2)">
+                                    <i class="fas fa-palette"></i>
+                                </button>
                             </div>
                             {% endif %}
                             {% if slots_count > 2 %}
                             <div class="col-6 p-0">
                                 <div class="picker3 ppp-picker"></div>
-                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">></button>
+                                <button class="btn btn-sm btn-dark ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(3)">
+                                    <i class="fas fa-palette"></i>
+                                </button>
                             </div>
                             {% endif %}
                             {% if slots_count > 3 %}
                             <div class="col-6 p-0">
                                 <div class="picker4 ppp-picker"></div>
-                                <button class="btn btn-sm btn-outline-info ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">></button>
+                                <button class="btn btn-sm btn-dark ppp-btn-color-picker" data-toggle="modal" data-target=".color-picker-modal" onclick="changeCurrentSlot(4)">
+                                    <i class="fas fa-palette"></i>
+                                </button>
                             </div>
                             {% endif %}
                         </div>
@@ -99,10 +107,10 @@
                         </div>
                     </li>
                     <li class="list-group-item text-white bg-dark">
-                        <button class="btn btn-md btn-outline-info d-inline" data-toggle="modal" data-target=".canvas-control-modal">
+                        <button class="btn btn-md btn-dark d-inline ppp-btn-detail-canvas" data-toggle="modal" data-target=".canvas-control-modal">
                             <i class="fas fa-info-circle ppp-canvas-control"></i>
                         </button>
-                        <a id="downloadButton" class="btn btn-lg btn-outline-info d-inline" href="{% url 'canvas-img' id=object.id %}" download="{{ object.name }}">
+                        <a id="downloadButton" class="btn btn-lg btn-dark d-inline ppp-btn-detail-canvas" href="{% url 'canvas-img' id=object.id %}" download="{{ object.name }}">
                             <i class="fas fa-file-download ppp-canvas-control"></i>
                         </a>                        
                     </li>
@@ -110,6 +118,14 @@
             </div>
         </div>
     </div>
+
+    <div id="canvasContainer" class="ppp-canvas-wrapper">
+        <canvas id="canvas">
+            Canvas are not supported
+        </canvas>
+    </div>
+
+    {% if user.is_authenticated %}
     <div id="downbarContainer" class="ppp-downbar-container">
         <div class="row">
             <div class="col-10 col-md-8 col-lg-4 offset-1 offset-md-2 offset-lg-4 ppp-downbar-content p-1">
@@ -144,14 +160,7 @@
             </div>
         </div>
     </div>
-
-    <div id="canvasContainer" class="ppp-canvas-wrapper">
-        <canvas id="canvas">
-            Canvas are not supported
-        </canvas>
-    </div>
     
-    {% if user.is_authenticated %}
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
@@ -192,14 +201,32 @@
     {% endif %}
 
     <div id="canvas-control-modal" class="modal fade canvas-control-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Canvas Controls</h2>
+                </div>
                 <div class="modal-body">
-                    <label class="font-weight-bold">Canvas Controls</label>
+                    <label class="font-weight-bold">General</label>
+                    <ul class="pl-3 text-left">
+                        <li>Pick a color to draw</li>
+                        <li>Click on the palette, on the right of a color to change it</li>
+                        <li>Selection tool is useful to get more information or to lock a pixel</li>
+                        <li>Show grid is useful to be more precise</li>
+                        <li>Show locked is useful to know which pixel is protected</li>
+                        <li>Pause Panzoom is useful to disable the zoom and the movement on the canvas</li>
+                    </ul>
+                    <label class="font-weight-bold">Mobile</label>
                     <ul class="pl-3 text-left">
                         <li>Hold left click to move the canvas</li>
-                        <li>Use mousewheel or fingers to zoom</li>
-                        <li>Click/Touch to change the color of a pixel</li>    
+                        <li>Use mousewheel to zoom</li>
+                        <li>Click to change the color of a pixel</li>
+                    </ul>
+                    <label class="font-weight-bold">Computer</label>
+                    <ul class="pl-3 text-left">
+                        <li>Move your finger on your screen to move the canvas</li>
+                        <li>Pinch the screen to zoom</li>
+                        <li>Touch to change the color of a pixel</li>
                     </ul>
                 </div>
                 <div class="modal-footer">

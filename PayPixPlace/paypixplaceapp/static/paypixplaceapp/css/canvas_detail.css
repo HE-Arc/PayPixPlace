@@ -66,13 +66,11 @@
     display: inline-block;
     cursor: pointer;
     vertical-align: middle;
+    border: 1px solid white;
 }
 
-.ppp-btn-color-picker-sm {
-    height: 40px;
-    display: inline-block;
-    cursor: pointer;
-    vertical-align: middle;
+.ppp-btn-detail-canvas {
+    border: 1px solid white;
 }
 
 .ppp-picker-sm {
