@@ -2,8 +2,6 @@ function display_informations(data) {
 
     transactionState = data.TransactionSuccess ? "success" : "error";
 
-    console.log(data);
-
     message = data.Result[1];
     if (data.TransactionSuccess) {
 
