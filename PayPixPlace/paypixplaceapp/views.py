@@ -583,7 +583,7 @@ def buy_fix_color(hex, user):
     transaction_success = False
     
     try:
-        user.owns.get(hex=hex)
+        user.owns.get(hex__iexact=hex)
         # The user already owns the color
         result_message = "You already own this color!"
     except Color.DoesNotExist:
@@ -605,7 +605,7 @@ def buy_random_color(user):
         hex = ('#%02X%02X%02X' % (r(),r(),r()))
     
         try:
-            user.owns.get(hex=hex)
+            user.owns.get(hex__iexact=hex)
             # The user already owns the color
             result_message = "You already own this color!"
         except Color.DoesNotExist:
@@ -641,7 +641,7 @@ def buy_color_pack(id, user):
 
     for color in color_pack.contains.all():
         try:
-            user.owns.get(hex=color.hex)
+            user.owns.get(hex__iexact=color.hex)
             break
             # The user already owns the color
         except Color.DoesNotExist:
