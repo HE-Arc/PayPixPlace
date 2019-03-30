@@ -45,13 +45,14 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-6">
-                                <span class="font-weight-bold">Theme : </span>{{ c.theme }}
+                            <div class="col-12 position-relative">
+                                <span class="font-weight-bold">Size : </span>
+                                <div class="pr-3 ppp-text-created-canvas">{{ c.width }} x {{ c.width }}</div>
                             </div>
-                            <div class="col-6 text-right">
-                                <span class="font-weight-bold">Size : </span>{{ c.width }} x {{ c.width }}
+                            <div class="col-12 mt-2 position-relative">
+                                <span class="font-weight-bold">Theme : </span>
+                                <div class="pr-3 ppp-text-created-canvas">{{ c.theme }}</div>
                             </div>
-                            <hr class="w-100">
                             <div class="col-12 mt-2">
                                 <span class="font-weight-bold">Is profit on : </span>
                                 <label class="switch">
