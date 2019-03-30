@@ -326,6 +326,10 @@ def lock_pixel(request):
                 pixel = Pixel.objects.select_related('canvas').get(canvas=canvas_id, x=x, y=y)
                 transaction_success, result_message, minutes, hours = lock_with_pix(user, duration_id, pixel.canvas) # duration_id from 10 to 14
                 
+                if is_pixel_locked(pixel):
+                    transaction_success = False
+                    result_message = "Pixel already locked"
+
                 if transaction_success:
                     pixel.user = user
                     pixel.end_protection_date = timezone.now() + timedelta(minutes=minutes, hours=hours)
@@ -370,10 +374,7 @@ def change_pixel_color(request):
                     canvas.interactions += 1
                     canvas.save()
                 
-                pixel_locked = (
-                    pixel.end_protection_date is not None and 
-                    current_date < pixel.end_protection_date
-                    ) and (pixel.user != user)
+                pixel_locked = is_pixel_locked(pixel) and (pixel.user != user)
     data = {
         'is_valid' : modification_valid,
         'user_authenticated' : request.user.is_authenticated,
@@ -392,6 +393,9 @@ def can_modify_pixel(pixel, color, user, current_date):
     returnBool &= user.owns.filter(hex=color).exists()
     
     return returnBool
+
+def is_pixel_locked(pixel):
+    return (pixel.end_protection_date is not None and timezone.now() < pixel.end_protection_date)
 
 @login_required
 def get_user_ammo(request):
