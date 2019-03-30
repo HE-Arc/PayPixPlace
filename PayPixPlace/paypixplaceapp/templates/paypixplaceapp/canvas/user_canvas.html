@@ -12,33 +12,32 @@
             </div>
         {% endif %}
 
-        {% for c in canvas %}
-
-            <div id="confirm-enable-profit-{{ c.id }}" class="modal fade confirm-enable-profit">
-                <div class="modal-dialog modal-sm">
-                    <div class="modal-content">
-                        {% with profit_activation=prices|get_item:9 %}
-                        <div class="modal-body" style="display: inline-block;">
-                            <h3>
-                                Enable the profit for this canvas will cost you <strong>{{ profit_activation.price }}</strong>
-                                <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">!
-                            </h3>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-success ppp-btn-md font-weight-bold" name="btn-confirm-profit" data-dismiss="modal" data-canvas-id="{{ c.id }}">
-                                Confirm
-                            </button>
-
-                            <button type="button" class="btn btn-danger ppp-btn-md font-weight-bold" name="btn-close-profit" data-dismiss="modal" data-canvas-id="{{ c.id }}">
-                                Cancel
-                            </button>
-                        </div>
-                        {% endwith %}
+        <div id="confirm-enable-profit" class="modal fade confirm-enable-profit">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    {% with profit_activation=prices|get_item:9 %}
+                    <div class="modal-body" style="display: inline-block;">
+                        <h3>
+                            Enable the profit for this canvas will cost you <strong>{{ profit_activation.price }}</strong>
+                            <img class="ppp-currency ppp-currency-lg" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">!
+                        </h3>
                     </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success ppp-btn-md font-weight-bold" name="btn-confirm-profit" data-dismiss="modal">
+                            Confirm
+                        </button>
+
+                        <button type="button" class="btn btn-danger ppp-btn-md font-weight-bold" name="btn-close-profit" data-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
+                    {% endwith %}
                 </div>
             </div>
+        </div>
 
+        {% for c in canvas %}
             <div class="col-12 col-sm-6 col-lg-4 mb-5">
                 <div class="card">
                     <div class="card-header">
