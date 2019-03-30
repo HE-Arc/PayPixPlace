@@ -10,7 +10,7 @@ from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db import connection
-from django.db.models import Prefetch, Max
+from django.db.models import Prefetch, Max, Q
 from django.forms import model_to_dict
 from django.http import HttpResponse, JsonResponse
 from django.http.response import Http404
@@ -514,7 +514,7 @@ def get_img(request, id):
     except:
         raise Http404()
 
-    pixels = [pixel for pixel in Pixel.objects.filter(canvas=id).values('x', 'y', 'hex') if pixel["hex"] != "#FFFFFF"]
+    pixels = list(Pixel.objects.filter(Q(canvas=id) & ~Q(hex="#ffffff")).values('x', 'y', 'hex'))
     imgSize = 1000
     img = Image.new(mode="RGB", size=(imgSize, imgSize), color="#FFFFFF")
     pixelSize = imgSize / canvas["width"]

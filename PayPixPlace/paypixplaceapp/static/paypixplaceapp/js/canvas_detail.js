@@ -21,6 +21,7 @@ let selectedPixel;
 let hideProtectedCB;
 let lockImage;
 let pausePanzoomCB;
+let isNewSlotAcquired;
 
 const CANVAS_PIXEL_WIDTH = 4000;
 
@@ -511,6 +512,9 @@ function initEvents() {
                 }
             }
         });
+        if (isNewSlotAcquired) {
+            document.location.reload();
+        }
     });
 }
 
@@ -566,6 +570,8 @@ function initParams() {
     countMove = 0;
 
     isColoring = true;
+
+    isNewSlotAcquired = false;
 }
 
 // Execute when the page is fully loaded

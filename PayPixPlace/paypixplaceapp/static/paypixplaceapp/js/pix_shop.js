@@ -2,8 +2,6 @@ function display_informations(data) {
 
     transactionState = data.TransactionSuccess ? "success" : "error";
 
-    console.log(data);
-
     message = data.Result[1];
     if (data.TransactionSuccess) {
 
@@ -38,7 +36,9 @@ function display_informations(data) {
             case 3:
 
                 unlockItem.appendChild(displayUnlockText("New color slot acquired!"));
-
+                if (typeof isNewSlotAcquired !== "undefined") {
+                    isNewSlotAcquired = true;
+                }
                 unlockItem.appendChild(displayUnlockItem(" ppp-unlock-item-icon mb-3 fas fa-palette", data.Result[2]));
                 break;
 
@@ -235,5 +235,6 @@ $(document).ready(function() {
             useAlpha: false
         });
     });
+
 });
 

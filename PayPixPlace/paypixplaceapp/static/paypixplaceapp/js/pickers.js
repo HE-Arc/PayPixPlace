@@ -152,7 +152,6 @@ function lockPixel(x,y) {
     });
 }
 
-
 // Execute when the page is fully loaded
 $(document).ready(function(){
     
