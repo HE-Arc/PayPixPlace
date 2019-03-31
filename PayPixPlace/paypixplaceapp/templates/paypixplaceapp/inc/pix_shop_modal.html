@@ -5,6 +5,7 @@
 <div id="buy-color-modal" class="modal fade buy-color-modal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+
             <div class="modal-body text-center">
                 <img class="img-fluid w-75 mb-3" src="{% static 'paypixplaceapp/images/pixShopPPP.png' %}" alt="PIX Shop">
                 <p class="font-weight-bold">
@@ -133,11 +134,17 @@
 <div id="unlock-item-modal" class="modal fade unlock-item-modal">
     <div class="modal-dialog modal-sm">
         <div class="modal-content text-center">
+            
+            <div class="pyro">
+                <div class="before"></div>
+                <div class="after"></div>
+            </div>
+            
             <div class="modal-body">
                 <h2 class="mb-3">Unlocked</h2>
                 <div id="unlockItem" class="mb-3"></div>
 
-                <button type="button" class="btn btn-outline-dark ppp-btn-md" data-dismiss="modal">Accept</button>
+                <button type="button" class="btn btn-outline-dark ppp-btn-md ppp-btn-shop" data-dismiss="modal">Accept</button>
             </div>
         </div>
     </div>
