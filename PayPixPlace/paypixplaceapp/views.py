@@ -715,7 +715,10 @@ def activate_profit(canvas_id):
 def buy_with_pix(request, id): 
     """Handle the purchase with pix"""
     user = request.user
-    price = PixPrice.objects.get(num_type=id).price
+    try:
+        price = PixPrice.objects.get(num_type=id).price
+    except:
+        raise Http404()
 
     result_message = ""
     transaction_success = False

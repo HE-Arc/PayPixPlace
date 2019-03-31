@@ -29,9 +29,10 @@ $.getScript('https://checkout.stripe.com/checkout.js', function()
           document.getElementById(purchaseOption.id).addEventListener('click', function(e) {
               // Open Checkout with further options:
               purchaseOption.handler.open({
-                name: 'Paypixplace',
+                name: 'Pay Pix Place',
                 description: purchaseOption.number + ' PIX + ' + purchaseOption.bonus + ' PIX bonus !',
                 zipCode: true,
+                image: '/static/paypixplaceapp/images/currencyPPPStripe.png',
                 billingAddress: false,
                 amount: purchaseOption.price,
                 currency: "CHF",
