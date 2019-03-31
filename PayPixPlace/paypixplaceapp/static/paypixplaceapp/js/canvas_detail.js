@@ -204,19 +204,17 @@ function canvasMouseMoveHover(event) {
             x : x,
             y : y
         }
-        if (mouseLastPos) {
-            mouseCord.innerHTML = "X : " + x + "<br>Y : " + y
-        } else {
-            mouseCord.innerHTML = "";
-        }
     } else if (mouseLastPos){
         x = mouseLastPos.x;
         y = mouseLastPos.y;
+    } else {
+        mouseCord.innerHTML = "";
     }
 
     drawPixels();
 
-    if (x !=undefined && y != undefined) {
+    if (!isNaN(x) && !isNaN(y)) {
+        mouseCord.innerHTML = "X : " + x + "<br>Y : " + y;
         ctx.lineWidth = 1 / scale;
         if (drawingColor && isColoring) {
             let c = hexToRgb(drawingColor);
