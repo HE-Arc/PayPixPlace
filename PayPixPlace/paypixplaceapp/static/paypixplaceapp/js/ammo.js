@@ -3,7 +3,6 @@ let ammoProgressbar;
 let timeRemaining;
 let interval;
 
-
 /**
  * updates the ammo informations in the navBar
  * sets the progressBar

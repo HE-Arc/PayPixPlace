@@ -9,7 +9,6 @@ function openModal(event) {
     }
 }
 
-
 document.getElementsByName("checkbox_profit").forEach(element => element.addEventListener ("change", openModal));
 
 document.getElementsByName("btn-confirm-profit").forEach(element => element.addEventListener("click", function(event) {

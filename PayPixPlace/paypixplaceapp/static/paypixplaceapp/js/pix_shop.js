@@ -107,6 +107,21 @@ function displayUnlockItem(classes, data) {
     return node;
 }
 
+$(function () {
+    $('button').clickFireworks({
+  
+      // canvas id
+      id: 'fireworks', 
+  
+      // append canvas to where, default is body
+      appendTo: 'body', 
+  
+      // canvas z-index, make it higher than anything on the page
+      zIndex: 1000 
+      
+    });
+});
+
 $(document).ready(function() {
 
     //Source : https://stackoverflow.com/questions/19305821/multiple-modals-overlay
