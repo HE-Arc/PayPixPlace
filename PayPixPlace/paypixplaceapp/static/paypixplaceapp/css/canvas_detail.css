@@ -6,6 +6,15 @@
     background-color: #EEEEEE;
 }
 
+#mouseCord {
+    position: absolute;
+    right: 0%;
+    text-align: left;
+    font-size: 1.5em;
+    margin: 10px;
+    width: 80px;
+}
+
 .ppp-sidebar-container {
     position: absolute;
     width: 280px;

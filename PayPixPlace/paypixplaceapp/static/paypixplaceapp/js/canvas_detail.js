@@ -22,6 +22,7 @@ let hideProtectedCB;
 let lockImage;
 let pausePanzoomCB;
 let isNewSlotAcquired;
+let mouseCord;
 
 const CANVAS_PIXEL_WIDTH = 4000;
 
@@ -203,6 +204,11 @@ function canvasMouseMoveHover(event) {
             x : x,
             y : y
         }
+        if (mouseLastPos) {
+            mouseCord.innerHTML = "X : " + x + "<br>Y : " + y
+        } else {
+            mouseCord.innerHTML = "";
+        }
     } else if (mouseLastPos){
         x = mouseLastPos.x;
         y = mouseLastPos.y;
@@ -284,72 +290,53 @@ function fillPixel(event) {
         },
         dataType: "json",
         success: function (data) {
-            loadPixels();
             if (data.is_valid) {
                 updateAmmo();
-                $.notify(
+                notify(
                     "+1 PIX ! You were rewarded for placing a pixel on this canvas !",
-                    {
-                        className : "success",
-                        // whether to hide the notification on click
-                        clickToHide: true,
-                        // whether to auto-hide the notification
-                        autoHide: true,
-                        // if autoHide, hide after milliseconds
-                        autoHideDelay: 4000,
-                        position: "bottom right",
-                        gap: 2
-                    }
+                    "success"
                 );
             } else {
                 if (data.user_authenticated) {
                     if (data.pixel_locked) {
-                        $.notify(
-                            "Pixel Protected, can't place", 
-                            {
-                                // whether to hide the notification on click
-                                clickToHide: true,
-                                // whether to auto-hide the notification
-                                autoHide: true,
-                                // if autoHide, hide after milliseconds
-                                autoHideDelay: 4000,
-                                position: "bottom right",
-                                gap: 2
-                            }
+                        notify(
+                            "Pixel Protected, can't place"
                         );
                     } else {
-                        $.notify(
-                            "Can't place pixel, next ammo in " + Math.round(timeRemaining) + " seconds", 
-                            {
-                                // whether to hide the notification on click
-                                clickToHide: true,
-                                // whether to auto-hide the notification
-                                autoHide: true,
-                                // if autoHide, hide after milliseconds
-                                autoHideDelay: 4000,
-                                position: "bottom right",
-                                gap: 2
-                            }
+                        notify(
+                            "Can't place pixel, next ammo in " + Math.round(timeRemaining) + " seconds"
                         );
                     }
                 } else {
-                    $.notify(
-                        "You need to login before placing pixels", 
-                        {
-                            // whether to hide the notification on click
-                            clickToHide: true,
-                            // whether to auto-hide the notification
-                            autoHide: true,
-                            // if autoHide, hide after milliseconds
-                            autoHideDelay: 4000,
-                            position: "bottom right",
-                            gap: 2
-                        }
+                    notify(
+                        "You need to login before placing pixels"
                     );
                 }
             }
         }
     });
+}
+
+/**
+ * Use Notifiy library to display notifications
+ * @param {String} text : text to display
+ * @param {String} className : type of notif, error, success, warning, etc...
+ */
+function notify(text, className="error") {
+    $.notify(
+        text, 
+        {
+            className : className,
+            // whether to hide the notification on click
+            clickToHide: true,
+            // whether to auto-hide the notification
+            autoHide: true,
+            // if autoHide, hide after milliseconds
+            autoHideDelay: 4000,
+            position: "bottom right",
+            gap: 2
+        }
+    );
 }
 
 /**
@@ -374,7 +361,7 @@ function resetTransform() {
     
     scale = 0.1;
     panZoomInstance.zoomAbs(
-        ((rectContainer.width-280) - rectCanvas.width*scale) / 2 + 280, // initial x position
+        ((rectContainer.width) - rectCanvas.width*scale) / 2, // initial x position
         (rectContainer.height - rectCanvas.height*scale) / 2, // initial y position
         scale  // initial zoom 
     );
@@ -447,6 +434,7 @@ function initEvents() {
     // redraw the canvas when the mouse leaves the area
     canvas.addEventListener("mouseleave", function() {
         drawPixels();
+        mouseCord.innerHTML = "";
         mouseLastPos = null;
     });
     
@@ -572,6 +560,8 @@ function initParams() {
     isColoring = true;
 
     isNewSlotAcquired = false;
+
+    mouseCord = document.getElementById("mouseCord");
 }
 
 // Execute when the page is fully loaded
@@ -622,9 +612,9 @@ $(document).ready(function(){
         }
     });
 
+    loadPixels();
+
     mainLoop = setInterval(function() {
         loadPixels();
     }, 4000)
-    
-    loadPixels();
 });

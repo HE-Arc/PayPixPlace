@@ -35,8 +35,8 @@
                     <li class="nav-item mr-3">
                         <a class="nav-link" data-toggle="modal" data-target=".buy-color-modal" style="cursor: pointer;">
                             <div class="d-inline-block mr-1">
-                                <progress class="" id="ammoProgressbar" value="0" max="{{user.ammo_reloading_seconds}}"></progress>
-                                <span id="userAmmo">{{ user.ammo }}</span>
+                                <progress id="ammoProgressbar" value="0" max="{{user.ammo_reloading_seconds}}"></progress>
+                                <span id="userAmmo">{{ user.ammo }} / {{ user.max_ammo}}</span>
                             </div>
                             <div class="d-inline-block">
                                 <img class="ppp-currency ppp-currency-md" src="{% static 'paypixplaceapp/images/currencyPPP.png' %}" alt="P">

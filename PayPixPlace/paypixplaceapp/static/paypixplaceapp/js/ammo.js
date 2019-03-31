@@ -14,7 +14,7 @@ function updateAmmo() {
         url: "/ammo/",
         dataType: "json",
         success: function (data) {
-            userAmmoDisplay.innerHTML = data.ammo;
+            userAmmoDisplay.innerHTML = data.ammo + " / " + data.maxAmmo;
             ammoProgressbar.max = data.reloadTime;
             timeRemaining = data.timeBeforeReload;
             
