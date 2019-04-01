@@ -173,10 +173,21 @@
     <div id="color-picker-modal" class="modal fade color-picker-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <div id="color-picker-modal-inner" class="modal-body text-center">
-                    {% for color in user.owns.all %}
-                        <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeSlotColor('{{ color.hex }}')"></div>
-                    {% endfor %}
+                <div class="modal-body text-center">
+                    <div class="row">
+                        <div id="color-picker-modal-inner" class="col-12">
+                            {% for color in user.owns.all %}
+                                <div class="ppp-color-case" style="background-color: {{ color.hex }};" onclick="changeSlotColor('{{ color.hex }}')"></div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-12 text-center">
+                            <hr class="ppp-hr w-100">
+
+                            <button class="btn btn-outline-dark" data-toggle="modal" data-target=".buy-color-modal" style="cursor: pointer;">
+                                Wants more colors ?
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger ppp-btn-lg" data-dismiss="modal">Close</button>
