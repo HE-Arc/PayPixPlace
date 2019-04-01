@@ -111,6 +111,10 @@ html, body {
     width: 1em;
 }
 
+.ppp-icon-md {
+    font-size: 40px;
+}
+
 .ppp-icon-xl {
     font-size: 6em;
 }
