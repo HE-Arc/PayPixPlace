@@ -122,6 +122,7 @@ $(document).ready(function() {
     });
 
     document.getElementById("btnFixColor").addEventListener("click", function(){
+        // Ajax request to buy a fixed color
         $.ajax({
             type: "POST",
             url: "/buy/0/",
@@ -137,6 +138,7 @@ $(document).ready(function() {
     });
 
     document.getElementById("btnRandomColor").addEventListener("click", function(){
+        // Ajax request to buy a random color
         $.ajax({
             type: "POST",
             url: "/buy/2/",
@@ -151,6 +153,7 @@ $(document).ready(function() {
     });
 
     document.getElementById("btnBuySlot").addEventListener("click", function(){
+        // Ajax request to buy a slot
         $.ajax({
             type: "POST",
             url: "/buy/3/",
@@ -165,6 +168,7 @@ $(document).ready(function() {
     });
 
     document.getElementById("btnIncreaseMaxAmmo").addEventListener("click", function(){
+        // Ajax request to increase the max ammo
         $.ajax({
             type: "POST",
             url: "/buy/5/",
@@ -179,6 +183,7 @@ $(document).ready(function() {
     });
 
     document.getElementById("btnReduceRefillTime").addEventListener("click", function(){
+        // Ajax request to reduce the refill time
         $.ajax({
             type: "POST",
             url: "/buy/6/",
@@ -193,6 +198,7 @@ $(document).ready(function() {
     });
 
     document.getElementById("btnInstantAmmo").addEventListener("click", function(){
+        // Ajax request to buy one ammo instantaneously
         $.ajax({
             type: "POST",
             url: "/buy/7/",
@@ -207,6 +213,7 @@ $(document).ready(function() {
     });
 
     document.getElementsByName("pack_form").forEach(element => element.addEventListener ("submit", function(event){
+        // Ajax request to buy a color pack
         event.preventDefault();
         $.ajax({
             type: "POST",

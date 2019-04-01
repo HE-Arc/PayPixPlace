@@ -12,6 +12,7 @@ function openModal(event) {
 document.getElementsByName("checkbox_profit").forEach(element => element.addEventListener ("change", openModal));
 
 document.getElementsByName("btn-confirm-profit").forEach(element => element.addEventListener("click", function(event) {
+    // When confirming the modal, send an ajax request to enable the profit on the canvas
     $.ajax({
         type: "POST",
         url: "/buy/9/",
@@ -31,15 +32,6 @@ document.getElementsByName("btn-confirm-profit").forEach(element => element.addE
         }
     });
 }));
-
-// document.getElementsByName("btn-close-profit").forEach(element => element.addEventListener("click", function(event) {
-//     id = element.dataset.canvasId;
-//     document.getElementsByName("checkbox_profit").forEach(checkbox => {
-//         checkboxid = checkbox.dataset.canvasId;
-//         if (id == checkboxid)
-//             checkbox.checked = false;
-//     });
-// }));
 
 $('[id^=confirm-enable-profit]').on("hide.bs.modal", function () {
     clicked_checkbox.checked = false;
