@@ -55,6 +55,14 @@
                                 </button>
                             </div>
                             {% endif %}
+
+                            {% if slots_count < 4 %}
+                            <div class="col-6 p-0">
+                                <a class="btn btn-dark p-0" data-toggle="modal" data-target=".buy-color-modal" style="cursor: pointer;">
+                                    <i class="fas fa-plus-square ppp-icon-md"></i>
+                                </a>
+                            </div>
+                            {% endif %}
                         </div>
                         {% endwith %}
                     </li>
