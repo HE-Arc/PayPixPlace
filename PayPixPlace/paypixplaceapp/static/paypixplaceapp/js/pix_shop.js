@@ -16,16 +16,12 @@ function display_informations(data) {
         switch (data.Result[0]) {
             case 0:
             case 2:
-
                 unlockItem.appendChild(displayUnlockText("New color acquired!"));
-
                 unlockItem.appendChild(displayUnlockItem(" ppp-unlock-item ppp-unlock-item-border mb-3", data.Result[2]));
                 break;
 
             case 1:
-
                 unlockItem.appendChild(displayUnlockText("New color pack acquired!"));
-
                 for (let i = 0; i < data.Result[2].length; i++) {
                     const color = data.Result[2][i];
 
@@ -34,7 +30,6 @@ function display_informations(data) {
                 break;
 
             case 3:
-
                 unlockItem.appendChild(displayUnlockText("New color slot acquired!"));
                 if (typeof isNewSlotAcquired !== "undefined") {
                     isNewSlotAcquired = true;
@@ -43,25 +38,25 @@ function display_informations(data) {
                 break;
 
             case 5:
-            
                 unlockItem.appendChild(displayUnlockText("Max ammo increased by one!"));
-
                 unlockItem.appendChild(displayUnlockItem(" ppp-unlock-item-icon mb-3 fas fa-arrows-alt", data.Result[2]));
                 break;
 
             case 6:
-            
                 unlockItem.appendChild(displayUnlockText("Refill time was reduced by 5 seconds!"));
-
                 unlockItem.appendChild(displayUnlockItem(" ppp-unlock-item-icon mb-3 fas fa-hourglass-end", data.Result[2]));
                 break;
 
             case 7:
-            
                 unlockItem.appendChild(displayUnlockText("One instant ammo added!"));
-
                 unlockItem.appendChild(displayUnlockItem(" ppp-unlock-item-icon mb-3 fas fa-plus-circle", data.Result[2]));
                 break;
+            case 8:
+            case 9:
+                unlockItem.appendChild(displayUnlockText("You will now earn 10% of all the PIX spend on this canvas!"));
+                unlockItem.appendChild(displayUnlockItem(" ppp-unlock-item-icon mb-3 fas fa-percent", data.Result[2]));
+                break;
+                
             default:
                 break;
         }

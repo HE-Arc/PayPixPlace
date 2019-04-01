@@ -14,7 +14,7 @@ document.getElementsByName("checkbox_profit").forEach(element => element.addEven
 document.getElementsByName("btn-confirm-profit").forEach(element => element.addEventListener("click", function(event) {
     $.ajax({
         type: "POST",
-        url: "/buy/9",
+        url: "/buy/9/",
         data: {
             csrfmiddlewaretoken: window.CSRF_TOKEN,
             canvas_id: canvas_id,
