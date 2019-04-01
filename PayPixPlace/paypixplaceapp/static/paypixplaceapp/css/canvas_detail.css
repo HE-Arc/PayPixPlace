@@ -13,6 +13,7 @@
     font-size: 1.5em;
     margin: 10px;
     width: 80px;
+    z-index: 1010;
 }
 
 .ppp-sidebar-container {
