@@ -9,12 +9,14 @@ from paypixplaceapp.models import Color, Slot, Colors_pack, Role
 from paypixplaceapp.views import get_pix_price
 
 def register(request):
+    """Register a user with the data form if POST method, return the form otherwise"""
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
 
             new_user = form.save()
 
+            # Prepare and add defaults color to user
             colors = [
                 '#fbae00',
                 '#da5353',
@@ -28,8 +30,10 @@ def register(request):
             new_user.role = Role.objects.get(name="user")
             new_user.save()
 
+            # Create a new slot for the user
             Slot.objects.create(place_num=1, user=new_user, color=colors[0])
 
+            # Authenticate and login the user
             new_user = authenticate(
                 username=form.cleaned_data['username'],
                 password=form.cleaned_data['password1'],
@@ -46,6 +50,7 @@ def register(request):
 
 @login_required
 def profile(request):
+    """Update the profile information with the data form if POST method, return the form otherwise"""
     if request.method == 'POST':
         form = UpdateForm(request.POST, instance=request.user)
         
@@ -65,10 +70,12 @@ def profile(request):
     return render(request, 'users/profile.html', context)
 
 def login(request):
+    """Login the user with the data form if POST method, return the form otherwise"""
     if request.method == 'POST':
         form = LoginForm(data=request.POST)
 
         if form.is_valid():
+            # Authenticate and login the user
             user = authenticate(
                 username=form.cleaned_data['username'],
                 password=form.cleaned_data['password'],

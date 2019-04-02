@@ -178,6 +178,7 @@ function cleanInfos() {
         pixelInfoDisplay.protected[i].value = "";
     }
 }
+
 /**
  * Transforms a integer of seconds into a HH:MM:SS format
  * @param {Integer} timeLeft 
@@ -263,9 +264,11 @@ function getOffsetPosition(evt, target){
  * @param {Event} event 
  */
 function fillPixel(event) {
+
     let pos = getOffsetPosition(event, canvas);
     let x = parseInt((pos.x) / pixelWidth);
     let y = parseInt((pos.y) / pixelWidth);
+
     if (x < 0 || y < 0 || x > canvasWidth-1 || y > canvasWidth-1) {
         return;
     }
@@ -276,7 +279,9 @@ function fillPixel(event) {
     if (drawingColor) {
         pixels[x][y].hex = drawingColor;
     }
+
     canvasMouseMoveHover();
+
     $.ajax({
         type: "POST",
         url: "/change_pixel_color/",
@@ -294,17 +299,20 @@ function fillPixel(event) {
                     "+1 PIX ! You were rewarded for placing a pixel on this canvas !",
                     "success"
                 );
+
             } else {
                 if (data.user_authenticated) {
                     if (data.pixel_locked) {
                         notify(
-                            "Pixel Protected, can't place"
+                            "Pixel protected, wait that protection time ends"
                         );
+
                     } else {
                         notify(
                             "Can't place pixel, next ammo in " + Math.round(timeRemaining) + " seconds"
                         );
                     }
+
                 } else {
                     notify(
                         "You need to login before placing pixels"

@@ -157,8 +157,9 @@ $(document).ready(function(){
     
     drawingColor = colors[0];
     setCursor();
-    pickers = []
 
+    // Init pickers
+    pickers = []
     pickers.push(document.getElementsByClassName("picker1"));
     pickers.push(document.getElementsByClassName("picker2"));
     pickers.push(document.getElementsByClassName("picker3"));
@@ -180,6 +181,7 @@ $(document).ready(function(){
         pickerMove[i].addEventListener("click", clickMove, false);
     }
 
+    // Init selection tool
     selectCB = document.getElementById("selectCB");
     selectCB.checked = false;
     selectCB.addEventListener("click", function() {

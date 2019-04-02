@@ -61,6 +61,7 @@ def get_pix_price():
     return prices
 
 def get_pix_prices_json(request):
+    """Return a dictionary containing the prices in JSON style"""
     if request.is_ajax():
         prices = {}
         for key, price in get_pix_price().items():
@@ -205,6 +206,7 @@ def getPaginatedCanvas(page, canvas):
 
 @login_required
 def createCanvas(request):
+    """Create the canvas with the data form if POST method, return the form otherwise"""
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -217,6 +219,7 @@ def createCanvas(request):
             # Check if the given place is a valid one
             if canvas.place == Place.OFFICIAL or canvas.place == Place.COMMUNITY:
 
+                # Check the user role and provided place
                 if request.user.role.name == "admin" or (request.user.role.name == "user" and canvas.place == Place.COMMUNITY):
                     canvas.save()
 
@@ -260,6 +263,7 @@ def createCanvas(request):
 
 @login_required
 def userCanvas(request):
+    """Get all user canvas"""
     canvas_list = Canvas.objects.filter(user=request.user)
     paginator = Paginator(canvas_list, 3)
     canvas = paginator.get_page(request.GET.get('page'))

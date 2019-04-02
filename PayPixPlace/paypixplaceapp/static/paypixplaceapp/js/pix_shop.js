@@ -1,3 +1,7 @@
+/**
+ * Display all the information relatively to a specific item.
+ * @param {} data : contains multiple information depending on the ajax call
+ */
 function display_informations(data) {
 
     transactionState = data.TransactionSuccess ? "success" : "error";
@@ -13,6 +17,7 @@ function display_informations(data) {
             unlockItem.removeChild(unlockItem.firstChild);
         }
 
+        // Switch updating the dom depending on the data.Result
         switch (data.Result[0]) {
             case 0:
             case 2:
@@ -66,6 +71,7 @@ function display_informations(data) {
         }
     }
 
+    // Display a notification to the user
     $.notify(
         message,
         {
@@ -84,6 +90,10 @@ function display_informations(data) {
     updateAmmo();
 }
 
+/**
+ * Create DOM elements
+ * @param {string} unlockText : the text that will be display
+ */
 function displayUnlockText(unlockText) {
 
     let para = document.createElement("p");
@@ -93,6 +103,11 @@ function displayUnlockText(unlockText) {
     return para;
 }
 
+/**
+ * Create DOM elements
+ * @param {string} classes : the css classes that will be added to the created DOM element
+ * @param {color} data : the background color
+ */
 function displayUnlockItem(classes, data) {
 
     let node = document.createElement("div");

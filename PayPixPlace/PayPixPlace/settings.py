@@ -136,6 +136,5 @@ STATIC_ROOT = '/var/www/static'
 
 LOGIN_REDIRECT_URL = 'paypixplace-home'
 LOGIN_URL = 'login'
-#LOGOUT_REDIRECT_URL = 'paypixplace-home'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
