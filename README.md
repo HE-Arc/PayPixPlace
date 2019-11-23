@@ -30,3 +30,5 @@ Exécuter à chaque fois anvant de lancer le serveur.
 ### Mettre à jour pip et installer les dépendances
 `python -m pip install --upgrade pip`  
 `python -m pip install -r requirements.txt`
+
+Modif
