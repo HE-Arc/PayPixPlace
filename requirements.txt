@@ -2,7 +2,7 @@ astroid==2.2.5
 certifi==2019.3.9
 chardet==3.0.4
 colorama==0.4.1
-Django==2.1.7
+Django==2.2.10
 django-crispy-forms==1.7.2
 django-debug-toolbar==1.11
 idna==2.8
