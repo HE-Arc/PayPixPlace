@@ -15,20 +15,23 @@ Les fonctionnalités principales sont :
 
 Tous les canvas sont modifiables librement par les utilisateur connectés. Les utilisateurs non-connectés peuvent uniquement visualiser les canvas.
 
-## Informations pour le déploiement
-### Mise en place du virtual env
-Exécuter la première fois dans le répertoire de base de projet.  
-`python -m venv env --clear`
+## Mise en place du projet locallement
+Cette procédure a été testée dans l'environement suivant, il est donc possible que si l'environement change, qu'il faille légèrement ou beaucoup adapter les commandes exécutées :
+- Windows 11
+- Python 3.8.10
+- pip 22.3.1
 
-### Activer le virtual env
-Exécuter à chaque fois anvant de lancer le serveur.  
-`source env/Scripts/activate`
+```
+python --version
+pip --version
 
-### Desactiver le virtual env
-`deactivate`
+python -m venv .venv
+source .venv/Scripts/activate
 
-### Mettre à jour pip et installer les dépendances
-`python -m pip install --upgrade pip`  
-`python -m pip install -r requirements.txt`
+pip install -r requirements.txt
 
-Modif
+python manage.py migrate
+
+cd paypixplace
+python manage.py runserver
+```
