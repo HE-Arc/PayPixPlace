@@ -19,7 +19,9 @@ Tous les canvas sont modifiables librement par les utilisateur connectés. Les u
 
 ## Mise en place du projet locallement
 
-Cette procédure a été testée dans l'environement suivant, il est donc possible que si l'environement change, qu'il faille légèrement ou beaucoup adapter les commandes exécutées :
+**WARNING** Ce projet se fait relativement vieux et n'est pas maintenu activement, il y a donc certaines choses à savoir.
+
+La procédure d'installation a été testée dans l'environement suivant, les bibliothèques ne sont plus disponible dans les nouvelles versions de pip. Il faut donc idéalement avoir le même environement ou adapter mettre à jour les bibliothèques et/ou adapter certaines des commandes à exécutées.
 
 - Windows 11
 - Python 3.8.10
